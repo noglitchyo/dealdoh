@@ -35,11 +35,11 @@
     "mockery/mockery": "^1.2"
   },
   "autoload": {
-    "psr-4": {
+    "psr-0": {
       "NoGlitchYo\\Dealdoh\\": "src/"
     },
     "autoload-dev": {
-      "psr-4": {
+      "psr-0": {
         "NoGlitchYo\\Dealdoh\\": "tests/"
       }
     }
