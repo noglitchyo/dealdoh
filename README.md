@@ -1,10 +1,6 @@
 # Dealdoh 
 
-Dealdoh is a simple DNS over HTTPS proxy as specified in https://tools.ietf.org/html/rfc8484 built on PHP.
-- PHP 7.3
-- PSR-7 compliant
-- PSR-18 compliant
-- RFC-8484 compliant (https://tools.ietf.org/html/rfc8484)
+Dealdoh is a simple DNS over HTTPS proxy to deal with DOH built with PHP.
 
 ## Features
 
@@ -86,3 +82,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 * Thanks to https://github.com/reactphp/dns for their really good DNS wire format codec 
 
+## References
+
+- https://tools.ietf.org/html/rfc8484
+- https://tools.ietf.org/html/rfc1035
+- PSR-7
+- PSR-18
