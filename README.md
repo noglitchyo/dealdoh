@@ -34,8 +34,20 @@ So, I ended up with the following solution: use the DOH client from Mozilla Fire
 
 ## Getting started
 
-This example involve the use of two different DNS upstreams using different protocols.
-We also inject two types of client who can handle each of the protocols used.
+### Installation
+
+- Install dependencies
+`composer require noglitchyo/dodoh`
+
+- You need a PSR-7 ServerRequest if you wish to directly use the `HttpProxy::forward()` method. Please check some cool implementations below:
+    * https://github.com/Nyholm/psr7 - `composer require nyholm/psr7`
+    * https://github.com/guzzle/psr7 - `composer require guzzle/psr7`
+    * https://github.com/zendframework/zend-diactoros - `composer require zendframework/zend-diactoros`
+
+- Configure your entrypoint
+As stated before, `HttpProxy::forward()` method consumes PSR-7 ServerRequest to make it easier to implement on "Action" or "Middleware" classes.
+The example below illustrate how to use two different DNS upstreams using different protocols.
+Two types of DNS client who can handle each of the DNS protocols used by our upstreams are also injected.
 
 ```php
 <?php
@@ -66,4 +78,11 @@ $dnsProxy = new \NoGlitchYo\DoDoh\HttpProxy(
 $response = $dnsProxy->forward($request);
 ```
 
-DoDoh take advantages of PSR-7 to make it easy to integrate with frameworks implementing it.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Acknowledgments
+
+* Thanks to https://github.com/reactphp/dns for their really good DNS wire format codec 
+
