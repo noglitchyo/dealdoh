@@ -30,23 +30,23 @@ trait MessageSectionAwareTrait
      */
     private $authoritySection;
 
-    public function setQuestionSection(QuestionSection $additionalSection): void
+    public function setQuestionSection(QuestionSection $section): void
     {
-        $this->questionSection = $additionalSection;
+        $this->questionSection = $section;
     }
 
-    public function setAdditionalSection(ResourceRecordSection $additionalSection): void
+    public function setAdditionalSection(ResourceRecordSection $section): void
     {
-        $this->additionalSection = $additionalSection;
+        $this->additionalSection = $section;
     }
 
-    public function setAnswerSection(ResourceRecordSection $additionalSection): void
+    public function setAnswerSection(ResourceRecordSection $section): void
     {
-        $this->answerSection = $additionalSection;
+        $this->answerSection = $section;
     }
 
-    public function setAuthoritySection(ResourceRecordSection $additionalSection): void
+    public function setAuthoritySection(ResourceRecordSection $section): void
     {
-        $this->authoritySection = $additionalSection;
+        $this->authoritySection = $section;
     }
 }

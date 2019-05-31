@@ -2,6 +2,7 @@
 
 namespace NoGlitchYo\DoDoh\Factory;
 
+use NoGlitchYo\DoDoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\DoDoh\Message\DnsMessage;
 use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
 use NoGlitchYo\DoDoh\Message\Header;
@@ -30,7 +31,7 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
         $this->binaryDumper = new BinaryDumper();
     }
 
-    public function createFromMessage(Message $message): DnsMessageInterface
+    private static function createFromMessage(Message $message): DnsMessageInterface
     {
         $dnsMessageHeader = new Header(
             (int)$message->header->get('id'),
@@ -44,10 +45,6 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
             (int)$message->header->get('rcode')
         );
         $dnsMessage = new DnsMessage($dnsMessageHeader);
-        $dnsMessageHeader->setQuestionSection($dnsMessage->getQuestionSection());
-        $dnsMessageHeader->setAnswerSection($dnsMessage->getAnswerSection());
-        $dnsMessageHeader->setAuthoritySection($dnsMessage->getAuthoritySection());
-        $dnsMessageHeader->setAdditionalSection($dnsMessage->getAdditionalSection());
 
         foreach ($message->questions as $query) {
             $dnsMessage->addQuestion(new Query($query['name'], $query['type'], $query['class']));
@@ -86,11 +83,11 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
 
         $header->set('id', $dnsHeader->getId());
         $header->set('opcode', $dnsHeader->getOpcode());
-        $header->set('aa', $dnsHeader->isAa());
-        $header->set('tc', $dnsHeader->isTc());
-        $header->set('rd', $dnsHeader->isRd());
-        $header->set('ra', $dnsHeader->isRa());
-        $header->set('z', $dnsHeader->getZ());
+        $header->set('aa', (int)$dnsHeader->isAa());
+        $header->set('tc', (int)$dnsHeader->isTc());
+        $header->set('rd', (int)$dnsHeader->isRd());
+        $header->set('ra', (int)$dnsHeader->isRa());
+        $header->set('z', (int)$dnsHeader->getZ());
         $header->set('rcode', $dnsHeader->getRcode());
         $header->set('qdCount', $dnsHeader->getQdCount());
         $header->set('anCount', $dnsHeader->getAnCount());
@@ -116,11 +113,6 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
 
     public function createMessageFromBase64(string $query): DnsMessageInterface
     {
-        return $this->createMessageFromDnsWireMessage(base64_decode($query));
-    }
-
-    public function convertMessageToBase64(DnsMessageInterface $dnsMessage): string
-    {
-        return base64_encode($this->createDnsWireMessageFromMessage($dnsMessage));
+        return $this->createMessageFromDnsWireMessage(Base64UrlCodecHelper::decode($query));
     }
 }

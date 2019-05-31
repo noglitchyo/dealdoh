@@ -35,7 +35,7 @@ class DohHttpMessageFactoryTest extends TestCase
         $this->sut = new DohHttpMessageFactory($this->dnsMessageFactoryMock);
     }
 
-    public function testCreateResponseFromMessageReturnValidHttpDnsMessage()
+    public function testCreateResponseFromMessageReturnValidHttpDnsMessage(): void
     {
         $dnsMessage = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
 
@@ -61,7 +61,7 @@ class DohHttpMessageFactoryTest extends TestCase
         $this->assertEquals((string) $expectedResponse->getBody(), (string) $response->getBody());
     }
 
-    public function testCreateResponseUseLowestTtlFromAnswersForCacheControlHeader()
+    public function testCreateResponseUseLowestTtlFromAnswersForCacheControlHeader(): void
     {
         $dnsMessage = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
         $dnsMessage->addAnswer(new ResourceRecord('answerWithLowestTtl', 1, 1, 20));

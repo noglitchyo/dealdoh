@@ -2,6 +2,9 @@
 
 namespace NoGlitchYo\DoDoh\Message;
 
+use NoGlitchYo\DoDoh\Message\Section\QuestionSection;
+use NoGlitchYo\DoDoh\Message\Section\ResourceRecordSection;
+
 /**
  * @codeCoverageIgnore
  */
@@ -75,6 +78,10 @@ class Header implements HeaderInterface
         $this->ra = $ra;
         $this->z = $z;
         $this->rcode = $rcode;
+        $this->setQuestionSection(new QuestionSection());
+        $this->setAnswerSection(new ResourceRecordSection());
+        $this->setAdditionalSection(new ResourceRecordSection());
+        $this->setAuthoritySection(new ResourceRecordSection());
     }
 
     public function getId(): int
@@ -84,22 +91,22 @@ class Header implements HeaderInterface
 
     public function getQdCount(): int
     {
-        return count($this->questionSection->getQueries());
+        return $this->questionSection ? count($this->questionSection->getQueries()) : 0;
     }
 
     public function getAnCount(): int
     {
-        return count($this->answerSection->getRecords());
+        return $this->answerSection ? count($this->answerSection->getRecords()) : 0;
     }
 
     public function getNsCount(): int
     {
-        return count($this->authoritySection->getRecords());
+        return $this->authoritySection ? count($this->authoritySection->getRecords()) : 0;
     }
 
     public function getArCount(): int
     {
-        return count($this->additionalSection->getRecords());
+        return $this->additionalSection ? count($this->additionalSection->getRecords()) : 0;
     }
 
     public function isQr(): bool

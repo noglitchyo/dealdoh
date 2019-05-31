@@ -62,7 +62,7 @@ class HttpProxyTest extends TestCase
         parent::setUp();
     }
 
-    public function testForwardCreateDnsMessageOnGetRequestWhenQueryParamIsValid()
+    public function testForwardCreateDnsMessageOnGetRequestWhenQueryParamIsValid(): void
     {
         $base64EncodedDnsRequest = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA';
 
@@ -100,7 +100,7 @@ class HttpProxyTest extends TestCase
         $this->assertSame($httpResponse, $this->sut->forward($requestMock));
     }
 
-    public function testForwardThrowExceptionOnGetRequestWhenQueryParamIsInvalid()
+    public function testForwardThrowExceptionOnGetRequestWhenQueryParamIsInvalid(): void
     {
         $invalidBase64Request = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA';
 
@@ -139,7 +139,7 @@ class HttpProxyTest extends TestCase
         $this->sut->forward($requestMock);
     }
 
-    public function testForwardCreateDnsMessageOnPostRequest()
+    public function testForwardCreateDnsMessageOnPostRequest(): void
     {
         $dnsWireMessage = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA';
 
@@ -182,7 +182,7 @@ class HttpProxyTest extends TestCase
         $this->assertSame($httpResponse, $this->sut->forward($requestMock));
     }
 
-    public function testForwardThrowExceptionWhenRequestMethodIsNotSupported()
+    public function testForwardThrowExceptionWhenRequestMethodIsNotSupported():  void
     {
         $dnsWireMessage = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA';
         $expectedExceptionMessage = 'Request method is not supported.';

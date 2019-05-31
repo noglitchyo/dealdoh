@@ -40,10 +40,17 @@ class DnsMessage implements DnsMessageInterface
     public function __construct(HeaderInterface $header)
     {
         $this->header = $header;
+
         $this->setQuestionSection(new QuestionSection());
         $this->setAnswerSection(new ResourceRecordSection());
         $this->setAdditionalSection(new ResourceRecordSection());
         $this->setAuthoritySection(new ResourceRecordSection());
+
+        $this->header->setQuestionSection($this->getQuestionSection());
+        $this->header->setAnswerSection($this->getAnswerSection());
+        $this->header->setAuthoritySection($this->getAuthoritySection());
+        $this->header->setAdditionalSection($this->getAdditionalSection());
+
     }
 
     public function getHeader(): HeaderInterface
