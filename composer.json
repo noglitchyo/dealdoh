@@ -37,11 +37,11 @@
   "autoload": {
     "psr-0": {
       "NoGlitchYo\\Dealdoh\\": "src/"
-    },
-    "autoload-dev": {
-      "psr-0": {
-        "NoGlitchYo\\Dealdoh\\": "tests/"
-      }
+    }
+  },
+  "autoload-dev": {
+    "psr-0": {
+      "NoGlitchYo\\Dealdoh\\": "tests/"
     }
   }
 }
