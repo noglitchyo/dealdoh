@@ -5,6 +5,9 @@ namespace NoGlitchYo\DoDoh\Message;
 use NoGlitchYo\DoDoh\Message\Section\QuestionSection;
 use NoGlitchYo\DoDoh\Message\Section\ResourceRecordSection;
 
+/**
+ * @codeCoverageIgnore
+ */
 trait MessageSectionAwareTrait
 {
     /**
@@ -27,14 +30,14 @@ trait MessageSectionAwareTrait
      */
     private $authoritySection;
 
-    public function setAdditionalSection(ResourceRecordSection $additionalSection): void
-    {
-        $this->additionalSection = $additionalSection;
-    }
-
     public function setQuestionSection(QuestionSection $additionalSection): void
     {
         $this->questionSection = $additionalSection;
+    }
+
+    public function setAdditionalSection(ResourceRecordSection $additionalSection): void
+    {
+        $this->additionalSection = $additionalSection;
     }
 
     public function setAnswerSection(ResourceRecordSection $additionalSection): void

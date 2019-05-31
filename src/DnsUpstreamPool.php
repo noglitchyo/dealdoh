@@ -2,6 +2,9 @@
 
 namespace NoGlitchYo\DoDoh;
 
+/**
+ * @codeCoverageIgnore
+ */
 class DnsUpstreamPool
 {
     /** @var array */

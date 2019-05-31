@@ -4,6 +4,9 @@ namespace NoGlitchYo\DoDoh\Message\Section;
 
 use React\Dns\Query\Query as ReactDnsQuery;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Query extends ReactDnsQuery implements QueryInterface
 {
     public function __construct(string $name, int $type, int $class, ?int $currentTime = null)

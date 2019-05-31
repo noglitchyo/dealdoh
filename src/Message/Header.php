@@ -2,6 +2,9 @@
 
 namespace NoGlitchYo\DoDoh\Message;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Header implements HeaderInterface
 {
     use MessageSectionAwareTrait;

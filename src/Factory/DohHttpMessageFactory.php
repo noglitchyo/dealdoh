@@ -3,19 +3,17 @@
 namespace NoGlitchYo\DoDoh\Factory;
 
 use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecord;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecordInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
-class DohHttpMessageFactory
+class DohHttpMessageFactory implements DohHttpMessageFactoryInterface
 {
     /**
-     * @var DnsMessageFactory
+     * @var DnsMessageFactoryInterface
      */
     private $dnsMessageFactory;
 
-    public function __construct(DnsMessageFactory $dnsMessageFactory)
+    public function __construct(DnsMessageFactoryInterface $dnsMessageFactory)
     {
         $this->dnsMessageFactory = $dnsMessageFactory;
     }
@@ -24,24 +22,30 @@ class DohHttpMessageFactory
     {
         $dnsWireQuery = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsMessage);
 
+        $headers = [
+            'Content-Type' => 'application/dns-message',
+            'Content-Length' => strlen($dnsWireQuery),
+        ];
+
+        $maxAge = $this->getMaxAge($dnsMessage);
+        if ($maxAge !== null) {
+            $headers['Cache-Control'] = 'max-age=' . $maxAge;
+        }
+
         return new Response(
             200,
-            [
-                'Content-Type' => 'application/dns-message',
-                'Content-Length' => strlen($dnsWireQuery),
-                'Cache-Control' => 'max-age=' . $this->getMaxAge($dnsMessage)
-            ],
+            $headers,
             $dnsWireQuery
         );
     }
 
-    public function getMaxAge(DnsMessageInterface $dnsMessage): int
+    private function getMaxAge(DnsMessageInterface $dnsMessage): ?int
     {
         $ttl = [];
-        foreach ($dnsMessage->getAnswers() as $rr){
+        foreach ($dnsMessage->getAnswers() as $rr) {
             $ttl[] = $rr->getTtl();
         }
 
-        return min($ttl);
+        return !empty($ttl) ? min($ttl) : null;
     }
 }

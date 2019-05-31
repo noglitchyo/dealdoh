@@ -2,6 +2,9 @@
 
 namespace NoGlitchYo\DoDoh\Message\Section;
 
+/**
+ * @codeCoverageIgnore
+ */
 interface QueryInterface
 {
     /**

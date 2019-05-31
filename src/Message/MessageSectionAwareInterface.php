@@ -5,6 +5,9 @@ namespace NoGlitchYo\DoDoh\Message;
 use NoGlitchYo\DoDoh\Message\Section\QuestionSection;
 use NoGlitchYo\DoDoh\Message\Section\ResourceRecordSection;
 
+/**
+ * @codeCoverageIgnore
+ */
 interface MessageSectionAwareInterface
 {
     public function setAdditionalSection(ResourceRecordSection $additionalSection): void;

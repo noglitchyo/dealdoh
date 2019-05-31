@@ -2,8 +2,44 @@
 
 namespace NoGlitchYo\DoDoh\Message;
 
+/**
+ * @codeCoverageIgnore
+ */
 interface HeaderInterface extends MessageSectionAwareInterface
 {
+    /**
+     * No error condition
+     */
+    const RCODE_OK = 0;
+
+    /**
+     * Format error - The name server was unable to interpret the query.
+     */
+    const RCODE_FORMAT_ERROR = 1;
+
+    /**
+     * Server failure - The name server was unable to process this query due to a problem with the name server.
+     */
+    const RCODE_SERVER_FAILURE = 2;
+
+    /**
+     * Name Error - Meaningful only for responses from an authoritative name server, this code signifies
+     * that the domain name referenced in the query does not exist.
+     */
+    const RCODE_NAME_ERROR = 3;
+
+    /**
+     *  Not Implemented - The name server does not support the requested kind of query.
+     */
+    const RCODE_NOT_IMPLEMENTED = 4;
+
+    /**
+     * Refused - The name server refuses to perform the specified operation for policy reasons.
+     * For example, a name server may not wish to provide the information to the particular requester,
+     * or a name server may not wish to perform a particular operation (e.g., zone transfer) for particular data.
+     */
+    const RCODE_REFUSED = 5;
+
     /**
      * A 16 bit identifier assigned by the program that
      * generates any kind of query.  This identifier is copied

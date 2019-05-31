@@ -2,6 +2,14 @@
 
 namespace NoGlitchYo\DoDoh\Message;
 
+use NoGlitchYo\DoDoh\Message\Section\QueryInterface;
+use NoGlitchYo\DoDoh\Message\Section\QuestionSection;
+use NoGlitchYo\DoDoh\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\DoDoh\Message\Section\ResourceRecordSection;
+
+/**
+ * @codeCoverageIgnore
+ */
 class DnsMessage implements DnsMessageInterface
 {
     use MessageSectionAwareTrait;
@@ -9,12 +17,36 @@ class DnsMessage implements DnsMessageInterface
     /** @var Header */
     private $header;
 
+    /**
+     * @var QuestionSection
+     */
+    private $questionSection;
+
+    /**
+     * @var ResourceRecordSection
+     */
+    private $additionalSection;
+
+    /**
+     * @var ResourceRecordSection
+     */
+    private $answerSection;
+
+    /**
+     * @var ResourceRecordSection
+     */
+    private $authoritySection;
+
     public function __construct(HeaderInterface $header)
     {
         $this->header = $header;
+        $this->setQuestionSection(new QuestionSection());
+        $this->setAnswerSection(new ResourceRecordSection());
+        $this->setAdditionalSection(new ResourceRecordSection());
+        $this->setAuthoritySection(new ResourceRecordSection());
     }
 
-    public function getHeader(): Header
+    public function getHeader(): HeaderInterface
     {
         return $this->header;
     }
@@ -46,24 +78,44 @@ class DnsMessage implements DnsMessageInterface
         return $this;
     }
 
-    public function addAnswer(RecordInterface $answer): self
+    public function addAnswer(ResourceRecordInterface $answer): self
     {
         $this->answerSection->add($answer);
 
         return $this;
     }
 
-    public function addAuthority(RecordInterface $authority): self
+    public function addAuthority(ResourceRecordInterface $authority): self
     {
         $this->authoritySection->add($authority);
 
         return $this;
     }
 
-    public function addAdditional(RecordInterface $additional): self
+    public function addAdditional(ResourceRecordInterface $additional): self
     {
         $this->additionalSection->add($additional);
 
         return $this;
+    }
+
+    public function getQuestionSection(): QuestionSection
+    {
+        return $this->questionSection;
+    }
+
+    public function getAdditionalSection(): ResourceRecordSection
+    {
+        return $this->additionalSection;
+    }
+
+    public function getAnswerSection(): ResourceRecordSection
+    {
+        return $this->answerSection;
+    }
+
+    public function getAuthoritySection(): ResourceRecordSection
+    {
+        return $this->authoritySection;
     }
 }

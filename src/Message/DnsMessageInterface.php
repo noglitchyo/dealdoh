@@ -5,9 +5,12 @@ namespace NoGlitchYo\DoDoh\Message;
 use NoGlitchYo\DoDoh\Message\Section\QueryInterface;
 use NoGlitchYo\DoDoh\Message\Section\ResourceRecordInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 interface DnsMessageInterface extends MessageSectionAwareInterface
 {
-    public function getHeader(): Header;
+    public function getHeader(): HeaderInterface;
 
     /**
      * @return QueryInterface[]

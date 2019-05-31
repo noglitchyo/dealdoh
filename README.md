@@ -9,14 +9,16 @@ DoDoh is a simple DNS over HTTPS proxy built on PHP.
 
 DoDoh go a little beyond what a simple proxy should do:
 
-- can use multiple upstreams
-- can use different protocol: standard udp/tcp, DoH
-- try to provide a nice DNS abstraction layer to allow easy customizations
+- [x] Can use multiple upstreams
+- [x] Can use different DNS protocol: standard udp/tcp, DoH
+- [x] Attempt to provide a nice DNS abstraction layer to allow development on top of it and customization
 
 ## Roadmap
 
-- full unit test coverage
-- DNS upstream strategy
+- [ ] Add full unit test coverage
+- [ ] Ability to choose a DNS upstream strategy
+- [ ] Dockerized app
+- [ ] Good documentation
 
 ## Why DoDoh?
 

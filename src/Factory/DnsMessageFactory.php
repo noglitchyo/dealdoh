@@ -6,9 +6,7 @@ use NoGlitchYo\DoDoh\Message\DnsMessage;
 use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
 use NoGlitchYo\DoDoh\Message\Header;
 use NoGlitchYo\DoDoh\Message\Section\Query;
-use NoGlitchYo\DoDoh\Message\Section\QuestionSection;
 use NoGlitchYo\DoDoh\Message\Section\ResourceRecord;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecordSection;
 use React\Dns\Model\HeaderBag;
 use React\Dns\Model\Message;
 use React\Dns\Protocol\BinaryDumper;
@@ -46,33 +44,25 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
             (int)$message->header->get('rcode')
         );
         $dnsMessage = new DnsMessage($dnsMessageHeader);
+        $dnsMessageHeader->setQuestionSection($dnsMessage->getQuestionSection());
+        $dnsMessageHeader->setAnswerSection($dnsMessage->getAnswerSection());
+        $dnsMessageHeader->setAuthoritySection($dnsMessage->getAuthoritySection());
+        $dnsMessageHeader->setAdditionalSection($dnsMessage->getAdditionalSection());
 
-        $questionSection = new QuestionSection();
-        $dnsMessage->setQuestionSection($questionSection);
-        $dnsMessageHeader->setQuestionSection($questionSection);
         foreach ($message->questions as $query) {
-            $questionSection->add(new Query($query['name'], $query['type'], $query['class']));
+            $dnsMessage->addQuestion(new Query($query['name'], $query['type'], $query['class']));
         }
 
-        $answerSection = new ResourceRecordSection();
-        $dnsMessage->setAnswerSection($answerSection);
-        $dnsMessageHeader->setAnswerSection($answerSection);
         foreach ($message->answers as $record) {
-            $answerSection->add(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
+            $dnsMessage->addAnswer(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
         }
 
-        $authoritySection = new ResourceRecordSection();
-        $dnsMessage->setAuthoritySection($authoritySection);
-        $dnsMessageHeader->setAuthoritySection($authoritySection);
         foreach ($message->authority as $record) {
-            $authoritySection->add(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
+            $dnsMessage->addAuthority(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
         }
 
-        $additionalSection = new ResourceRecordSection();
-        $dnsMessage->setAdditionalSection($additionalSection);
-        $dnsMessageHeader->setAdditionalSection($additionalSection);
         foreach ($message->additional as $record) {
-            $additionalSection->add(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
+            $dnsMessage->addAdditional(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
         }
 
         return $dnsMessage;

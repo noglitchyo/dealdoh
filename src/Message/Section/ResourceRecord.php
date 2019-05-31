@@ -4,6 +4,9 @@ namespace NoGlitchYo\DoDoh\Message\Section;
 
 use React\Dns\Model\Record as ReactDnsRecord;
 
+/**
+ * @codeCoverageIgnore
+ */
 class ResourceRecord extends ReactDnsRecord implements ResourceRecordInterface
 {
     public function __construct(string $name, int $type, int $class, int $ttl = 0, $data = null)

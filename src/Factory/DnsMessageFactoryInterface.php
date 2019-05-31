@@ -4,6 +4,9 @@ namespace NoGlitchYo\DoDoh\Factory;
 
 use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
 
+/**
+ * @codeCoverageIgnore
+ */
 interface DnsMessageFactoryInterface
 {
     public function createMessageFromDnsWireMessage(string $dnsWireMessage): DnsMessageInterface;

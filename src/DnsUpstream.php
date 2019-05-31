@@ -2,6 +2,9 @@
 
 namespace NoGlitchYo\DoDoh;
 
+/**
+ * @codeCoverageIgnore
+ */
 class DnsUpstream
 {
     /** @var string */
@@ -17,7 +20,7 @@ class DnsUpstream
     {
         $this->uri = $uri;
         $parsedUri = parse_url($uri);
-        $this->port = (int)$parsedUri['port'] ?? null;
+        $this->port = $parsedUri['port'] ?? null;
         $this->scheme = $parsedUri['scheme'] ?? null;
     }
 

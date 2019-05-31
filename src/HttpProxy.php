@@ -5,7 +5,8 @@ namespace NoGlitchYo\DoDoh;
 use Exception;
 use InvalidArgumentException;
 use NoGlitchYo\DoDoh\Factory\DnsMessageFactory;
-use NoGlitchYo\DoDoh\Factory\DohHttpMessageFactory;
+use NoGlitchYo\DoDoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\DoDoh\Factory\DohHttpMessageFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -26,12 +27,22 @@ class HttpProxy
      * @var DnsMessageFactory
      */
     private $dnsMessageFactory;
+    /**
+     * @var DohHttpMessageFactoryInterface
+     */
+    private $dohHttpMessageFactory;
 
-    public function __construct(DnsPoolResolver $dnsResolver, DnsMessageFactory $dnsMessageFactory, LoggerInterface $logger = null)
+    public function __construct(
+        DnsResolverInterface $dnsResolver,
+        DnsMessageFactoryInterface $dnsMessageFactory,
+        DohHttpMessageFactoryInterface $dohHttpMessageFactory,
+        LoggerInterface $logger = null
+    )
     {
         $this->dnsResolver = $dnsResolver;
         $this->logger = $logger ?? new NullLogger();
         $this->dnsMessageFactory = $dnsMessageFactory;
+        $this->dohHttpMessageFactory = $dohHttpMessageFactory;
     }
 
     public function forward(ServerRequestInterface $serverRequest): ResponseInterface
@@ -39,7 +50,7 @@ class HttpProxy
         try {
             switch ($serverRequest->getMethod()) {
                 case 'GET':
-                    $dnsQuery = $serverRequest->getQueryParams()['dns'];
+                    $dnsQuery = $serverRequest->getQueryParams()['dns'] ?? null;
                     if (!$dnsQuery) {
                         throw new InvalidArgumentException('Query parameter `dns` is mandatory.');
                     }
@@ -52,31 +63,27 @@ class HttpProxy
                     throw new Exception('Request method is not supported.');
             }
         } catch (Throwable $t) {
-            $this->logger->error(sprintf('Failed to initialize DNS request message: %s', $t->getMessage()));
+            $this->logger->error(sprintf('Failed to create DNS message: %s', $t->getMessage()));
             throw $t;
         }
 
         try {
             $dnsResponseMessage = $this->dnsResolver->resolve($dnsRequestMessage);
         } catch (Throwable $t) {
-            $this->logger->error(sprintf('Failed to resolve DNS query: %s', $t->getMessage()));
+            $this->logger->error(sprintf('Failed to resolve DNS query: %s', $t->getMessage()), [
+                'dnsRequestMessage' => $dnsRequestMessage,
+            ]);
             throw $t;
         }
 
         $this->logger->info(
-            sprintf(
-                "Resolved DNS query with method %s and query: %s",
-                $serverRequest->getMethod(),
-                $this->dnsMessageFactory->convertMessageToBase64($dnsRequestMessage)
-            ),
+            sprintf("Resolved DNS query with method %s", $serverRequest->getMethod()),
             [
                 'dnsRequestMessage' => $dnsRequestMessage,
-                'dnsResponseMessage' => $dnsResponseMessage
+                'dnsResponseMessage' => $dnsResponseMessage,
             ]
         );
 
-        $dohHttpResponseFactory = new DohHttpMessageFactory($this->dnsMessageFactory);
-
-        return $dohHttpResponseFactory->createResponseFromMessage($dnsResponseMessage);
+        return $this->dohHttpMessageFactory->createResponseFromMessage($dnsResponseMessage);
     }
 }

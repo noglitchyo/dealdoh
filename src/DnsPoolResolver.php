@@ -2,11 +2,11 @@
 
 namespace NoGlitchYo\DoDoh;
 
-use Exception;
 use NoGlitchYo\DoDoh\Client\DnsClientInterface;
+use NoGlitchYo\DoDoh\Exception\DnsPoolResolveFailedException;
 use NoGlitchYo\DoDoh\Exception\UpstreamNotSupportedException;
 use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
-use React\Dns\Model\Message;
+use NoGlitchYo\DoDoh\Message\HeaderInterface;
 use Throwable;
 
 class DnsPoolResolver implements DnsResolverInterface
@@ -30,31 +30,24 @@ class DnsPoolResolver implements DnsResolverInterface
         }
     }
 
-    public function addClient(DnsClientInterface $dnsClient): self
-    {
-        $this->dnsClients[] = $dnsClient;
-
-        return $this;
-    }
-
     public function resolve(DnsMessageInterface $dnsMessage): DnsMessageInterface
     {
         foreach ($this->dnsUpstreamPool->getUpstreams() as $dnsUpstream) {
             try {
-                $dnsResponse = $this->getClientForUpstream($dnsUpstream)->resolve($dnsUpstream, $dnsMessage);
-                if ($dnsResponse->getHeader()->getRcode() === Message::RCODE_NAME_ERROR) {
+                $dnsClient = $this->getClientForUpstream($dnsUpstream);
+                $dnsResponse = $dnsClient->resolve($dnsUpstream, $dnsMessage);
+                if ($dnsResponse->getHeader()->getRcode() === HeaderInterface::RCODE_NAME_ERROR) { // TODO: this behavior should be configurable
                     continue; // if upstream did not find it (NXDOMAIN error), we retry with next
                 }
                 return $dnsResponse;
             } catch (UpstreamNotSupportedException $e) {
-                throw $e; // no upstream who can not be handle should be present
+                throw $e; // no upstream who can not be handle by a client should be provided
             } catch (Throwable $t) {
                 continue; // if upstream failed, then we should try with another one
             }
         }
 
-        throw new Exception('Unable to resolve DNS message');
-        // TODO: we should handle this scenario correctly
+        throw new DnsPoolResolveFailedException('Unable to resolve DNS message'); // TODO: we should handle this scenario correctly
     }
 
     private function getClientForUpstream(DnsUpstream $dnsUpstream): DnsClientInterface
@@ -66,5 +59,12 @@ class DnsPoolResolver implements DnsResolverInterface
         }
 
         throw new UpstreamNotSupportedException($dnsUpstream);
+    }
+
+    private function addClient(DnsClientInterface $dnsClient): self
+    {
+        $this->dnsClients[] = $dnsClient;
+
+        return $this;
     }
 }
