@@ -17,6 +17,7 @@ DoDoh go a little beyond what a simple proxy should do:
 ## Roadmap
 
 - [ ] Add full unit test coverage
+- [ ] Improve current DNS clients
 - [ ] Ability to choose a DNS upstream strategy
 - [ ] Dockerized app
 - [ ] Good documentation
@@ -33,32 +34,36 @@ So, I ended up with the following solution: use the DOH client from Mozilla Fire
 
 ## Getting started
 
-This example involve the use of 2 different DNS upstreams using different protocols.
+This example involve the use of two different DNS upstreams using different protocols.
+We also inject two types of client who can handle each of the protocols used.
 
 ```php
- <?php
-
-$dnsMessageFactory = new DnsMessageFactory();
-$dnsResolver = new DnsPoolResolver(
-    new DnsUpstreamPool([
+<?php
+$dnsMessageFactory = new \NoGlitchYo\DoDoh\Factory\DnsMessageFactory();
+$dnsResolver = new \NoGlitchYo\DoDoh\DnsPoolResolver(
+    new \NoGlitchYo\DoDoh\DnsUpstreamPool([
         '8.8.8.8:53',
         'https://cloudflare-dns.com/dns-query',
     ]),
     [
-        new DohClient(
-            new Client(
-                new \GuzzleHttp\Client([])
-            ),
+        new \NoGlitchYo\DoDoh\Client\DohClient(
+            new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client()),
             $dnsMessageFactory
         ),
-        new StdClient(new Factory(), $dnsMessageFactory),
+        new \NoGlitchYo\DoDoh\Client\StdClient(
+            new \Socket\Raw\Factory(), 
+            $dnsMessageFactory
+        ),
     ]
 );
 
-$dnsProxy = new HttpProxy(
+$dnsProxy = new \NoGlitchYo\DoDoh\HttpProxy(
     $dnsResolver,
     $dnsMessageFactory,
 );
 
-return $dnsProxy->forward($request);
+/** @var \Psr\Http\Message\ResponseInterface */
+$response = $dnsProxy->forward($request);
 ```
+
+DoDoh take advantages of PSR-7 to make it easy to integrate with frameworks implementing it.
