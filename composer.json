@@ -19,7 +19,6 @@
     "clue/socket-raw": "^1.4",
     "ext-json": "*",
     "ext-sockets": "*",
-    "monolog/monolog": "^1.24",
     "nyholm/psr7": "^1.1",
     "nyholm/psr7-server": "^0.3.0",
     "php": "^7.3",
@@ -32,7 +31,8 @@
     "slim/slim": "4.0.0-alpha",
     "slim/http": "^0.7.0",
     "phpunit/phpunit": "^8.1",
-    "mockery/mockery": "^1.2"
+    "mockery/mockery": "^1.2",
+    "monolog/monolog": "^1.24"
   },
   "autoload": {
     "psr-0": {

@@ -22,9 +22,9 @@ Dealdoh go a little beyond what a simple proxy should do:
 
 Dealdoh was created for development purpose: I wanted to reach my Docker containers from the browser by their hostnames.
 But let's give some context:
-- could not modify the /etc/hosts file
-- could not change the DNS for the machine
-- container domain names were well registered in a custom DNS container (thanks to: https://github.com/mageddo/dns-proxy-server)
+- I could not change the /etc/hosts file
+- I could not change the DNS for the machine
+- My Docker container domain names were well registered in a custom DNS docker container (thanks to: https://github.com/mageddo/dns-proxy-server)
 So, I ended up with the following solution: use the DOH client from Mozilla Firefox and proxy every DNS query to Dealdoh.
 
 
@@ -81,6 +81,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 * Thanks to https://github.com/reactphp/dns for their really good DNS wire format codec 
+* Thanks to https://github.com/mageddo/dns-proxy-server for its amazing container hostname discovery & DNS image
+* Thanks to https://github.com/facebookexperimental/doh-proxy, because their doh-client rocks!
 
 ## References
 
