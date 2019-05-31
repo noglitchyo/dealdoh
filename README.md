@@ -1,9 +1,10 @@
 # DoDoh 
 
-DoDoh is a simple DNS over HTTPS proxy built on PHP.
+DoDoh is a simple DNS over HTTPS proxy as specified in https://tools.ietf.org/html/rfc8484 built on PHP.
 - PHP 7.3
-- PSR-7 implementation
-- PSR-18 implementation
+- PSR-7 compliant
+- PSR-18 compliant
+- RFC-8484 compliant (https://tools.ietf.org/html/rfc8484)
 
 ## Features
 
@@ -11,7 +12,7 @@ DoDoh go a little beyond what a simple proxy should do:
 
 - [x] Can use multiple upstreams
 - [x] Can use different DNS protocol: standard udp/tcp, DoH
-- [x] Attempt to provide a nice DNS abstraction layer to allow development on top of it and customization
+- [x] Attempt to provide a DNS abstraction layer (from https://tools.ietf.org/html/rfc1035) to allow development on top of it and customization
 
 ## Roadmap
 
@@ -61,4 +62,3 @@ $dnsProxy = new HttpProxy(
 
 return $dnsProxy->forward($request);
 ```
-
