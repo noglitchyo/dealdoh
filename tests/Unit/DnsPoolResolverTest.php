@@ -1,23 +1,23 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Tests\Unit;
+namespace NoGlitchYo\Dealdoh\Tests\Unit;
 
 use Exception;
 use Mockery;
 use Mockery\MockInterface;
-use NoGlitchYo\DoDoh\Client\DnsClientInterface;
-use NoGlitchYo\DoDoh\DnsPoolResolver;
-use NoGlitchYo\DoDoh\DnsUpstream;
-use NoGlitchYo\DoDoh\DnsUpstreamPool;
-use NoGlitchYo\DoDoh\Exception\DnsPoolResolveFailedException;
-use NoGlitchYo\DoDoh\Exception\UpstreamNotSupportedException;
-use NoGlitchYo\DoDoh\Message\DnsMessage;
-use NoGlitchYo\DoDoh\Message\Header;
-use NoGlitchYo\DoDoh\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\DnsUpstream;
+use NoGlitchYo\Dealdoh\DnsUpstreamPool;
+use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
+use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
+use NoGlitchYo\Dealdoh\Message\DnsMessage;
+use NoGlitchYo\Dealdoh\Message\Header;
+use NoGlitchYo\Dealdoh\Message\HeaderInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\DoDoh\DnsPoolResolver
+ * @covers \NoGlitchYo\Dealdoh\DnsPoolResolver
  */
 class DnsPoolResolverTest extends TestCase
 {

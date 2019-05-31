@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh;
+namespace NoGlitchYo\Dealdoh;
 
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
 
 /**
  * @codeCoverageIgnore

@@ -1,5 +1,5 @@
 {
-  "name": "noglitchyo/dodoh",
+  "name": "noglitchyo/dealdoh",
   "description": "A simple DNS over HTTPS proxy built on PHP.",
   "keywords": [
     "dns",
@@ -36,11 +36,11 @@
   },
   "autoload": {
     "psr-4": {
-      "NoGlitchYo\\DoDoh\\": "src/"
+      "NoGlitchYo\\Dealdoh\\": "src/"
     },
     "autoload-dev": {
       "psr-4": {
-        "NoGlitchYo\\DoDoh\\": "tests/"
+        "NoGlitchYo\\Dealdoh\\": "tests/"
       }
     }
   }

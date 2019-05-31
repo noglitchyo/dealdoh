@@ -2,20 +2,20 @@
 
 namespace Unit\Factory;
 
-use NoGlitchYo\DoDoh\Factory\DnsMessageFactory;
-use NoGlitchYo\DoDoh\Helper\Base64UrlCodecHelper;
-use NoGlitchYo\DoDoh\Message\DnsMessage;
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
-use NoGlitchYo\DoDoh\Message\Header;
-use NoGlitchYo\DoDoh\Message\HeaderInterface;
-use NoGlitchYo\DoDoh\Message\Section\Query;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecord;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Factory\DnsMessageFactory;
+use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
+use NoGlitchYo\Dealdoh\Message\DnsMessage;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Message\Header;
+use NoGlitchYo\Dealdoh\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordInterface;
 use PHPUnit\Framework\TestCase;
 use React\Dns\Protocol\Parser;
 
 /**
- * @covers \NoGlitchYo\DoDoh\Factory\DnsMessageFactory
+ * @covers \NoGlitchYo\Dealdoh\Factory\DnsMessageFactory
  */
 class DnsMessageFactoryTest extends TestCase
 {

@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Factory;
+namespace NoGlitchYo\Dealdoh\Factory;
 
-use NoGlitchYo\DoDoh\Helper\Base64UrlCodecHelper;
-use NoGlitchYo\DoDoh\Message\DnsMessage;
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
-use NoGlitchYo\DoDoh\Message\Header;
-use NoGlitchYo\DoDoh\Message\Section\Query;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
+use NoGlitchYo\Dealdoh\Message\DnsMessage;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Message\Header;
+use NoGlitchYo\Dealdoh\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Message\Section\ResourceRecord;
 use React\Dns\Model\HeaderBag;
 use React\Dns\Model\Message;
 use React\Dns\Protocol\BinaryDumper;

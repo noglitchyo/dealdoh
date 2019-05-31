@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Tests\Unit\Factory;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory;
 
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\DoDoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\DoDoh\Factory\DohHttpMessageFactory;
-use NoGlitchYo\DoDoh\Message\DnsMessage;
-use NoGlitchYo\DoDoh\Message\Header;
-use NoGlitchYo\DoDoh\Message\HeaderInterface;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory;
+use NoGlitchYo\Dealdoh\Message\DnsMessage;
+use NoGlitchYo\Dealdoh\Message\Header;
+use NoGlitchYo\Dealdoh\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Message\Section\ResourceRecord;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\DoDoh\Factory\DohHttpMessageFactory
+ * @covers \NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory
  */
 class DohHttpMessageFactoryTest extends TestCase
 {

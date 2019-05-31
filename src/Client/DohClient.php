@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Client;
+namespace NoGlitchYo\Dealdoh\Client;
 
 use GuzzleHttp\Psr7\Request;
 use Http\Client\HttpClient;
-use NoGlitchYo\DoDoh\DnsUpstream;
-use NoGlitchYo\DoDoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\DnsUpstream;
+use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
 
 class DohClient implements DnsClientInterface
 {

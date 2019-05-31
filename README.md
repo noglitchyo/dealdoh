@@ -1,6 +1,6 @@
-# DoDoh 
+# Dealdoh 
 
-DoDoh is a simple DNS over HTTPS proxy as specified in https://tools.ietf.org/html/rfc8484 built on PHP.
+Dealdoh is a simple DNS over HTTPS proxy as specified in https://tools.ietf.org/html/rfc8484 built on PHP.
 - PHP 7.3
 - PSR-7 compliant
 - PSR-18 compliant
@@ -8,7 +8,7 @@ DoDoh is a simple DNS over HTTPS proxy as specified in https://tools.ietf.org/ht
 
 ## Features
 
-DoDoh go a little beyond what a simple proxy should do:
+Dealdoh go a little beyond what a simple proxy should do:
 
 - [x] Can use multiple upstreams
 - [x] Can use different DNS protocol: standard udp/tcp, DoH
@@ -22,14 +22,14 @@ DoDoh go a little beyond what a simple proxy should do:
 - [ ] Dockerized app
 - [ ] Good documentation
 
-## Why DoDoh?
+## Why Dealdoh?
 
-DoDoh was created for development purpose: I wanted to reach my Docker containers from the browser by their hostnames.
+Dealdoh was created for development purpose: I wanted to reach my Docker containers from the browser by their hostnames.
 But let's give some context:
 - could not modify the /etc/hosts file
 - could not change the DNS for the machine
 - container domain names were well registered in a custom DNS container (thanks to: https://github.com/mageddo/dns-proxy-server)
-So, I ended up with the following solution: use the DOH client from Mozilla Firefox and proxy every DNS query to DoDoh.
+So, I ended up with the following solution: use the DOH client from Mozilla Firefox and proxy every DNS query to Dealdoh.
 
 
 ## Getting started
@@ -37,7 +37,7 @@ So, I ended up with the following solution: use the DOH client from Mozilla Fire
 ### Installation
 
 - Install dependencies
-`composer require noglitchyo/dodoh`
+`composer require noglitchyo/dealdoh`
 
 - You need a PSR-7 ServerRequest if you wish to directly use the `HttpProxy::forward()` method. Please check some cool implementations below:
     * https://github.com/Nyholm/psr7 - `composer require nyholm/psr7`
@@ -51,25 +51,25 @@ Two types of DNS client who can handle each of the DNS protocols used by our ups
 
 ```php
 <?php
-$dnsMessageFactory = new \NoGlitchYo\DoDoh\Factory\DnsMessageFactory();
-$dnsResolver = new \NoGlitchYo\DoDoh\DnsPoolResolver(
-    new \NoGlitchYo\DoDoh\DnsUpstreamPool([
+$dnsMessageFactory = new \NoGlitchYo\Dealdoh\Factory\DnsMessageFactory();
+$dnsResolver = new \NoGlitchYo\Dealdoh\DnsPoolResolver(
+    new \NoGlitchYo\Dealdoh\DnsUpstreamPool([
         '8.8.8.8:53',
         'https://cloudflare-dns.com/dns-query',
     ]),
     [
-        new \NoGlitchYo\DoDoh\Client\DohClient(
+        new \NoGlitchYo\Dealdoh\Client\DohClient(
             new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client()),
             $dnsMessageFactory
         ),
-        new \NoGlitchYo\DoDoh\Client\StdClient(
+        new \NoGlitchYo\Dealdoh\Client\StdClient(
             new \Socket\Raw\Factory(), 
             $dnsMessageFactory
         ),
     ]
 );
 
-$dnsProxy = new \NoGlitchYo\DoDoh\HttpProxy(
+$dnsProxy = new \NoGlitchYo\Dealdoh\HttpProxy(
     $dnsResolver,
     $dnsMessageFactory,
 );

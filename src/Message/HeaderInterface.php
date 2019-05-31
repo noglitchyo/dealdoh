@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Message;
+namespace NoGlitchYo\Dealdoh\Message;
 
 /**
  * @codeCoverageIgnore

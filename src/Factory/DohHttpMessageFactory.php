@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Factory;
+namespace NoGlitchYo\Dealdoh\Factory;
 
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 

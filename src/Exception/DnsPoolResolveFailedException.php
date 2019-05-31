@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Exception;
+namespace NoGlitchYo\Dealdoh\Exception;
 
 use Exception;
 

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Exception;
+namespace NoGlitchYo\Dealdoh\Exception;
 
 use Exception;
-use NoGlitchYo\DoDoh\DnsUpstream;
+use NoGlitchYo\Dealdoh\DnsUpstream;
 use Throwable;
 
 class UpstreamNotSupportedException extends Exception

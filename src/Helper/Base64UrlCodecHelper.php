@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Helper;
+namespace NoGlitchYo\Dealdoh\Helper;
 
 use const STR_PAD_RIGHT;
 

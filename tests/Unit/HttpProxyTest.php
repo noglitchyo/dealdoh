@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Tests\Unit;
+namespace NoGlitchYo\Dealdoh\Tests\Unit;
 
 use Exception;
 use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\DoDoh\DnsResolverInterface;
-use NoGlitchYo\DoDoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\DoDoh\Factory\DohHttpMessageFactoryInterface;
-use NoGlitchYo\DoDoh\HttpProxy;
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\DnsResolverInterface;
+use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\HttpProxy;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @covers \NoGlitchYo\DoDoh\HttpProxy
+ * @covers \NoGlitchYo\Dealdoh\HttpProxy
  */
 class HttpProxyTest extends TestCase
 {

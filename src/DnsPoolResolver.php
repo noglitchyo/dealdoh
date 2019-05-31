@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh;
+namespace NoGlitchYo\Dealdoh;
 
-use NoGlitchYo\DoDoh\Client\DnsClientInterface;
-use NoGlitchYo\DoDoh\Exception\DnsPoolResolveFailedException;
-use NoGlitchYo\DoDoh\Exception\UpstreamNotSupportedException;
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
-use NoGlitchYo\DoDoh\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
+use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Message\HeaderInterface;
 use Throwable;
 
 class DnsPoolResolver implements DnsResolverInterface

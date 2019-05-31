@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh;
+namespace NoGlitchYo\Dealdoh;
 
 use Exception;
 use InvalidArgumentException;
-use NoGlitchYo\DoDoh\Factory\DnsMessageFactory;
-use NoGlitchYo\DoDoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\DoDoh\Factory\DohHttpMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Factory\DnsMessageFactory;
+use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;

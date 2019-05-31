@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Message;
+namespace NoGlitchYo\Dealdoh\Message;
 
-use NoGlitchYo\DoDoh\Message\Section\QueryInterface;
-use NoGlitchYo\DoDoh\Message\Section\QuestionSection;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecordInterface;
-use NoGlitchYo\DoDoh\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Message\Section\QueryInterface;
+use NoGlitchYo\Dealdoh\Message\Section\QuestionSection;
+use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordSection;
 
 /**
  * @codeCoverageIgnore

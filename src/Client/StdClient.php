@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\DoDoh\Client;
+namespace NoGlitchYo\Dealdoh\Client;
 
-use NoGlitchYo\DoDoh\DnsUpstream;
-use NoGlitchYo\DoDoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\DoDoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\DnsUpstream;
+use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
 use Socket\Raw\Exception;
 use Socket\Raw\Factory;
 use const MSG_EOR;
