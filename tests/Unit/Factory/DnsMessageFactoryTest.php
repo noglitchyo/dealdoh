@@ -63,7 +63,7 @@ class DnsMessageFactoryTest extends TestCase
     ): void {
         $message = $this->sut->createMessageFromBase64($dnsWireMessageBase64Encoded);
 
-        $this->assertEquals($expectedDnsMessage, $message);
+        $this->assertEquals($expectedDnsMessage, $message, '', 1);
     }
 
     public function provideDnsMessages(): array
