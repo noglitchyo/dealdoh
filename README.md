@@ -98,12 +98,19 @@ To make it easier, I created a [Docker image](https://hub.docker.com/) that you 
 `docker run --name dohfb -it noglitchyo/facebookexperimental-doh-proxy doh-client --domain dealdoh.proxy.addr --qname whatismyip.com --dnssec --insecure`
 
 (Tips: pass the --insecure option to doh-client if you are using self-signed certificates **#notDocumented**)
+
 Please, check [how to use the client](https://github.com/facebookexperimental/doh-proxy#doh-client).
     
 * Using your client browser  
 
 Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted_Recursive_Resolver) who can be configured to query DoH servers.
-I advise you to read [this really good article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) which will give you lot of details about this TRR and how to configure lik a pro.  
+
+I advise you to read [this really good article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
+which will give you lot of details about this TRR and how to configure it like a pro.  
+
+## Contributing
+
+Get started here [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
