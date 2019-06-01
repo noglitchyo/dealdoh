@@ -9,7 +9,7 @@ install:
 
 script:
   - vendor/bin/phpcs --standard=PSR2 ./src/
-  - vendor/bin/phpstan analyse --level 8 src --no-interaction --no-progress
+  - vendor/bin/phpstan analyse -l max src --no-interaction --no-progress
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
