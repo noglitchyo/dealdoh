@@ -2,7 +2,9 @@
 
 Dealdoh is a simple DNS over HTTPS proxy to deal with DOH built with PHP.
 
+![PHP from Packagist](https://img.shields.io/packagist/php-v/noglitchyo/dealdoh.svg)
 [![Build Status](https://travis-ci.org/noglitchyo/dealdoh.svg?branch=master)](https://travis-ci.org/noglitchyo/dealdoh)
+[![codecov](https://codecov.io/gh/noglitchyo/dealdoh/branch/master/graph/badge.svg)](https://codecov.io/gh/noglitchyo/dealdoh)
 
 ## Features
 
