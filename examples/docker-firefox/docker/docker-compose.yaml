@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  dps:
+    image: defreitas/dns-proxy-server
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - MG_LOG_LEVEL=ERROR
+    hostname: dns.server
+
+  nginx:
+    image: nginx:latest
+    environment:
+      - HOSTNAMES=resolveme.please
+
+  dohclient:
+    image: noglitchyo/facebookexperimental-doh-proxy:latest
+
+  https:
+    image: nginx:latest
+    links:
+      - php
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs:rw
+      - ./nginx/conf.d/site.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginxconfig.io:/etc/nginx/nginxconfig.io
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/dhparam.pem:/etc/nginx/dhparam.pem
+      - ./src:/var/www/html
+    ports:
+      - "443:443"
+    environment:
+      - HOSTNAMES=dealdoh.server
+
+  php:
+    build: ./php/
+    volumes:
+      - ./src:/var/www/html

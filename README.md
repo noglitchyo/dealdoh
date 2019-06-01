@@ -113,6 +113,7 @@ which will give you lot of details about this TRR and how to configure it like a
 Checkout some really simple integration examples to get a glimpse:
 
 - [Slim Framework](examples/slim-integration/README.md) 
+- [DoH + Docker + DNS + Hostname Discovery](examples/docker-firefox/README.md)
 
 ## Contributing
 
