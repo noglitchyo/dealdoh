@@ -35,13 +35,13 @@
     "monolog/monolog": "^1.24"
   },
   "autoload": {
-    "psr-0": {
+    "psr-4": {
       "NoGlitchYo\\Dealdoh\\": "src/"
     }
   },
   "autoload-dev": {
-    "psr-0": {
-      "NoGlitchYo\\Dealdoh\\": "tests/"
+    "psr-4": {
+      "NoGlitchYo\\Dealdoh\\Tests\\": "tests/"
     }
   }
 }

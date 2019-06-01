@@ -6,6 +6,9 @@ use Exception;
 use NoGlitchYo\Dealdoh\DnsUpstream;
 use Throwable;
 
+/**
+ * @codeCoverageIgnore 
+ */
 class UpstreamNotSupportedException extends Exception
 {
     public function __construct(DnsUpstream $dnsUpstream, Throwable $previous = null)

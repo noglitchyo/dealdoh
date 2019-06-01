@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Unit\Factory;
+namespace NoGlitchYo\Dealdoh\Unit\Factory;
 
 use NoGlitchYo\Dealdoh\Factory\DnsMessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;

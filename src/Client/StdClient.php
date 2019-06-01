@@ -35,29 +35,23 @@ class StdClient implements DnsClientInterface
 
     public function resolve(DnsUpstream $dnsUpstream, DnsMessageInterface $dnsRequestMessage): DnsMessageInterface
     {
-        try {
-            $socket = $this->getClientSocket($dnsUpstream);
-            $remote = $dnsUpstream->getUri();
-            $socket->sendTo(
-                $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage),
-                MSG_EOR,
-                $remote
-            );
-            $socket->setOption(SOL_SOCKET, SO_RCVTIMEO, ['sec' => 5, 'usec' => 0]);
-            // TODO: Need to be improved: usage of tcp, handle truncated query, retry, etc...
-            $dnsWireResponseMessage = $socket->recvFrom(static::EDNS_SIZE, MSG_WAITALL, $remote);
-        } catch (Exception $t) {
-            if ($t->getCode() == SOCKET_EAGAIN) {
-                throw $t;
-            }
-        }
+        $socket = $this->getClientSocket($dnsUpstream);
+        $remote = $dnsUpstream->getUri();
+        $socket->sendTo(
+            $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage),
+            MSG_EOR,
+            $remote
+        );
+        $socket->setOption(SOL_SOCKET, SO_RCVTIMEO, ['sec' => 5, 'usec' => 0]);
+        // TODO: Need to be improved: usage of tcp, handle truncated query, retry, etc...
+        $dnsWireResponseMessage = $socket->recvFrom(static::EDNS_SIZE, MSG_WAITALL, $remote);
 
         return $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireResponseMessage);
     }
 
     public function supports(DnsUpstream $dnsUpstream): bool
     {
-        return $dnsUpstream->getScheme() === null;
+        return $dnsUpstream->getScheme() === null || $dnsUpstream->getScheme() === 'udp';
     }
 
     private function getClientSocket(DnsUpstream $dnsUpstream)

@@ -4,6 +4,9 @@ namespace NoGlitchYo\Dealdoh\Exception;
 
 use Exception;
 
+/**
+ * @codeCoverageIgnore
+ */
 class DnsPoolResolveFailedException extends Exception
 {
 
