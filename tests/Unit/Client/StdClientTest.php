@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Unit\Client;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 
 use Mockery;
 use Mockery\MockInterface;

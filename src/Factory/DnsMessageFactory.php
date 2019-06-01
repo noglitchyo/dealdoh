@@ -2,7 +2,6 @@
 
 namespace NoGlitchYo\Dealdoh\Factory;
 
-use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\Message\DnsMessage;
 use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
 use NoGlitchYo\Dealdoh\Message\Header;
@@ -10,6 +9,7 @@ use NoGlitchYo\Dealdoh\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Message\Section\ResourceRecord;
 use React\Dns\Model\HeaderBag;
 use React\Dns\Model\Message;
+use React\Dns\Model\Record;
 use React\Dns\Protocol\BinaryDumper;
 use React\Dns\Protocol\Parser;
 
@@ -106,21 +106,42 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
 
         foreach ($dnsMessage->getQuestions() as $query) {
             $message->questions[] = [
-                'name'  => $query->getName(),
+                'name' => $query->getName(),
                 'class' => $query->getClass(),
-                'type'  => $query->getType(),
+                'type' => $query->getType(),
             ];
         }
 
-        $message->answers = $dnsMessage->getAnswers();
-        $message->authority = $dnsMessage->getAuthority();
-        $message->additional = $dnsMessage->getAdditional();
+        foreach ($dnsMessage->getAnswers() as $record) {
+            $message->answers[] = new Record(
+                $record->getName(),
+                $record->getType(),
+                $record->getClass(),
+                $record->getTtl(),
+                $record->getData()
+            );
+        }
+
+        foreach ($dnsMessage->getAuthority() as $record) {
+            $message->answers[] = new Record(
+                $record->getName(),
+                $record->getType(),
+                $record->getClass(),
+                $record->getTtl(),
+                $record->getData()
+            );
+        }
+
+        foreach ($dnsMessage->getAdditional() as $record) {
+            $message->answers[] = new Record(
+                $record->getName(),
+                $record->getType(),
+                $record->getClass(),
+                $record->getTtl(),
+                $record->getData()
+            );
+        }
 
         return $this->binaryDumper->toBinary($message);
-    }
-
-    public function createMessageFromBase64(string $query): DnsMessageInterface
-    {
-        return $this->createMessageFromDnsWireMessage(Base64UrlCodecHelper::decode($query));
     }
 }

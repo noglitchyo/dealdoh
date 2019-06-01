@@ -2,16 +2,43 @@
 
 namespace NoGlitchYo\Dealdoh\Message\Section;
 
-use React\Dns\Model\Record as ReactDnsRecord;
-
 /**
  * @codeCoverageIgnore
  */
-class ResourceRecord extends ReactDnsRecord implements ResourceRecordInterface
+class ResourceRecord implements ResourceRecordInterface
 {
+    /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @var int
+     */
+    private $type;
+
+    /**
+     * @var int
+     */
+    private $class;
+
+    /**
+     * @var int
+     */
+    private $ttl;
+
+    /**
+     * @var string|string[]|array|null
+     */
+    private $data;
+
     public function __construct(string $name, int $type, int $class, int $ttl = 0, $data = null)
     {
-        parent::__construct($name, $type, $class, $ttl, $data);
+        $this->name = $name;
+        $this->type = $type;
+        $this->class = $class;
+        $this->ttl = $ttl;
+        $this->data = $data;
     }
 
     public function getName(): string

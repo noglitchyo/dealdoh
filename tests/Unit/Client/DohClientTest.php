@@ -45,7 +45,7 @@ class DohClientTest extends TestCase
         parent::setUp();
     }
 
-    public function testResolveCreateAndReturnDnsMessage()
+    public function testResolveCreateAndReturnDnsMessage(): void
     {
         $dnsUpstreamAddr = 'https://some-random-doh-server.com/dns-query';
         $dnsUpstream = new DnsUpstream($dnsUpstreamAddr);
@@ -83,7 +83,7 @@ class DohClientTest extends TestCase
         $this->assertEquals($dnsResponseMessage, $this->sut->resolve($dnsUpstream, $dnsRequestMessage));
     }
 
-    public function testSupportsAcceptUpstreamWithHttps()
+    public function testSupportsAcceptUpstreamWithHttps(): void
     {
         $dnsUpstreamAddr = 'https://8.8.8.8:53';
         $dnsUpstream = new DnsUpstream($dnsUpstreamAddr);
@@ -91,7 +91,7 @@ class DohClientTest extends TestCase
         $this->assertTrue($this->sut->supports($dnsUpstream));
     }
 
-    public function testSupportsDeclineUpstreamWithOtherSchemeThanHttp()
+    public function testSupportsDeclineUpstreamWithOtherSchemeThanHttp(): void
     {
         $dnsUpstreamAddr = 'udp://8.8.8.8:53';
         $dnsUpstream = new DnsUpstream($dnsUpstreamAddr);

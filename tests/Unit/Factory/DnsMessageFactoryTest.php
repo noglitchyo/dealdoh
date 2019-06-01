@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Unit\Factory;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory;
 
 use NoGlitchYo\Dealdoh\Factory\DnsMessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
@@ -54,7 +54,9 @@ class DnsMessageFactoryTest extends TestCase
         DnsMessageInterface $expectedDnsMessage,
         string $dnsWireMessageBase64Encoded
     ): void {
-        $message = $this->sut->createMessageFromBase64($dnsWireMessageBase64Encoded);
+        $message = $this->sut->createMessageFromDnsWireMessage(
+            Base64UrlCodecHelper::decode($dnsWireMessageBase64Encoded)
+        );
 
         $this->assertEqualsWithDelta($expectedDnsMessage, $message, 1);
     }

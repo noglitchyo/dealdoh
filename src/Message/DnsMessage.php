@@ -14,7 +14,7 @@ class DnsMessage implements DnsMessageInterface
 {
     use MessageSectionAwareTrait;
 
-    /** @var Header */
+    /** @var HeaderInterface */
     private $header;
 
     /**

@@ -10,6 +10,7 @@ use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\DnsResolverInterface;
 use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\HttpProxy;
 use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
 use Nyholm\Psr7\Response;
@@ -81,8 +82,8 @@ class HttpProxyTest extends TestCase
         $dnsResponseMessage = Mockery::mock(DnsMessageInterface::class);
 
         $this->dnsMessageFactoryMock
-            ->shouldReceive('createMessageFromBase64')
-            ->with($base64EncodedDnsRequest)
+            ->shouldReceive('createMessageFromDnsWireMessage')
+            ->with(Base64UrlCodecHelper::decode($base64EncodedDnsRequest))
             ->andReturn($dnsRequestMessage);
 
         $this->dnsResolverMock
@@ -112,7 +113,7 @@ class HttpProxyTest extends TestCase
 
     public function testForwardThrowExceptionOnGetRequestWhenQueryParamIsInvalid(): void
     {
-        $invalidBase64Request = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA';
+        $invalidBase64Request = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA***+++()()()';
 
         $requestMock = (new ServerRequest('GET', '/dns-query'))->withQueryParams(
             [
@@ -129,8 +130,8 @@ class HttpProxyTest extends TestCase
             ->with(sprintf('Failed to create DNS message: %s', $exception->getMessage()));
 
         $this->dnsMessageFactoryMock
-            ->shouldReceive('createMessageFromBase64')
-            ->with($invalidBase64Request)
+            ->shouldReceive('createMessageFromDnsWireMessage')
+            ->with(Base64UrlCodecHelper::decode($invalidBase64Request))
             ->andThrow($exception);
 
         $this->sut->forward($requestMock);
@@ -233,11 +234,10 @@ class HttpProxyTest extends TestCase
         );
 
         $dnsRequestMessage = Mockery::mock(DnsMessageInterface::class);
-        $dnsResponseMessage = Mockery::mock(DnsMessageInterface::class);
 
         $this->dnsMessageFactoryMock
-            ->shouldReceive('createMessageFromBase64')
-            ->with($base64EncodedDnsRequest)
+            ->shouldReceive('createMessageFromDnsWireMessage')
+            ->with(Base64UrlCodecHelper::decode($base64EncodedDnsRequest))
             ->andReturn($dnsRequestMessage);
 
         $exception = new Exception('Resolve failed');

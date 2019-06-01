@@ -2,6 +2,9 @@
 
 namespace NoGlitchYo\Dealdoh;
 
+use const PHP_URL_PORT;
+use const PHP_URL_SCHEME;
+
 /**
  * @codeCoverageIgnore
  */
@@ -19,9 +22,8 @@ class DnsUpstream
     public function __construct(string $uri)
     {
         $this->uri = $uri;
-        $parsedUri = parse_url($uri);
-        $this->port = $parsedUri['port'] ?? null;
-        $this->scheme = $parsedUri['scheme'] ?? null;
+        $this->port = parse_url($uri, PHP_URL_PORT) ?? null;
+        $this->scheme = parse_url($uri, PHP_URL_SCHEME) ?? null;
     }
 
     public function getPort(): ?int

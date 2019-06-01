@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use NoGlitchYo\Dealdoh\Factory\DnsMessageFactory;
 use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -16,7 +17,7 @@ use Throwable;
 class HttpProxy
 {
     /**
-     * @var DnsPoolResolver
+     * @var DnsResolverInterface
      */
     private $dnsResolver;
     /**
@@ -24,7 +25,7 @@ class HttpProxy
      */
     private $logger;
     /**
-     * @var DnsMessageFactory
+     * @var DnsMessageFactoryInterface
      */
     private $dnsMessageFactory;
     /**
@@ -53,7 +54,9 @@ class HttpProxy
                     if (!$dnsQuery) {
                         throw new InvalidArgumentException('Query parameter `dns` is mandatory.');
                     }
-                    $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromBase64($dnsQuery);
+                    $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromDnsWireMessage(
+                        Base64UrlCodecHelper::decode($dnsQuery)
+                    );
                     break;
                 case 'POST':
                     $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromDnsWireMessage(

@@ -90,22 +90,22 @@ class Header implements HeaderInterface
 
     public function getQdCount(): int
     {
-        return $this->questionSection ? count($this->questionSection->getQueries()) : 0;
+        return count($this->questionSection->getQueries());
     }
 
     public function getAnCount(): int
     {
-        return $this->answerSection ? count($this->answerSection->getRecords()) : 0;
+        return count($this->answerSection->getRecords());
     }
 
     public function getNsCount(): int
     {
-        return $this->authoritySection ? count($this->authoritySection->getRecords()) : 0;
+        return count($this->authoritySection->getRecords());
     }
 
     public function getArCount(): int
     {
-        return $this->additionalSection ? count($this->additionalSection->getRecords()) : 0;
+        return count($this->additionalSection->getRecords());
     }
 
     public function isQr(): bool

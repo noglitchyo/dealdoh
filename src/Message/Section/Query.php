@@ -2,16 +2,25 @@
 
 namespace NoGlitchYo\Dealdoh\Message\Section;
 
-use React\Dns\Query\Query as ReactDnsQuery;
-
 /**
  * @codeCoverageIgnore
  */
-class Query extends ReactDnsQuery implements QueryInterface
+class Query implements QueryInterface
 {
-    public function __construct(string $name, int $type, int $class, ?int $currentTime = null)
+    /** @var string */
+    private $name;
+
+    /** @var int */
+    private $type;
+
+    /** @var int */
+    private $class;
+
+    public function __construct(string $name, int $type, int $class)
     {
-        parent::__construct($name, $type, $class, $currentTime);
+        $this->name = $name;
+        $this->type = $type;
+        $this->class = $class;
     }
 
     public function getType(): int

@@ -52,4 +52,9 @@ interface ResourceRecordInterface
      * @return int
      */
     public function getTtl(): int;
+
+    /**
+     * @return string|string[]|array|null
+     */
+    public function getData();
 }
