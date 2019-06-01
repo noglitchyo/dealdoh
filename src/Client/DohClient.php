@@ -3,20 +3,20 @@
 namespace NoGlitchYo\Dealdoh\Client;
 
 use GuzzleHttp\Psr7\Request;
-use Http\Client\HttpClient;
 use NoGlitchYo\Dealdoh\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
+use Psr\Http\Client\ClientInterface;
 
 class DohClient implements DnsClientInterface
 {
-    /** @var HttpClient */
+    /** @var ClientInterface */
     private $client;
 
     /** @var DnsMessageFactoryInterface */
     private $dnsMessageFactory;
 
-    public function __construct(HttpClient $client, DnsMessageFactoryInterface $dnsMessageFactory)
+    public function __construct(ClientInterface $client, DnsMessageFactoryInterface $dnsMessageFactory)
     {
         $this->client = $client;
         $this->dnsMessageFactory = $dnsMessageFactory;

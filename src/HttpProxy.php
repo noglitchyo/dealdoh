@@ -37,8 +37,7 @@ class HttpProxy
         DnsMessageFactoryInterface $dnsMessageFactory,
         DohHttpMessageFactoryInterface $dohHttpMessageFactory,
         LoggerInterface $logger = null
-    )
-    {
+    ) {
         $this->dnsResolver = $dnsResolver;
         $this->logger = $logger ?? new NullLogger();
         $this->dnsMessageFactory = $dnsMessageFactory;
@@ -57,7 +56,9 @@ class HttpProxy
                     $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromBase64($dnsQuery);
                     break;
                 case 'POST':
-                    $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromDnsWireMessage((string)$serverRequest->getBody());
+                    $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromDnsWireMessage(
+                        (string)$serverRequest->getBody()
+                    );
                     break;
                 default:
                     throw new Exception('Request method is not supported.');
@@ -70,16 +71,19 @@ class HttpProxy
         try {
             $dnsResponseMessage = $this->dnsResolver->resolve($dnsRequestMessage);
         } catch (Throwable $t) {
-            $this->logger->error(sprintf('Failed to resolve DNS query: %s', $t->getMessage()), [
-                'dnsRequestMessage' => $dnsRequestMessage,
-            ]);
+            $this->logger->error(
+                sprintf('Failed to resolve DNS query: %s', $t->getMessage()),
+                [
+                    'dnsRequestMessage' => $dnsRequestMessage,
+                ]
+            );
             throw $t;
         }
 
         $this->logger->info(
             sprintf("Resolved DNS query with method %s", $serverRequest->getMethod()),
             [
-                'dnsRequestMessage' => $dnsRequestMessage,
+                'dnsRequestMessage'  => $dnsRequestMessage,
                 'dnsResponseMessage' => $dnsResponseMessage,
             ]
         );

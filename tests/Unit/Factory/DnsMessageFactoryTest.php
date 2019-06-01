@@ -12,7 +12,6 @@ use NoGlitchYo\Dealdoh\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Message\Section\ResourceRecord;
 use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordInterface;
 use PHPUnit\Framework\TestCase;
-use React\Dns\Protocol\Parser;
 
 /**
  * @covers \NoGlitchYo\Dealdoh\Factory\DnsMessageFactory
@@ -24,14 +23,8 @@ class DnsMessageFactoryTest extends TestCase
      */
     private $sut;
 
-    /**
-     * @var Parser
-     */
-    private $parser;
-
     protected function setUp(): void
     {
-        $this->parser = new Parser();
         $this->sut = new DnsMessageFactory();
     }
 
@@ -63,7 +56,7 @@ class DnsMessageFactoryTest extends TestCase
     ): void {
         $message = $this->sut->createMessageFromBase64($dnsWireMessageBase64Encoded);
 
-        $this->assertEquals($expectedDnsMessage, $message, '', 1);
+        $this->assertEqualsWithDelta($expectedDnsMessage, $message, 1);
     }
 
     public function provideDnsMessages(): array
@@ -111,7 +104,8 @@ class DnsMessageFactoryTest extends TestCase
                 )->addAdditional(
                     new ResourceRecord("additional", ResourceRecordInterface::TYPE_A, 1, 60, '127.0.0.1')
                 ),
-                "AAABAAABAAEAAQABBXF1ZXJ5AAABAAEGYW5zd2VyAAABAAEAAAA8AAR_AAABCWF1dGhvcml0eQAAAQABAAAAPAAEfwAAAQphZGRpdGlvbmFsAAABAAEAAAA8AAR_AAAB",
+                "AAABAAABAAEAAQABBXF1ZXJ5AAABAAEGYW5zd2VyAAABAAEAAAA8AAR_AAABCWF1dGhvcml0eQAAAQABAAAAPAAEfwAAAQphZGRp" .
+                "dGlvbmFsAAABAAEAAAA8AAR_AAAB",
             ],
         ];
     }

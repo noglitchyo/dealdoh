@@ -50,7 +50,6 @@ class DnsMessage implements DnsMessageInterface
         $this->header->setAnswerSection($this->getAnswerSection());
         $this->header->setAuthoritySection($this->getAuthoritySection());
         $this->header->setAdditionalSection($this->getAdditionalSection());
-
     }
 
     public function getHeader(): HeaderInterface

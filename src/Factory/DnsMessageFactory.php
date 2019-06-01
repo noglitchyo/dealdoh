@@ -51,15 +51,21 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
         }
 
         foreach ($message->answers as $record) {
-            $dnsMessage->addAnswer(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
+            $dnsMessage->addAnswer(
+                new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)
+            );
         }
 
         foreach ($message->authority as $record) {
-            $dnsMessage->addAuthority(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
+            $dnsMessage->addAuthority(
+                new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)
+            );
         }
 
         foreach ($message->additional as $record) {
-            $dnsMessage->addAdditional(new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data));
+            $dnsMessage->addAdditional(
+                new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)
+            );
         }
 
         return $dnsMessage;
@@ -72,7 +78,9 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
 
     /**
      * Return a DNS message in wire format as defined in RFC-1035
+     *
      * @param DnsMessageInterface $dnsMessage
+     *
      * @return string
      */
     public function createDnsWireMessageFromMessage(DnsMessageInterface $dnsMessage): string
@@ -98,9 +106,9 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
 
         foreach ($dnsMessage->getQuestions() as $query) {
             $message->questions[] = [
-                'name' => $query->getName(),
+                'name'  => $query->getName(),
                 'class' => $query->getClass(),
-                'type' => $query->getType(),
+                'type'  => $query->getType(),
             ];
         }
 

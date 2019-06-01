@@ -40,7 +40,7 @@ class DnsPoolResolverTest extends TestCase
     {
         $this->dnsUpstreamPoolMock = Mockery::mock(DnsUpstreamPool::class);
         $this->dnsClientsMock = [
-            Mockery::mock(DnsClientInterface::class)
+            Mockery::mock(DnsClientInterface::class),
         ];
 
         $this->sut = new DnsPoolResolver($this->dnsUpstreamPoolMock, $this->dnsClientsMock);
@@ -52,8 +52,12 @@ class DnsPoolResolverTest extends TestCase
     {
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
-        $dnsRequestMessageMock = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
-        $dnsResponseMessage = new DnsMessage(new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
+        $dnsRequestMessageMock = new DnsMessage(
+            new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
+        $dnsResponseMessage = new DnsMessage(
+            new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
 
         $this->dnsUpstreamPoolMock
             ->shouldReceive('getUpstreams')
@@ -85,9 +89,15 @@ class DnsPoolResolverTest extends TestCase
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
         $upstream3 = new DnsUpstream('8.8.8.8:53');
-        $dnsRequestMessage = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
-        $dnsResponseMessageOk = new DnsMessage(new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
-        $dnsResponseMessageRefused = new DnsMessage(new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_NAME_ERROR));
+        $dnsRequestMessage = new DnsMessage(
+            new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
+        $dnsResponseMessageOk = new DnsMessage(
+            new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
+        $dnsResponseMessageRefused = new DnsMessage(
+            new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_NAME_ERROR)
+        );
 
         $this->dnsUpstreamPoolMock
             ->shouldReceive('getUpstreams')
@@ -125,8 +135,12 @@ class DnsPoolResolverTest extends TestCase
     {
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
-        $dnsRequestMessage = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
-        $dnsResponseMessage = new DnsMessage(new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
+        $dnsRequestMessage = new DnsMessage(
+            new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
+        $dnsResponseMessage = new DnsMessage(
+            new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
 
         $this->dnsUpstreamPoolMock
             ->shouldReceive('getUpstreams')
@@ -158,7 +172,9 @@ class DnsPoolResolverTest extends TestCase
     public function testResolveThrowExceptionIfNoClientCanHandleUpstream()
     {
         $upstream1 = new DnsUpstream('localhost:53');
-        $dnsRequestMessage = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
+        $dnsRequestMessage = new DnsMessage(
+            new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
 
         $this->dnsUpstreamPoolMock
             ->shouldReceive('getUpstreams')
@@ -179,7 +195,9 @@ class DnsPoolResolverTest extends TestCase
     {
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
-        $dnsRequestMessage = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
+        $dnsRequestMessage = new DnsMessage(
+            new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
+        );
 
         $this->dnsUpstreamPoolMock
             ->shouldReceive('getUpstreams')

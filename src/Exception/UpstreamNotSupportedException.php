@@ -7,7 +7,7 @@ use NoGlitchYo\Dealdoh\DnsUpstream;
 use Throwable;
 
 /**
- * @codeCoverageIgnore 
+ * @codeCoverageIgnore
  */
 class UpstreamNotSupportedException extends Exception
 {

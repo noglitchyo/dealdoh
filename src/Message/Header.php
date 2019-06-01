@@ -67,8 +67,7 @@ class Header implements HeaderInterface
         bool $ra,
         int $z,
         int $rcode
-    )
-    {
+    ) {
         $this->id = $id;
         $this->qr = $qr;
         $this->opcode = $opcode;

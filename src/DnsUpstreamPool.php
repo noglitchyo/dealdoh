@@ -12,7 +12,7 @@ class DnsUpstreamPool
 
     public function __construct(array $dnsUpstreams)
     {
-        foreach ($dnsUpstreams as $dnsUpstream){
+        foreach ($dnsUpstreams as $dnsUpstream) {
             $this->addUpstream($dnsUpstream);
         }
     }

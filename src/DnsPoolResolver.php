@@ -36,7 +36,8 @@ class DnsPoolResolver implements DnsResolverInterface
             try {
                 $dnsClient = $this->getClientForUpstream($dnsUpstream);
                 $dnsResponse = $dnsClient->resolve($dnsUpstream, $dnsMessage);
-                if ($dnsResponse->getHeader()->getRcode() === HeaderInterface::RCODE_NAME_ERROR) { // TODO: this behavior should be configurable
+                if ($dnsResponse->getHeader()->getRcode() === HeaderInterface::RCODE_NAME_ERROR) {
+                    // TODO: this behavior should be configurable
                     continue; // if upstream did not find it (NXDOMAIN error), we retry with next
                 }
                 return $dnsResponse;
@@ -46,8 +47,8 @@ class DnsPoolResolver implements DnsResolverInterface
                 continue; // if upstream failed, then we should try with another one
             }
         }
-
-        throw new DnsPoolResolveFailedException('Unable to resolve DNS message'); // TODO: we should handle this scenario correctly
+        // TODO: we should handle this scenario correctly
+        throw new DnsPoolResolveFailedException('Unable to resolve DNS message');
     }
 
     private function getClientForUpstream(DnsUpstream $dnsUpstream): DnsClientInterface
