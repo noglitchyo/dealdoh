@@ -106,7 +106,13 @@ Please, check [how to use the client](https://github.com/facebookexperimental/do
 Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted_Recursive_Resolver) who can be configured to query DoH servers.
 
 I advise you to read [this really good article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
-which will give you lot of details about this TRR and how to configure it like a pro.  
+which will give you lot of details about this TRR and how to configure it like a pro. 
+
+### Examples
+
+Checkout some really simple integration examples to get a glimpse:
+
+- [Slim Framework](examples/slim-integration/README.md) 
 
 ## Contributing
 

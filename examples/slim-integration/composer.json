@@ -1,0 +1,7 @@
+{
+    "require": {
+        "slim/slim": "^3.12",
+        "noglitchyo/dealdoh": "^0.1.0@alpha"
+    },
+    "minimum-stability": "alpha"
+}
