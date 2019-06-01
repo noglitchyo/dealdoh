@@ -1,0 +1,12 @@
+language: php
+dist: trusty
+
+php:
+  - 7.2.0
+  - 7.3.0
+
+install:
+  - composer install
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
