@@ -21,6 +21,7 @@ internal network IP](https://github.com/docker/for-win/issues/221). Let's fix th
 **Please, read the placeholders description:**
 
 > [DOCKER_SUBNET_IP]: Your Docker subnet (default: 172.27.0.0)
+
 > [DOCKER_HOST_IP]: Your Docker host IP (default: 10.0.75.2)
 
 Replace the placeholders and run the following command:
