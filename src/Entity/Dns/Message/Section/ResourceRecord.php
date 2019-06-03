@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Message\Section;
+namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
 /**
  * @codeCoverageIgnore

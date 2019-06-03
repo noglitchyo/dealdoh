@@ -45,5 +45,10 @@
     "psr-4": {
       "NoGlitchYo\\Dealdoh\\Tests\\": "tests/"
     }
+  },
+  "scripts": {
+    "phpstan": "phpstan analyse -l max src",
+    "phpcs": "phpcs --standard=PSR2 ./src/",
+    "test": "phpunit phpunit.dist.xml"
   }
 }

@@ -1,23 +1,23 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Tests\Unit;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Service;
 
 use Exception;
 use Mockery;
 use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
-use NoGlitchYo\Dealdoh\DnsPoolResolver;
-use NoGlitchYo\Dealdoh\DnsUpstream;
-use NoGlitchYo\Dealdoh\DnsUpstreamPool;
+use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
 use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
-use NoGlitchYo\Dealdoh\Message\DnsMessage;
-use NoGlitchYo\Dealdoh\Message\Header;
-use NoGlitchYo\Dealdoh\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\DnsPoolResolver
+ * @covers \NoGlitchYo\Dealdoh\Service\DnsPoolResolver
  */
 class DnsPoolResolverTest extends TestCase
 {
@@ -33,7 +33,7 @@ class DnsPoolResolverTest extends TestCase
      */
     private $dnsUpstreamPoolMock;
 
-    /** @var DnsPoolResolver */
+    /** @var \NoGlitchYo\Dealdoh\Service\DnsPoolResolver */
     private $sut;
 
     protected function setUp(): void
@@ -52,10 +52,10 @@ class DnsPoolResolverTest extends TestCase
     {
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
-        $dnsRequestMessageMock = new DnsMessage(
+        $dnsRequestMessageMock = new Message(
             new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
-        $dnsResponseMessage = new DnsMessage(
+        $dnsResponseMessage = new Message(
             new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
 
@@ -89,13 +89,13 @@ class DnsPoolResolverTest extends TestCase
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
         $upstream3 = new DnsUpstream('8.8.8.8:53');
-        $dnsRequestMessage = new DnsMessage(
+        $dnsRequestMessage = new Message(
             new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
-        $dnsResponseMessageOk = new DnsMessage(
+        $dnsResponseMessageOk = new Message(
             new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
-        $dnsResponseMessageRefused = new DnsMessage(
+        $dnsResponseMessageRefused = new Message(
             new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_NAME_ERROR)
         );
 
@@ -135,10 +135,10 @@ class DnsPoolResolverTest extends TestCase
     {
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
-        $dnsRequestMessage = new DnsMessage(
+        $dnsRequestMessage = new Message(
             new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
-        $dnsResponseMessage = new DnsMessage(
+        $dnsResponseMessage = new Message(
             new Header(0, true, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
 
@@ -172,7 +172,7 @@ class DnsPoolResolverTest extends TestCase
     public function testResolveThrowExceptionIfNoClientCanHandleUpstream()
     {
         $upstream1 = new DnsUpstream('localhost:53');
-        $dnsRequestMessage = new DnsMessage(
+        $dnsRequestMessage = new Message(
             new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
 
@@ -195,7 +195,7 @@ class DnsPoolResolverTest extends TestCase
     {
         $upstream1 = new DnsUpstream('localhost:53');
         $upstream2 = new DnsUpstream('https://cloudflare-dns.com/dns-query');
-        $dnsRequestMessage = new DnsMessage(
+        $dnsRequestMessage = new Message(
             new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
 

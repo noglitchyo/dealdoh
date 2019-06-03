@@ -1,19 +1,31 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Message\Section;
+namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
 /**
  * @codeCoverageIgnore
  */
 class Query implements QueryInterface
 {
-    /** @var string */
+    /**
+     *
+     *
+     * @var string
+     */
     private $name;
 
-    /** @var int */
+    /**
+     *
+     *
+     * @var int
+     */
     private $type;
 
-    /** @var int */
+    /**
+     *
+     *
+     * @var int
+     */
     private $class;
 
     public function __construct(string $name, int $type, int $class)

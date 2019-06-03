@@ -2,35 +2,35 @@
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory;
 
-use NoGlitchYo\Dealdoh\Factory\DnsMessageFactory;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
-use NoGlitchYo\Dealdoh\Message\DnsMessage;
-use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
-use NoGlitchYo\Dealdoh\Message\Header;
-use NoGlitchYo\Dealdoh\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Message\Section\ResourceRecord;
-use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\Factory\DnsMessageFactory
+ * @covers \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory
  */
 class DnsMessageFactoryTest extends TestCase
 {
     /**
-     * @var DnsMessageFactory
+     * @var MessageFactory
      */
     private $sut;
 
     protected function setUp(): void
     {
-        $this->sut = new DnsMessageFactory();
+        $this->sut = new MessageFactory();
     }
 
     public function testCreateDnsWireMessageFromMessageReturnString(): void
     {
-        $dnsMessage = new DnsMessage(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
+        $dnsMessage = new Message(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
         $this->assertIsString($this->sut->createDnsWireMessageFromMessage($dnsMessage));
     }
 
@@ -38,7 +38,7 @@ class DnsMessageFactoryTest extends TestCase
      * @dataProvider provideDnsMessages
      */
     public function testCreateDnsWireMessageFromMessageReturnValidMessage(
-        DnsMessageInterface $dnsMessage,
+        MessageInterface $dnsMessage,
         string $expectedDnsWireMessageBase64Encoded
     ): void {
         $this->assertSame(
@@ -51,7 +51,7 @@ class DnsMessageFactoryTest extends TestCase
      * @dataProvider provideDnsMessages
      */
     public function testCreateMessageFromDnsWireMessage(
-        DnsMessageInterface $expectedDnsMessage,
+        MessageInterface $expectedDnsMessage,
         string $dnsWireMessageBase64Encoded
     ): void {
         $message = $this->sut->createMessageFromDnsWireMessage(
@@ -65,37 +65,37 @@ class DnsMessageFactoryTest extends TestCase
     {
         return [
             'simple message with header' => [
-                new DnsMessage(
+                new Message(
                     new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
                 ),
                 "AAABAAAAAAAAAAAA",
             ],
             'message with question'      => [
-                (new DnsMessage(
+                (new Message(
                     new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
                 ))->addQuestion(new Query("test", 1, 1)),
                 "AAABAAABAAAAAAAABHRlc3QAAAEAAQ",
             ],
             'message with answers'       => [
-                (new DnsMessage(
+                (new Message(
                     new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
                 ))->addAnswer(new ResourceRecord("test", ResourceRecordInterface::TYPE_A, 1, 60, '127.0.0.1')),
                 "AAABAAAAAAEAAAAABHRlc3QAAAEAAQAAADwABH8AAAE",
             ],
             'message with authority'     => [
-                (new DnsMessage(
+                (new Message(
                     new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
                 ))->addAuthority(new ResourceRecord("test", ResourceRecordInterface::TYPE_A, 1, 60, '127.0.0.1')),
                 "AAABAAAAAAAAAQAABHRlc3QAAAEAAQAAADwABH8AAAE",
             ],
             'message with additional'    => [
-                (new DnsMessage(
+                (new Message(
                     new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
                 ))->addAdditional(new ResourceRecord("test", ResourceRecordInterface::TYPE_A, 1, 60, '127.0.0.1')),
                 "AAABAAAAAAAAAAABBHRlc3QAAAEAAQAAADwABH8AAAE",
             ],
             'message with all sections'  => [
-                (new DnsMessage(
+                (new Message(
                     new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
                 ))->addQuestion(
                     new Query("query", 1, 1)

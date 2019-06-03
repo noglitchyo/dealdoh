@@ -2,23 +2,24 @@
 
 namespace NoGlitchYo\Dealdoh\Factory;
 
-use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
 class DohHttpMessageFactory implements DohHttpMessageFactoryInterface
 {
     /**
-     * @var DnsMessageFactoryInterface
+     * @var MessageFactoryInterface
      */
     private $dnsMessageFactory;
 
-    public function __construct(DnsMessageFactoryInterface $dnsMessageFactory)
+    public function __construct(MessageFactoryInterface $dnsMessageFactory)
     {
         $this->dnsMessageFactory = $dnsMessageFactory;
     }
 
-    public function createResponseFromMessage(DnsMessageInterface $dnsMessage): ResponseInterface
+    public function createResponseFromMessage(MessageInterface $dnsMessage): ResponseInterface
     {
         $dnsWireQuery = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsMessage);
 
@@ -39,7 +40,7 @@ class DohHttpMessageFactory implements DohHttpMessageFactoryInterface
         );
     }
 
-    private function getMaxAge(DnsMessageInterface $dnsMessage): ?int
+    private function getMaxAge(MessageInterface $dnsMessage): ?int
     {
         $ttl = [];
         foreach ($dnsMessage->getAnswers() as $rr) {

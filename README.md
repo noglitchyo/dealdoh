@@ -60,7 +60,7 @@ Two types of DNS client who can handle each of the DNS protocols used by our ups
 
 ```php
 <?php
-$dnsMessageFactory = new \NoGlitchYo\Dealdoh\Factory\DnsMessageFactory();
+$dnsMessageFactory = new \NoGlitchYo\Dealdoh\Factory\MessageFactory();
 $dnsResolver = new \NoGlitchYo\Dealdoh\DnsPoolResolver(
     new \NoGlitchYo\Dealdoh\DnsUpstreamPool([
         '8.8.8.8:53',

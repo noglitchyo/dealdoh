@@ -1,14 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Message;
+namespace NoGlitchYo\Dealdoh\Entity\Dns;
 
-use NoGlitchYo\Dealdoh\Message\Section\QueryInterface;
-use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\MessageSectionAwareInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QueryInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 
 /**
  * @codeCoverageIgnore
  */
-interface DnsMessageInterface extends MessageSectionAwareInterface
+interface MessageInterface extends MessageSectionAwareInterface
 {
     public function getHeader(): HeaderInterface;
 

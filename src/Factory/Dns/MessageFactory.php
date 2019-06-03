@@ -1,19 +1,19 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Factory;
+namespace NoGlitchYo\Dealdoh\Factory\Dns;
 
-use NoGlitchYo\Dealdoh\Message\DnsMessage;
-use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
-use NoGlitchYo\Dealdoh\Message\Header;
-use NoGlitchYo\Dealdoh\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use React\Dns\Model\HeaderBag;
-use React\Dns\Model\Message;
+use React\Dns\Model\Message as DnsMessage;
 use React\Dns\Model\Record;
 use React\Dns\Protocol\BinaryDumper;
 use React\Dns\Protocol\Parser;
 
-class DnsMessageFactory implements DnsMessageFactoryInterface
+class MessageFactory implements MessageFactoryInterface
 {
     /**
      * @var Parser
@@ -31,7 +31,7 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
         $this->binaryDumper = new BinaryDumper();
     }
 
-    private static function createFromMessage(Message $message): DnsMessageInterface
+    private static function createFromMessage(DnsMessage $message): MessageInterface
     {
         $dnsMessageHeader = new Header(
             (int)$message->header->get('id'),
@@ -44,7 +44,7 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
             (int)$message->header->get('z'),
             (int)$message->header->get('rcode')
         );
-        $dnsMessage = new DnsMessage($dnsMessageHeader);
+        $dnsMessage = new Message($dnsMessageHeader);
 
         foreach ($message->questions as $query) {
             $dnsMessage->addQuestion(new Query($query['name'], $query['type'], $query['class']));
@@ -71,7 +71,7 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
         return $dnsMessage;
     }
 
-    public function createMessageFromDnsWireMessage(string $dnsWireMessage): DnsMessageInterface
+    public function createMessageFromDnsWireMessage(string $dnsWireMessage): MessageInterface
     {
         return self::createFromMessage($this->parser->parseMessage($dnsWireMessage));
     }
@@ -79,13 +79,13 @@ class DnsMessageFactory implements DnsMessageFactoryInterface
     /**
      * Return a DNS message in wire format as defined in RFC-1035
      *
-     * @param DnsMessageInterface $dnsMessage
+     * @param \NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface $dnsMessage
      *
      * @return string
      */
-    public function createDnsWireMessageFromMessage(DnsMessageInterface $dnsMessage): string
+    public function createDnsWireMessageFromMessage(MessageInterface $dnsMessage): string
     {
-        $message = new Message();
+        $message = new DnsMessage();
         $header = new HeaderBag();
         $dnsHeader = $dnsMessage->getHeader();
 

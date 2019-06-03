@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Message;
+namespace NoGlitchYo\Dealdoh\Entity\Dns\Message;
 
 /**
  * @codeCoverageIgnore
@@ -103,7 +103,7 @@ interface HeaderInterface extends MessageSectionAwareInterface
      *
      * 3-15            reserved for future use
      *
-     * @return  int
+     * @return int
      */
     public function getOpcode(): int;
 
