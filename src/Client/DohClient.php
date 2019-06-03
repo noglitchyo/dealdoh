@@ -3,24 +3,25 @@
 namespace NoGlitchYo\Dealdoh\Client;
 
 use GuzzleHttp\Psr7\Request;
-use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Exception\DnsClientException;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use Psr\Http\Client\ClientInterface;
+use Throwable;
 
+/**
+ * DoH client following RFC-8484
+ */
 class DohClient implements DnsClientInterface
 {
     /**
-     *
-     *
      * @var ClientInterface
      */
     private $client;
 
     /**
-     *
-     *
-     * @var \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface
+     * @var MessageFactoryInterface
      */
     private $dnsMessageFactory;
 
@@ -45,9 +46,17 @@ class DohClient implements DnsClientInterface
             $dnsMessage
         );
 
-        $response = $this->client->sendRequest($request);
+        try {
+            $response = $this->client->sendRequest($request);
+        } catch (Throwable $throwable) {
+            throw new DnsClientException(
+                sprintf('Failed to send the request to DoH upstream `%s`', $dnsUpstream->getUri()),
+                0,
+                $throwable
+            );
+        }
 
-        return $this->dnsMessageFactory->createMessageFromDnsWireMessage((string) $response->getBody());
+        return $this->dnsMessageFactory->createMessageFromDnsWireMessage((string)$response->getBody());
     }
 
     public function supports(DnsUpstream $dnsUpstream): bool

@@ -2,6 +2,7 @@
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns;
 
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\MessageSectionAwareTrait;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QueryInterface;
@@ -17,31 +18,9 @@ class Message implements MessageInterface
     use MessageSectionAwareTrait;
 
     /**
-     *
-     *
      * @var HeaderInterface
      */
     private $header;
-
-    /**
-     * @var QuestionSection
-     */
-    private $questionSection;
-
-    /**
-     * @var ResourceRecordSection
-     */
-    private $additionalSection;
-
-    /**
-     * @var ResourceRecordSection
-     */
-    private $answerSection;
-
-    /**
-     * @var ResourceRecordSection
-     */
-    private $authoritySection;
 
     public function __construct(HeaderInterface $header)
     {
@@ -52,10 +31,17 @@ class Message implements MessageInterface
         $this->setAdditionalSection(new ResourceRecordSection());
         $this->setAuthoritySection(new ResourceRecordSection());
 
-        $this->header->setQuestionSection($this->getQuestionSection());
-        $this->header->setAnswerSection($this->getAnswerSection());
-        $this->header->setAuthoritySection($this->getAuthoritySection());
-        $this->header->setAdditionalSection($this->getAdditionalSection());
+        $this->header->setQuestionSection($this->questionSection);
+        $this->header->setAnswerSection($this->answerSection);
+        $this->header->setAuthoritySection($this->authoritySection);
+        $this->header->setAdditionalSection($this->additionalSection);
+    }
+
+    public static function createWithDefaultHeader(
+        bool $isResponse = false,
+        int $rcode = HeaderInterface::RCODE_OK
+    ): self {
+        return new static(new Header(0, $isResponse, 0, false, false, false, false, 0, $rcode));
     }
 
     public function getHeader(): HeaderInterface
@@ -63,12 +49,12 @@ class Message implements MessageInterface
         return $this->header;
     }
 
-    public function getQuestions(): array
+    public function getQuestion(): array
     {
         return $this->questionSection->getQueries();
     }
 
-    public function getAnswers(): array
+    public function getAnswer(): array
     {
         return $this->answerSection->getRecords();
     }
@@ -111,23 +97,14 @@ class Message implements MessageInterface
         return $this;
     }
 
-    public function getQuestionSection(): QuestionSection
+    public function jsonSerialize(): array
     {
-        return $this->questionSection;
-    }
-
-    public function getAdditionalSection(): ResourceRecordSection
-    {
-        return $this->additionalSection;
-    }
-
-    public function getAnswerSection(): ResourceRecordSection
-    {
-        return $this->answerSection;
-    }
-
-    public function getAuthoritySection(): ResourceRecordSection
-    {
-        return $this->authoritySection;
+        return [
+            'header' => $this->header,
+            'question' => $this->questionSection,
+            'answer' => $this->answerSection,
+            'authority' => $this->authoritySection,
+            'additional' => $this->additionalSection
+        ];
     }
 }

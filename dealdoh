@@ -1,0 +1,58 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use GuzzleHttp\Client as HttpClient;
+use Http\Adapter\Guzzle6\Client;
+use NoGlitchYo\Dealdoh\Client\DohClient;
+use NoGlitchYo\Dealdoh\Client\GoogleDnsClient;
+use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Command\ResolveCommand;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Mapper\GoogleDns\MessageMapper;
+use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use Socket\Raw\Factory;
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+if (false === $upstreamPoolContent = file_get_contents(__DIR__ . '/../config/upstreampool.json')) {
+    throw new Exception('Please define upstreampool.json file.');
+}
+
+$upstreams = json_decode($upstreamPoolContent, true);
+
+if (empty($upstreams)) {
+    throw new Exception('No upstreams configured in upstreampool.json file');
+}
+
+$upstreamPool = new DnsUpstreamPool();
+foreach ($upstreams as $upstream) {
+    $upstreamPool->addUpstream(new DnsUpstream($upstream['uri']));
+}
+
+$dnsMessageFactory = new MessageFactory();
+$httpClient = new Client(
+    new HttpClient(['verify' => false])
+);
+$dnsClients = [
+    new GoogleDnsClient(
+        $httpClient,
+        new MessageMapper()
+    ),
+    new DohClient(
+        $httpClient,
+        $dnsMessageFactory
+    ),
+    new StdClient(
+        new Factory(),
+        $dnsMessageFactory
+    ),
+];
+
+$application->add(new ResolveCommand(new DnsPoolResolver($upstreamPool, $dnsClients), $dnsMessageFactory));
+
+$application->run();

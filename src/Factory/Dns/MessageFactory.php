@@ -79,7 +79,7 @@ class MessageFactory implements MessageFactoryInterface
     /**
      * Return a DNS message in wire format as defined in RFC-1035
      *
-     * @param \NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface $dnsMessage
+     * @param MessageInterface $dnsMessage
      *
      * @return string
      */
@@ -104,15 +104,15 @@ class MessageFactory implements MessageFactoryInterface
 
         $message->header = $header;
 
-        foreach ($dnsMessage->getQuestions() as $query) {
+        foreach ($dnsMessage->getQuestion() as $query) {
             $message->questions[] = [
-                'name' => $query->getName(),
-                'class' => $query->getClass(),
-                'type' => $query->getType(),
+                'name' => $query->getQname(),
+                'class' => $query->getQclass(),
+                'type' => $query->getQtype(),
             ];
         }
 
-        foreach ($dnsMessage->getAnswers() as $record) {
+        foreach ($dnsMessage->getAnswer() as $record) {
             $message->answers[] = new Record(
                 $record->getName(),
                 $record->getType(),

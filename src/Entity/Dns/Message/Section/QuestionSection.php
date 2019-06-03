@@ -2,10 +2,12 @@
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
+use JsonSerializable;
+
 /**
  * @codeCoverageIgnore
  */
-class QuestionSection
+class QuestionSection implements JsonSerializable
 {
     /**
      * @var QueryInterface[]
@@ -23,6 +25,12 @@ class QuestionSection
      * @return QueryInterface[]
      */
     public function getQueries(): array
+    {
+        return $this->queries;
+    }
+
+
+    public function jsonSerialize(): array
     {
         return $this->queries;
     }

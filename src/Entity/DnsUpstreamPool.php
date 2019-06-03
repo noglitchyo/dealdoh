@@ -8,22 +8,20 @@ namespace NoGlitchYo\Dealdoh\Entity;
 class DnsUpstreamPool
 {
     /**
-     *
-     *
      * @var array
      */
-    private $dnsUpstreams;
+    private $dnsUpstreams = [];
 
-    public function __construct(array $dnsUpstreams)
+    public function __construct(array $dnsUpstreams = [])
     {
         foreach ($dnsUpstreams as $dnsUpstream) {
-            $this->addUpstream($dnsUpstream);
+            $this->addUpstream(new DnsUpstream($dnsUpstream));
         }
     }
 
-    public function addUpstream(string $dnsUpstream): void
+    public function addUpstream(DnsUpstream $dnsUpstream): void
     {
-        $this->dnsUpstreams[] = new DnsUpstream($dnsUpstream);
+        $this->dnsUpstreams[] = $dnsUpstream;
     }
 
     /**

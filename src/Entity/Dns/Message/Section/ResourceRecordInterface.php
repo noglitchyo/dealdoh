@@ -2,10 +2,13 @@
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
+use JsonSerializable;
+
 /**
+ * @see https://tools.ietf.org/html/rfc1035#section-4.1.3
  * @codeCoverageIgnore
  */
-interface ResourceRecordInterface
+interface ResourceRecordInterface extends JsonSerializable
 {
     public const TYPE_A = 1;
     public const TYPE_NS = 2;
@@ -17,6 +20,8 @@ interface ResourceRecordInterface
     public const TYPE_AAAA = 28;
     public const TYPE_SRV = 33;
     public const TYPE_ANY = 255;
+
+    public const CLASS_IN = 1;
 
     /**
      * a domain name to which this resource record pertains.

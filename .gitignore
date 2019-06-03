@@ -6,3 +6,4 @@ vendor
 coverage
 clover.xml
 .phpunit*
+upstreampool.json

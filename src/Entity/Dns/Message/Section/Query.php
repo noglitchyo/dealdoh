@@ -8,45 +8,48 @@ namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 class Query implements QueryInterface
 {
     /**
-     *
-     *
      * @var string
      */
-    private $name;
+    private $qname;
 
     /**
-     *
-     *
      * @var int
      */
-    private $type;
+    private $qtype;
 
     /**
-     *
-     *
      * @var int
      */
-    private $class;
+    private $qclass;
 
-    public function __construct(string $name, int $type, int $class)
+    public function __construct(string $name, int $type, int $qclass)
     {
-        $this->name = $name;
-        $this->type = $type;
-        $this->class = $class;
+        $this->qname = $name;
+        $this->qtype = $type;
+        $this->qclass = $qclass;
     }
 
-    public function getType(): int
+    public function getQtype(): int
     {
-        return $this->type;
+        return $this->qtype;
     }
 
-    public function getName(): string
+    public function getQname(): string
     {
-        return $this->name;
+        return $this->qname;
     }
 
-    public function getClass(): int
+    public function getQclass(): int
     {
-        return $this->class;
+        return $this->qclass;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'qname' => $this->qname,
+            'qtype' => $this->qtype,
+            'qclass' => $this->qclass,
+        ];
     }
 }

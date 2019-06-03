@@ -2,10 +2,12 @@
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
+use JsonSerializable;
+
 /**
  * @codeCoverageIgnore
  */
-class ResourceRecordSection
+class ResourceRecordSection implements JsonSerializable
 {
     /**
      * @var ResourceRecordInterface[]
@@ -23,6 +25,11 @@ class ResourceRecordSection
      * @return ResourceRecordInterface[]
      */
     public function getRecords(): array
+    {
+        return $this->records;
+    }
+
+    public function jsonSerialize(): array
     {
         return $this->records;
     }

@@ -12,9 +12,17 @@ interface MessageSectionAwareInterface
 {
     public function setAdditionalSection(ResourceRecordSection $additionalSection): void;
 
-    public function setQuestionSection(QuestionSection $additionalSection): void;
+    public function getAdditionalSection(): ResourceRecordSection;
 
-    public function setAnswerSection(ResourceRecordSection $additionalSection): void;
+    public function setQuestionSection(QuestionSection $questionSection): void;
 
-    public function setAuthoritySection(ResourceRecordSection $additionalSection): void;
+    public function getQuestionSection(): QuestionSection;
+
+    public function setAnswerSection(ResourceRecordSection $answerSection): void;
+
+    public function getAnswerSection(): ResourceRecordSection;
+
+    public function setAuthoritySection(ResourceRecordSection $authoritySection): void;
+
+    public function getAuthoritySection(): ResourceRecordSection;
 }

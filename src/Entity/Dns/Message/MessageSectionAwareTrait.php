@@ -49,4 +49,24 @@ trait MessageSectionAwareTrait
     {
         $this->authoritySection = $section;
     }
+
+    public function getQuestionSection(): QuestionSection
+    {
+        return $this->questionSection;
+    }
+
+    public function getAdditionalSection(): ResourceRecordSection
+    {
+        return $this->additionalSection;
+    }
+
+    public function getAnswerSection(): ResourceRecordSection
+    {
+        return $this->answerSection;
+    }
+
+    public function getAuthoritySection(): ResourceRecordSection
+    {
+        return $this->authoritySection;
+    }
 }

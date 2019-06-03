@@ -2,10 +2,13 @@
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
+use JsonSerializable;
+
 /**
+ * @see https://tools.ietf.org/html/rfc1035#section-4.1.2
  * @codeCoverageIgnore
  */
-interface QueryInterface
+interface QueryInterface extends JsonSerializable
 {
     /**
      * a domain name represented as a sequence of labels, where
@@ -17,7 +20,7 @@ interface QueryInterface
      *
      * @return string
      */
-    public function getName(): string;
+    public function getQname(): string;
 
     /**
      * a two octet code which specifies the type of the query.
@@ -27,7 +30,7 @@ interface QueryInterface
      *
      * @return int
      */
-    public function getType(): int;
+    public function getQtype(): int;
 
     /**
      * a two octet code that specifies the class of the query.
@@ -35,5 +38,5 @@ interface QueryInterface
      *
      * @return int
      */
-    public function getClass(): int;
+    public function getQclass(): int;
 }

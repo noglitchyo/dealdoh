@@ -5,10 +5,13 @@ namespace NoGlitchYo\Dealdoh\Service;
 use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
 use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Throwable;
 
 class DnsPoolResolver implements DnsResolverInterface
@@ -22,46 +25,78 @@ class DnsPoolResolver implements DnsResolverInterface
      * @var DnsClientInterface[]
      */
     private $dnsClients;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(DnsUpstreamPool $dnsUpstreamPool, array $dnsClients = [])
+    public function __construct(DnsUpstreamPool $dnsUpstreamPool, array $dnsClients, LoggerInterface $logger = null)
     {
         $this->dnsUpstreamPool = $dnsUpstreamPool;
 
         foreach ($dnsClients as $dnsClient) {
             $this->addClient($dnsClient);
         }
+        $this->logger = $logger ?? new NullLogger();
     }
 
-    public function resolve(MessageInterface $dnsMessage): MessageInterface
+    /**
+     * @throws DnsPoolResolveFailedException
+     * @throws UpstreamNotSupportedException
+     */
+    public function resolve(MessageInterface $dnsRequest): DnsResource
     {
-        foreach ($this->dnsUpstreamPool->getUpstreams() as $dnsUpstream) {
-            try {
-                $dnsClient = $this->getClientForUpstream($dnsUpstream);
-                $dnsResponse = $dnsClient->resolve($dnsUpstream, $dnsMessage);
-                if ($dnsResponse->getHeader()->getRcode() === HeaderInterface::RCODE_NAME_ERROR) {
-                    // TODO: this behavior should be configurable
-                    continue; // if upstream did not find it (NXDOMAIN error), we retry with next
+        if (!$this->dnsUpstreamPool->getUpstreams()) {
+            throw DnsPoolResolveFailedException::emptyDnsPool();
+        }
+
+        $dnsUpstreams = $this->dnsUpstreamPool->getUpstreams();
+
+        foreach ($dnsUpstreams as $key => $dnsUpstream) { // TODO: the resolve strategy should be configurable
+            $dnsClients = $this->getSupportedClientsForUpstream($dnsUpstream);
+            if (empty($dnsClients)) {
+                throw new UpstreamNotSupportedException($dnsUpstream);
+            }
+
+            foreach ($dnsClients as $dnsClient) {
+                try {
+                    $dnsResponse = $dnsClient->resolve($dnsUpstream, $dnsRequest);
+                    if ($dnsResponse->getHeader()->getRcode() === HeaderInterface::RCODE_NAME_ERROR) {
+                        break; // Domain is not found on upstream, retry with the next upstream until out of upstreams.
+                    }
+                    return new DnsResource($dnsRequest, $dnsResponse, $dnsUpstream, $dnsClient);
+                } catch (Throwable $t) {
+                    $this->logger->warning(
+                        "Resolving from client failed:" . $t->getMessage(),
+                        [
+                            "client" => $dnsClient,
+                            "upstream" => $dnsUpstream,
+                            "exception" => $t
+                        ]
+                    );
+                    continue; // Retry with the next client until out of clients for the upstream.
                 }
-                return $dnsResponse;
-            } catch (UpstreamNotSupportedException $e) {
-                throw $e; // no upstream who can not be handle by a client should be provided
-            } catch (Throwable $t) {
-                continue; // if upstream failed, then we should try with another one
             }
         }
-        // TODO: we should handle this scenario correctly
-        throw new DnsPoolResolveFailedException('Unable to resolve DNS message');
+
+        throw DnsPoolResolveFailedException::unableToResolveFromUpstreams($dnsUpstreams);
     }
 
-    private function getClientForUpstream(DnsUpstream $dnsUpstream): DnsClientInterface
+    /**
+     * @param DnsUpstream $dnsUpstream
+     * @return DnsClientInterface[]
+     */
+    private function getSupportedClientsForUpstream(DnsUpstream $dnsUpstream): array
     {
+        $dnsClients = [];
+
         foreach ($this->dnsClients as $dnsClient) {
             if ($dnsClient->supports($dnsUpstream)) {
-                return $dnsClient;
+                $dnsClients[] = $dnsClient;
             }
         }
 
-        throw new UpstreamNotSupportedException($dnsUpstream);
+        return $dnsClients;
     }
 
     private function addClient(DnsClientInterface $dnsClient): self

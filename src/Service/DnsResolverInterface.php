@@ -3,11 +3,12 @@
 namespace NoGlitchYo\Dealdoh\Service;
 
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsResource;
 
 /**
  * @codeCoverageIgnore
  */
 interface DnsResolverInterface
 {
-    public function resolve(MessageInterface $dnsMessage): MessageInterface;
+    public function resolve(MessageInterface $dnsRequest): DnsResource;
 }
