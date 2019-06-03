@@ -2,7 +2,7 @@
 
 namespace NoGlitchYo\Dealdoh\Factory;
 
-use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -10,5 +10,5 @@ use Psr\Http\Message\ResponseInterface;
  */
 interface DohHttpMessageFactoryInterface
 {
-    public function createResponseFromMessage(DnsMessageInterface $dnsMessage): ResponseInterface;
+    public function createResponseFromMessage(MessageInterface $dnsMessage): ResponseInterface;
 }

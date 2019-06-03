@@ -1,13 +1,17 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh;
+namespace NoGlitchYo\Dealdoh\Entity;
 
 /**
  * @codeCoverageIgnore
  */
 class DnsUpstreamPool
 {
-    /** @var array */
+    /**
+     *
+     *
+     * @var array
+     */
     private $dnsUpstreams;
 
     public function __construct(array $dnsUpstreams)

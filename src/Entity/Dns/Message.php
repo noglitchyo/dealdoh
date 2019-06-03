@@ -1,20 +1,26 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Message;
+namespace NoGlitchYo\Dealdoh\Entity\Dns;
 
-use NoGlitchYo\Dealdoh\Message\Section\QueryInterface;
-use NoGlitchYo\Dealdoh\Message\Section\QuestionSection;
-use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordInterface;
-use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\MessageSectionAwareTrait;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QueryInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
 
 /**
  * @codeCoverageIgnore
  */
-class DnsMessage implements DnsMessageInterface
+class Message implements MessageInterface
 {
     use MessageSectionAwareTrait;
 
-    /** @var HeaderInterface */
+    /**
+     *
+     *
+     * @var HeaderInterface
+     */
     private $header;
 
     /**

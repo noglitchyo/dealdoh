@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Message;
+namespace NoGlitchYo\Dealdoh\Entity\Dns\Message;
 
-use NoGlitchYo\Dealdoh\Message\Section\QuestionSection;
-use NoGlitchYo\Dealdoh\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
 
 /**
  * @codeCoverageIgnore

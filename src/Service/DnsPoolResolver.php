@@ -1,12 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh;
+namespace NoGlitchYo\Dealdoh\Service;
 
 use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
 use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
-use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
-use NoGlitchYo\Dealdoh\Message\HeaderInterface;
 use Throwable;
 
 class DnsPoolResolver implements DnsResolverInterface
@@ -30,7 +32,7 @@ class DnsPoolResolver implements DnsResolverInterface
         }
     }
 
-    public function resolve(DnsMessageInterface $dnsMessage): DnsMessageInterface
+    public function resolve(MessageInterface $dnsMessage): MessageInterface
     {
         foreach ($this->dnsUpstreamPool->getUpstreams() as $dnsUpstream) {
             try {

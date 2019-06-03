@@ -3,7 +3,7 @@
 namespace NoGlitchYo\Dealdoh\Exception;
 
 use Exception;
-use NoGlitchYo\Dealdoh\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use Throwable;
 
 /**

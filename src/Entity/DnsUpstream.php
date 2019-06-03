@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh;
+namespace NoGlitchYo\Dealdoh\Entity;
 
 use const PHP_URL_PORT;
 use const PHP_URL_SCHEME;
@@ -10,13 +10,25 @@ use const PHP_URL_SCHEME;
  */
 class DnsUpstream
 {
-    /** @var string */
+    /**
+     *
+     *
+     * @var string
+     */
     private $uri;
 
-    /** @var null|string */
+    /**
+     *
+     *
+     * @var null|string
+     */
     private $scheme;
 
-    /** @var null|int */
+    /**
+     *
+     *
+     * @var null|int
+     */
     private $port;
 
     public function __construct(string $uri)

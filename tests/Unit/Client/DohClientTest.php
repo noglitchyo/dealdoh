@@ -4,11 +4,11 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 
 use Mockery;
 use NoGlitchYo\Dealdoh\Client\DohClient;
-use NoGlitchYo\Dealdoh\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Message\DnsMessage;
-use NoGlitchYo\Dealdoh\Message\Header;
-use NoGlitchYo\Dealdoh\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
@@ -26,7 +26,7 @@ class DohClientTest extends TestCase
     private $clientMock;
 
     /**
-     * @var MockInterface|DnsMessageFactoryInterface
+     * @var MockInterface|MessageFactoryInterface
      */
     private $dnsMessageFactoryMock;
 
@@ -38,7 +38,7 @@ class DohClientTest extends TestCase
     protected function setUp(): void
     {
         $this->clientMock = Mockery::mock(ClientInterface::class);
-        $this->dnsMessageFactoryMock = Mockery::mock(DnsMessageFactoryInterface::class);
+        $this->dnsMessageFactoryMock = Mockery::mock(MessageFactoryInterface::class);
 
         $this->sut = new DohClient($this->clientMock, $this->dnsMessageFactoryMock);
 
@@ -49,13 +49,13 @@ class DohClientTest extends TestCase
     {
         $dnsUpstreamAddr = 'https://some-random-doh-server.com/dns-query';
         $dnsUpstream = new DnsUpstream($dnsUpstreamAddr);
-        $dnsRequestMessage = new DnsMessage(
+        $dnsRequestMessage = new Message(
             new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
 
         $dnsWireRequestMessage = 'somebytesindnswireformat';
         $dnsWireResponseMessage = 'somemorebytesindnswireformat';
-        $dnsResponseMessage = new DnsMessage(
+        $dnsResponseMessage = new Message(
             new Header(0, true, 0, false, false, false, false, 0, HeaderInterface::RCODE_OK)
         );
         $httpResponse = new Response(200, [], $dnsWireResponseMessage);

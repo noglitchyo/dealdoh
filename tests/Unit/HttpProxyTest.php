@@ -7,12 +7,12 @@ use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\DnsResolverInterface;
-use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\HttpProxy;
-use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
@@ -32,7 +32,7 @@ class HttpProxyTest extends TestCase
     private $dnsResolverMock;
 
     /**
-     * @var MockInterface|DnsMessageFactoryInterface
+     * @var MockInterface|\NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface
      */
     private $dnsMessageFactoryMock;
 
@@ -54,7 +54,7 @@ class HttpProxyTest extends TestCase
     protected function setUp(): void
     {
         $this->dnsResolverMock = Mockery::mock(DnsResolverInterface::class);
-        $this->dnsMessageFactoryMock = Mockery::mock(DnsMessageFactoryInterface::class);
+        $this->dnsMessageFactoryMock = Mockery::mock(MessageFactoryInterface::class);
         $this->dohHttpMessageFactoryMock = Mockery::mock(DohHttpMessageFactoryInterface::class);
         $this->loggerMock = Mockery::mock(LoggerInterface::class);
 
@@ -78,8 +78,8 @@ class HttpProxyTest extends TestCase
             ]
         );
 
-        $dnsRequestMessage = Mockery::mock(DnsMessageInterface::class);
-        $dnsResponseMessage = Mockery::mock(DnsMessageInterface::class);
+        $dnsRequestMessage = Mockery::mock(MessageInterface::class);
+        $dnsResponseMessage = Mockery::mock(MessageInterface::class);
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')
@@ -165,8 +165,8 @@ class HttpProxyTest extends TestCase
             Stream::create($dnsWireMessage)
         );
 
-        $dnsRequestMessage = Mockery::mock(DnsMessageInterface::class);
-        $dnsResponseMessage = Mockery::mock(DnsMessageInterface::class);
+        $dnsRequestMessage = Mockery::mock(MessageInterface::class);
+        $dnsResponseMessage = Mockery::mock(MessageInterface::class);
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')
@@ -233,7 +233,7 @@ class HttpProxyTest extends TestCase
             ]
         );
 
-        $dnsRequestMessage = Mockery::mock(DnsMessageInterface::class);
+        $dnsRequestMessage = Mockery::mock(MessageInterface::class);
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')

@@ -2,15 +2,13 @@
 
 namespace NoGlitchYo\Dealdoh\Client;
 
-use NoGlitchYo\Dealdoh\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Message\DnsMessageInterface;
-use Socket\Raw\Exception;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use Socket\Raw\Factory;
 use const MSG_EOR;
 use const MSG_WAITALL;
 use const SO_RCVTIMEO;
-use const SOCKET_EAGAIN;
 use const SOL_SOCKET;
 
 class StdClient implements DnsClientInterface
@@ -23,17 +21,17 @@ class StdClient implements DnsClientInterface
     private $factory;
 
     /**
-     * @var DnsMessageFactoryInterface
+     * @var MessageFactoryInterface
      */
     private $dnsMessageFactory;
 
-    public function __construct(Factory $factory, DnsMessageFactoryInterface $dnsMessageFactory)
+    public function __construct(Factory $factory, MessageFactoryInterface $dnsMessageFactory)
     {
         $this->factory = $factory;
         $this->dnsMessageFactory = $dnsMessageFactory;
     }
 
-    public function resolve(DnsUpstream $dnsUpstream, DnsMessageInterface $dnsRequestMessage): DnsMessageInterface
+    public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
         $socket = $this->getClientSocket($dnsUpstream);
         $remote = $dnsUpstream->getUri();

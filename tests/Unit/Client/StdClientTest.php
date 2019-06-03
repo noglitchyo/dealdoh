@@ -5,11 +5,11 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 use Mockery;
 use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Message\DnsMessage;
-use NoGlitchYo\Dealdoh\Message\Header;
-use NoGlitchYo\Dealdoh\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use PHPUnit\Framework\TestCase;
 use Socket\Raw\Factory;
 use Socket\Raw\Socket;
@@ -21,7 +21,7 @@ use const SOL_SOCKET;
 class StdClientTest extends TestCase
 {
     /**
-     * @var MockInterface|DnsMessageFactoryInterface
+     * @var MockInterface|MessageFactoryInterface
      */
     private $dnsMessageFactoryMock;
 
@@ -38,7 +38,7 @@ class StdClientTest extends TestCase
     protected function setUp(): void
     {
         $this->socketFactoryMock = Mockery::mock(Factory::class);
-        $this->dnsMessageFactoryMock = Mockery::mock(DnsMessageFactoryInterface::class);
+        $this->dnsMessageFactoryMock = Mockery::mock(MessageFactoryInterface::class);
 
         $this->sut = new StdClient($this->socketFactoryMock, $this->dnsMessageFactoryMock);
 
@@ -49,14 +49,14 @@ class StdClientTest extends TestCase
     {
         $dnsUpstreamAddr = '8.8.8.8:53';
         $dnsUpstream = new DnsUpstream($dnsUpstreamAddr);
-        $dnsRequestMessage = new DnsMessage(
+        $dnsRequestMessage = new Message(
             new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
         );
 
         $socketMock = Mockery::mock(Socket::class);
         $dnsWireRequestMessage = 'somebytesindnswireformat';
         $dnsWireResponseMessage = 'somemorebytesindnswireformat';
-        $dnsResponseMessage = new DnsMessage(
+        $dnsResponseMessage = new Message(
             new Header(0, true, 0, false, false, false, false, 0, HeaderInterface::RCODE_OK)
         );
 

@@ -4,10 +4,10 @@ namespace NoGlitchYo\Dealdoh;
 
 use Exception;
 use InvalidArgumentException;
-use NoGlitchYo\Dealdoh\Factory\DnsMessageFactory;
-use NoGlitchYo\Dealdoh\Factory\DnsMessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
+use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -25,7 +25,7 @@ class HttpProxy
      */
     private $logger;
     /**
-     * @var DnsMessageFactoryInterface
+     * @var \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface
      */
     private $dnsMessageFactory;
     /**
@@ -35,7 +35,7 @@ class HttpProxy
 
     public function __construct(
         DnsResolverInterface $dnsResolver,
-        DnsMessageFactoryInterface $dnsMessageFactory,
+        MessageFactoryInterface $dnsMessageFactory,
         DohHttpMessageFactoryInterface $dohHttpMessageFactory,
         LoggerInterface $logger = null
     ) {
