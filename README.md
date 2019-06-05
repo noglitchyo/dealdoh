@@ -1,7 +1,8 @@
 # Dealdoh
-> Deal DNS over HTTPS
+> A toy to deal DNS over HTTPS and more!
 
-Dealdoh is a simple DNS over HTTPS proxy powered by PHP.
+Dealdoh is a simple DNS-over-HTTPS (DoH) proxy written in PHP. 
+It can be use as a middleware or a client and attempt to provide a low-level abstraction for DNS.
 
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/noglitchyo/dealdoh.svg)
 [![Build Status](https://travis-ci.org/noglitchyo/dealdoh.svg?branch=master)](https://travis-ci.org/noglitchyo/dealdoh)
@@ -9,15 +10,20 @@ Dealdoh is a simple DNS over HTTPS proxy powered by PHP.
 ![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/noglitchyo/dealdoh.svg)
 ![Packagist](https://img.shields.io/packagist/l/noglitchyo/dealdoh.svg)
 
+## Description
+
+Dealdoh can be use in different manners and for different purposes:
+- as a middleware in a web server and acts as a DNS proxy
+- as a client, using the provided command-line client to make DNS queries
+- as a low-level abstraction layer for development around DNS.
+
 ## Features
 
-Dealdoh go a little beyond what a simple proxy should do:
-
-- [x] Can use multiple upstreams at once and it provides a fallback mechanism.
-- [x] Can use different DNS protocol: RFC-1035 (TCP/UDP), RFC-8484 (DoH)
-- [x] Attempt to provide a DNS abstraction layer to allow easy development on top of it.
-- [x] Google DOH API client (https://developers.google.com/speed/public-dns/docs/dns-over-https) 
-- [x] Make DNS query from the command-line
+- [x] Create and forward DNS messages in different format to different type of upstreams.
+- [x] Use a pool of DNS upstreams to send queries with a fallback mechanism.
+- [x] Use different DNS protocol: RFC-1035 (TCP/UDP), RFC-8484 (DoH), Google DoH API.
+- [x] Provide a DNS low-level abstraction layer for DNS development. 
+- [x] Make DNS query from the command-line and provide results in JSON 
 
 ## Roadmap
 
@@ -26,38 +32,39 @@ Dealdoh go a little beyond what a simple proxy should do:
 - [ ] Dockerized application
 - [ ] Good documentation
 
-## Why Dealdoh?
-
-Dealdoh was created for development purpose. I wanted to reach my Docker containers from the browser by their hostnames. 
-So I started to use a [Docker image who discover services and register their hostname into a DNS](https://github.com/mageddo/dns-proxy-server) exposed on port 53.
-But I encountered the following issues:
-- I could not change the /etc/hosts file
-- I could not change the DNS for my computer (restrictions issue)
- 
-I ended up with the following solution: use the DoH client from Firefox and proxy every DNS query to a DoH proxy: Dealdoh.
-
 ## Getting started
 
-### Requirements
+As mentionned above, there is multiple ways to use Dealdoh.
+Let's see what can be done at the time with Dealdoh.
+
+### As a DoH proxy middleware
+
+#### Requirements
 
 - A web server
-- HTTPS enabled (self-signed certificates can do depending on the DOH client)
+- HTTPS enabled (self-signed certificates can work but it depends of the DOH client)
+- PHP 7.3
 
-### Installation
+#### Installation
 
-- `composer require noglitchyo/dealdoh`
+- You will need to install Dealdoh as a dependency in your project:
 
-- You need a PSR-7 ServerRequest if you wish to directly use the `HttpProxy::forward()` method. 
+`composer require noglitchyo/dealdoh`
+
+- You will need a PSR-7 ServerRequest if you wish to directly use the `HttpProxy::forward()` method. 
 Please check those cool implementations below:
     * https://github.com/Nyholm/psr7 - `composer require nyholm/psr7`
     * https://github.com/guzzle/psr7 - `composer require guzzle/psr7`
     * https://github.com/zendframework/zend-diactoros - `composer require zendframework/zend-diactoros`
 
-- Configure your dealdoh entrypoint
+- Configure your middleware/entrypoint to call Dealdoh's HttpProxy
 
-As stated before, `HttpProxy::forward()` method consumes PSR-7 ServerRequest to make it easier to implement on "Action"/"Middleware" classes.
-The example below illustrate how to use two different DNS upstreams using different protocols.
-Two types of DNS client who can handle each of the DNS protocols used by our upstreams are also injected.
+As stated before, `HttpProxy::forward()` method consumes PSR-7 ServerRequest to make integration easier 
+when implementing on "Action"/"Middleware" classes. 
+
+The example below illustrates how to use two DNS upstreams which are using different protocols. 
+In this example, the used protocols are UDP (RFC-1035) and DoH (RFC-8484).
+Two types of DNS client who can handle each of the DNS protocols used by our upstreams are injected to handle those upstreams.
 
 ```php
 <?php
@@ -82,6 +89,7 @@ $dnsResolver = new \NoGlitchYo\Dealdoh\DnsPoolResolver(
 $dnsProxy = new \NoGlitchYo\Dealdoh\HttpProxy(
     $dnsResolver,
     $dnsMessageFactory,
+    new \NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory($dnsMessageFactory)
 );
 
 /** @var \Psr\Http\Message\ResponseInterface */
@@ -90,15 +98,18 @@ $response = $dnsProxy->forward($request);
 - Testing the installation
 
 First, you need to know that most of implemented DoH client/server will send/receive DNS requests on the following path:
-`/dns-query`. Make sure your Dealdoh proxy has been configured to listen on this route or configure the client accordingly.
+`/dns-query`. 
+Make sure your Dealdoh's entrypoint has been configured to listen on this route or configure your client accordingly if it is possible.
 
-Multiple options exists: 
+A large variety of client already exists than you can easily find on Internet. For testing purpose, I advise the one below:  
 
 * Using the doh-client from [Facebook Experimental](https://github.com/facebookexperimental/doh-proxy)
 
-To make it easier, I created a [Docker image](https://hub.docker.com/) that you can use by running:
+To make it easier, I created a [Docker image](https://hub.docker.com/) that you can directly pull and run by running:
 
-`docker run --name dohfb -it noglitchyo/facebookexperimental-doh-proxy doh-client --domain dealdoh.proxy.addr --qname whatismyip.com --dnssec --insecure`
+`docker run --name dohfb -it noglitchyo/facebookexperimental-doh-proxy doh-client --domain <DEALDOH_ENTRYPOINT> --qname google.com --dnssec --insecure`
+
+*Replace the <DEALDOH_ENTRYPOINT> with the host of your entrypoint for Dealdoh.*
 
 (Tips: pass the --insecure option to doh-client if you are using self-signed certificates **#notDocumented**)
 
@@ -111,14 +122,33 @@ Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted
 I advise you to read [this really good article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
 which will give you lot of details about this TRR and how to configure it like a pro. 
 
-### Examples
+#### Examples
 
-Checkout some really simple integration examples to get a glimpse:
+Checkout some really simple integration examples to get a glimpse on how it can be done:
 
-- [Slim Framework](examples/slim-integration/README.md) 
+- [Slim Framework integration](examples/slim-integration/README.md) 
 - [DoH + Docker + DNS + Hostname Discovery](examples/docker-firefox/README.md)
 
-### Using the command-line
+### As a DNS command-line client
+
+#### Requirements
+
+- PHP 7.3
+- [Composer](https://getcomposer.org/doc/00-intro.md)
+
+#### Installation
+
+- You can use the client by cloning the project:
+
+`git clone https://github.com/noglitchyo/dealdoh` 
+
+`composer install`
+
+- or by using as a dependency in a project:
+
+`composer require noglitchyo/dealdoh` 
+
+#### Usage
 
 To execute DNS query directly from the command-line, you can use the provided binary:
 
@@ -161,6 +191,12 @@ It will output the result as JSON string:
 }
 ```
 
+## Testing
+
+If you wish to run the test, checkout the project and run the test with: 
+
+`composer test`
+
 ## Contributing
 
 Get started here [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -168,6 +204,16 @@ Get started here [CONTRIBUTING.md](CONTRIBUTING.md).
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Why Dealdoh?
+
+Dealdoh was created for development purpose. I wanted to reach my Docker containers from the browser by their hostnames. 
+So I started to use a [Docker image who discover services and register their hostname into a DNS](https://github.com/mageddo/dns-proxy-server) exposed on port 53.
+But I encountered the following issues:
+- I could not change the /etc/hosts file
+- I could not change the DNS for my computer (restrictions issue)
+ 
+I ended up with the following solution: use the DoH client from Firefox and proxy every DNS query to a DoH proxy: Dealdoh.
 
 ## Acknowledgments
 
@@ -178,7 +224,7 @@ Combined with Dealdoh it is amazing.
 
 ## References
 
-- https://tools.ietf.org/html/rfc8484
-- https://tools.ietf.org/html/rfc1035
-- PSR-7
-- PSR-18
+- [RFC-8484](https://tools.ietf.org/html/rfc8484)
+- [RFC-1035](https://tools.ietf.org/html/rfc1035)
+- [PSR-7](https://www.php-fig.org/psr/psr-7/)
+- [PSR-18](https://www.php-fig.org/psr/psr-18/)
