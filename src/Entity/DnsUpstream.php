@@ -26,7 +26,7 @@ class DnsUpstream
     private $port;
 
     /**
-     * @var null|string
+     * @var string
      */
     private $code;
 
