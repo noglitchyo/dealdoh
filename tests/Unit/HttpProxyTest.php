@@ -3,16 +3,20 @@
 namespace NoGlitchYo\Dealdoh\Tests\Unit;
 
 use Exception;
-use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
+use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsResource;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Exception\HttpProxyException;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\HttpProxy;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
@@ -78,8 +82,14 @@ class HttpProxyTest extends TestCase
             ]
         );
 
-        $dnsRequestMessage = Mockery::mock(MessageInterface::class);
-        $dnsResponseMessage = Mockery::mock(MessageInterface::class);
+        $dnsRequestMessage = Message::createWithDefaultHeader();
+        $dnsResponseMessage = Message::createWithDefaultHeader(true);
+        $dnsResource = new DnsResource(
+            $dnsRequestMessage,
+            $dnsResponseMessage,
+            new DnsUpstream('upstream'),
+            Mockery::mock(DnsClientInterface::class)
+        );
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')
@@ -89,14 +99,14 @@ class HttpProxyTest extends TestCase
         $this->dnsResolverMock
             ->shouldReceive('resolve')
             ->with($dnsRequestMessage)
-            ->andReturn($dnsResponseMessage);
+            ->andReturn($dnsResource);
 
         $this->loggerMock
             ->shouldReceive('info')
             ->with(
                 "Resolved DNS query with method GET",
                 [
-                    'dnsRequestMessage'  => $dnsRequestMessage,
+                    'dnsRequestMessage' => $dnsRequestMessage,
                     'dnsResponseMessage' => $dnsResponseMessage,
                 ]
             );
@@ -105,51 +115,49 @@ class HttpProxyTest extends TestCase
 
         $this->dohHttpMessageFactoryMock
             ->shouldReceive('createResponseFromMessage')
-            ->with($dnsResponseMessage)
+            ->with($dnsResource->getResponse())
             ->andReturn($httpResponse);
 
         $this->assertSame($httpResponse, $this->sut->forward($requestMock));
     }
 
-    public function testForwardThrowExceptionOnGetRequestWhenQueryParamIsInvalid(): void
+    public function testForwardLogAndThrowbackExceptionWhenExceptionIsRaised(): void
     {
-        $invalidBase64Request = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA***+++()()()';
+        $dnsWireMessage = 'wiremessage';
+        $requestMock = new ServerRequest('POST', '/dns-query', [], $dnsWireMessage);
 
-        $requestMock = (new ServerRequest('GET', '/dns-query'))->withQueryParams(
-            [
-                'dns' => $invalidBase64Request,
-            ]
-        );
+        $exception = new Exception('something wrong happened during message creation');
 
-        $exception = new Exception('dns query is malformated');
-
-        $this->expectExceptionMessage($exception->getMessage());
+        $this->expectExceptionMessage('DNS message creation failed.');
+        $this->expectException(HttpProxyException::class);
 
         $this->loggerMock
             ->shouldReceive('error')
-            ->with(sprintf('Failed to create DNS message: %s', $exception->getMessage()));
+            ->with(sprintf('Failed to create DNS message: %s', $exception->getMessage()), [
+                'exception' => $exception,
+                'httpRequest' => $requestMock
+            ]);
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')
-            ->with(Base64UrlCodecHelper::decode($invalidBase64Request))
+            ->with($dnsWireMessage)
             ->andThrow($exception);
 
         $this->sut->forward($requestMock);
     }
 
-    public function testForwardThrowExceptionOnGetRequestWhenQueryParamIsMissing()
+    public function testForwardReturnHttpBadRequestWhenQueryParamIsMissing()
     {
         $requestMock = new ServerRequest('GET', '/dns-query', ['Accept' => 'application/dns-message']);
         $expectedExceptionMessage = 'Query parameter `dns` is mandatory.';
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
 
         $this->loggerMock
             ->shouldReceive('error')
             ->with(sprintf('Failed to create DNS message: %s', $expectedExceptionMessage));
 
-        $this->sut->forward($requestMock);
+        $httpResponse = $this->sut->forward($requestMock);
+
+        $this->assertEquals(400, $httpResponse->getStatusCode());
     }
 
     public function testForwardCreateDnsMessageOnPostRequest(): void
@@ -165,8 +173,14 @@ class HttpProxyTest extends TestCase
             Stream::create($dnsWireMessage)
         );
 
-        $dnsRequestMessage = Mockery::mock(MessageInterface::class);
-        $dnsResponseMessage = Mockery::mock(MessageInterface::class);
+        $dnsRequestMessage = Message::createWithDefaultHeader();
+        $dnsResponseMessage = Message::createWithDefaultHeader(true);
+        $dnsResource = new DnsResource(
+            $dnsRequestMessage,
+            $dnsResponseMessage,
+            new DnsUpstream('udp://upstream:53'),
+            Mockery::mock(DnsClientInterface::class)
+        );
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')
@@ -176,14 +190,14 @@ class HttpProxyTest extends TestCase
         $this->dnsResolverMock
             ->shouldReceive('resolve')
             ->with($dnsRequestMessage)
-            ->andReturn($dnsResponseMessage);
+            ->andReturn($dnsResource);
 
         $this->loggerMock
             ->shouldReceive('info')
             ->with(
                 "Resolved DNS query with method POST",
                 [
-                    'dnsRequestMessage'  => $dnsRequestMessage,
+                    'dnsRequestMessage' => $dnsRequestMessage,
                     'dnsResponseMessage' => $dnsResponseMessage,
                 ]
             );
@@ -198,7 +212,7 @@ class HttpProxyTest extends TestCase
         $this->assertSame($httpResponse, $this->sut->forward($requestMock));
     }
 
-    public function testForwardThrowExceptionWhenRequestMethodIsNotSupported(): void
+    public function testForwardReturnMethodNotAllowedResponseWhenRequestMethodIsNotSupported(): void
     {
         $dnsWireMessage = 'AAABAAABAAAAAAABA3NzbAdnc3RhdGljA2NvbQAAAQABAAApEAAAAAAAAAgACAAEAAEAAA';
         $expectedExceptionMessage = 'Request method is not supported.';
@@ -212,15 +226,12 @@ class HttpProxyTest extends TestCase
             Stream::create($dnsWireMessage)
         );
 
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-
         $this->loggerMock
             ->shouldReceive('error')
             ->with(sprintf('Failed to create DNS message: %s', $expectedExceptionMessage));
 
-
-        $this->sut->forward($requestMock);
+        $httpResponse = $this->sut->forward($requestMock);
+        $this->assertEquals(405, $httpResponse->getStatusCode());
     }
 
     public function testForwardLogErrorAndThrowBackExceptionWhenResolveFail()
@@ -251,12 +262,13 @@ class HttpProxyTest extends TestCase
             ->with(
                 sprintf('Failed to resolve DNS query: %s', $exception->getMessage()),
                 [
-                    'dnsRequestMessage'  => $dnsRequestMessage,
+                    'exception' => $exception,
+                    'dnsRequestMessage' => $dnsRequestMessage,
                 ]
             );
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Resolve failed');
+        $this->expectExceptionMessage('Resolving DNS message failed.');
 
         $this->sut->forward($requestMock);
     }

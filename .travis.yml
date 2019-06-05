@@ -7,9 +7,16 @@ php:
 install:
   - composer install
 
-script:
-  - vendor/bin/phpcs --standard=PSR2 ./src/
-  - vendor/bin/phpstan analyse -l max src --no-interaction --no-progress
+jobs:
+  include:
+    - stage: "Tests"
+      name: "Unit tests"
+      script: "./vendor/bin/phpunit"
+    - stage: "Static Code Analysis"
+      name: "Static Analyze"
+      script: "vendor/bin/phpstan analyse -l max src --no-interaction --no-progress"
+    - name: "Linter"
+      script: "vendor/bin/phpcs --standard=PSR2 ./src/"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

@@ -2,18 +2,18 @@
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 
+use Exception;
 use Mockery;
+use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\Client\DohClient;
-use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Exception\DnsClientException;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
-use Mockery\MockInterface;
 
 /**
  * @covers \NoGlitchYo\Dealdoh\Client\DohClient
@@ -49,15 +49,10 @@ class DohClientTest extends TestCase
     {
         $dnsUpstreamAddr = 'https://some-random-doh-server.com/dns-query';
         $dnsUpstream = new DnsUpstream($dnsUpstreamAddr);
-        $dnsRequestMessage = new Message(
-            new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
-        );
-
+        $dnsRequestMessage = Message::createWithDefaultHeader();
         $dnsWireRequestMessage = 'somebytesindnswireformat';
         $dnsWireResponseMessage = 'somemorebytesindnswireformat';
-        $dnsResponseMessage = new Message(
-            new Header(0, true, 0, false, false, false, false, 0, HeaderInterface::RCODE_OK)
-        );
+        $dnsResponseMessage = Message::createWithDefaultHeader(true);
         $httpResponse = new Response(200, [], $dnsWireResponseMessage);
 
         $this->dnsMessageFactoryMock->shouldReceive('createDnsWireMessageFromMessage')
@@ -79,6 +74,29 @@ class DohClientTest extends TestCase
         $this->dnsMessageFactoryMock->shouldReceive('createMessageFromDnsWireMessage')
             ->with($dnsWireResponseMessage)
             ->andReturn($dnsResponseMessage);
+
+        $this->assertEquals($dnsResponseMessage, $this->sut->resolve($dnsUpstream, $dnsRequestMessage));
+    }
+
+    public function testResolveThrowDnsClientExceptionWhenSendingRequestFailed(): void
+    {
+        $dnsUpstreamAddr = 'https://some-random-doh-server.com/dns-query';
+        $dnsUpstream = new DnsUpstream($dnsUpstreamAddr);
+        $dnsRequestMessage = Message::createWithDefaultHeader();
+        $dnsWireRequestMessage = 'somebytesindnswireformat';
+        $dnsWireResponseMessage = 'somemorebytesindnswireformat';
+        $dnsResponseMessage = Message::createWithDefaultHeader(true);
+
+        $this->dnsMessageFactoryMock->shouldReceive('createDnsWireMessageFromMessage')
+            ->with($dnsRequestMessage)
+            ->andReturn($dnsWireRequestMessage);
+
+        $this->clientMock->shouldReceive('sendRequest')
+            ->with(Mockery::type(RequestInterface::class))
+            ->andThrow(Exception::class);
+
+        $this->expectException(DnsClientException::class);
+        $this->expectExceptionMessage(sprintf('Failed to send the request to DoH upstream `%s`', $dnsUpstreamAddr));
 
         $this->assertEquals($dnsResponseMessage, $this->sut->resolve($dnsUpstream, $dnsRequestMessage));
     }

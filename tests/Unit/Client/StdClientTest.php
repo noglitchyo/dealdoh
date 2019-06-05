@@ -5,15 +5,14 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 use Mockery;
 use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use PHPUnit\Framework\TestCase;
 use Socket\Raw\Factory;
 use Socket\Raw\Socket;
-use const MSG_EOR;
 use const MSG_WAITALL;
 use const SO_RCVTIMEO;
 use const SOL_SOCKET;
@@ -69,7 +68,7 @@ class StdClientTest extends TestCase
             ->andReturn($dnsWireRequestMessage);
 
         $socketMock->shouldReceive('sendTo')
-            ->with($dnsWireRequestMessage, MSG_EOR, $dnsUpstreamAddr);
+            ->with($dnsWireRequestMessage, 0, $dnsUpstreamAddr);
 
         $socketMock->shouldReceive('recvFrom')
             ->with(4096, MSG_WAITALL, $dnsUpstreamAddr)

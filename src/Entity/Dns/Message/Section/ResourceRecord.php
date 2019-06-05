@@ -65,4 +65,15 @@ class ResourceRecord implements ResourceRecordInterface
     {
         return $this->data;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'name' => $this->name,
+            'type' => $this->type,
+            'class' => $this->class,
+            'ttl' => $this->ttl,
+            'data' => $this->data
+        ];
+    }
 }

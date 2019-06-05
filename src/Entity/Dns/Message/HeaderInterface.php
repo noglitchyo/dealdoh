@@ -2,10 +2,13 @@
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message;
 
+use JsonSerializable;
+
 /**
+ * @see https://tools.ietf.org/html/rfc1035#section-4.1.1
  * @codeCoverageIgnore
  */
-interface HeaderInterface extends MessageSectionAwareInterface
+interface HeaderInterface extends MessageSectionAwareInterface, JsonSerializable
 {
     /**
      * No error condition
@@ -41,58 +44,50 @@ interface HeaderInterface extends MessageSectionAwareInterface
     const RCODE_REFUSED = 5;
 
     /**
-     * A 16 bit identifier assigned by the program that
-     * generates any kind of query.  This identifier is copied
-     * the corresponding reply and can be used by the requester
-     * to match up replies to outstanding queries.
+     * A 16 bit identifier assigned by the program that generates any kind of query.  This identifier is copied
+     * the corresponding reply and can be used by the requester to match up replies to outstanding queries.
      *
      * @return int
      */
     public function getId(): int;
 
     /**
-     * an unsigned 16 bit integer specifying the number of
-     * entries in the question section.
+     * an unsigned 16 bit integer specifying the number ofentries in the question section.
      *
      * @return int
      */
     public function getQdCount(): int;
 
     /**
-     * an unsigned 16 bit integer specifying the number of
-     * resource records in the answer section.
+     * an unsigned 16 bit integer specifying the number of resource records in the answer section.
      *
      * @return int
      */
     public function getAnCount(): int;
 
     /**
-     * an unsigned 16 bit integer specifying the number of name
-     * server resource records in the authority records section.
+     * an unsigned 16 bit int specifying the number of name server resource records in the authority records section.
      *
      * @return int
      */
     public function getNsCount(): int;
 
     /**
-     * an unsigned 16 bit integer specifying the number of
-     * resource records in the additional records section.
+     * an unsigned 16 bit integer specifying the number of resource records in the additional records section.
      *
      * @return int
      */
     public function getArCount(): int;
 
     /**
-     * A one bit field that specifies whether this message is a
-     * query (0), or a response (1).
+     * A one bit field that specifies whether this message is a query (0), or a response (1).
      *
      * @return bool
      */
     public function isQr(): bool;
 
     /**
-     * A four bit field that specifies kind of query in this
-     * message.  This value is set by the originator of a query
+     * A four bit field that specifies kind of query in this message.  This value is set by the originator of a query
      * and copied into the response.  The values are:
      *
      * 0               a standard query (QUERY)
@@ -108,22 +103,18 @@ interface HeaderInterface extends MessageSectionAwareInterface
     public function getOpcode(): int;
 
     /**
-     * Authoritative Answer - this bit is valid in responses,
-     * and specifies that the responding name server is an
+     * Authoritative Answer - this bit is valid in responses, and specifies that the responding name server is an
      * authority for the domain name in question section.
      *
-     * Note that the contents of the answer section may have
-     * multiple owner names because of aliases. The AA bit
-     * corresponds to the name which matches the query name, or
-     * the first owner name in the answer section.
+     * Note that the contents of the answer section may have multiple owner names because of aliases. The AA bit
+     * corresponds to the name which matches the query name, or the first owner name in the answer section.
      *
      * @return bool
      */
     public function isAa(): bool;
 
     /**
-     * TrunCation - specifies that this message was truncated
-     * due to length greater than that permitted on the
+     * TrunCation - specifies that this message was truncated due to length greater than that permitted on the
      * transmission channel.
      *
      * @return bool
@@ -131,18 +122,15 @@ interface HeaderInterface extends MessageSectionAwareInterface
     public function isTc(): bool;
 
     /**
-     * Recursion Desired - this bit may be set in a query and
-     * is copied into the response.  If RD is set, it directs
-     * the name server to pursue the query recursively.
-     * Recursive query support is optional.
+     * Recursion Desired - this bit may be set in a query and is copied into the response.  If RD is set, it directs
+     * the name server to pursue the query recursively. Recursive query support is optional.
      *
      * @return bool
      */
     public function isRd(): bool;
 
     /**
-     * Recursion Available - this be is set or cleared in a
-     * response, and denotes whether recursive query support is
+     * Recursion Available - this be is set or cleared in a response, and denotes whether recursive query support is
      * available in the name server.
      *
      * @return bool
@@ -150,8 +138,7 @@ interface HeaderInterface extends MessageSectionAwareInterface
     public function isRa(): bool;
 
     /**
-     * Reserved for future use.  Must be zero in all queries
-     * and responses.
+     * Reserved for future use.  Must be zero in all queries and responses.
      *
      * @return int
      */

@@ -2,8 +2,8 @@
 
 namespace NoGlitchYo\Dealdoh\Client;
 
-use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 
 interface DnsClientInterface
 {

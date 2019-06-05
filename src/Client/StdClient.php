@@ -6,11 +6,14 @@ use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use Socket\Raw\Factory;
-use const MSG_EOR;
 use const MSG_WAITALL;
 use const SO_RCVTIMEO;
 use const SOL_SOCKET;
 
+/**
+ * Standard DNS client making request over UDP (& TCP as a fallback)
+ * Use message in DNS wire format as described in RFC-1035
+ */
 class StdClient implements DnsClientInterface
 {
     public const EDNS_SIZE = 4096;
@@ -35,11 +38,7 @@ class StdClient implements DnsClientInterface
     {
         $socket = $this->getClientSocket($dnsUpstream);
         $remote = $dnsUpstream->getUri();
-        $socket->sendTo(
-            $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage),
-            MSG_EOR,
-            $remote
-        );
+        $socket->sendTo($this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage), 0, $remote);
         $socket->setOption(SOL_SOCKET, SO_RCVTIMEO, ['sec' => 5, 'usec' => 0]);
         // TODO: Need to be improved: usage of tcp, handle truncated query, retry, etc...
         $dnsWireResponseMessage = $socket->recvFrom(static::EDNS_SIZE, MSG_WAITALL, $remote);

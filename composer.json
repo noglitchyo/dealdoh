@@ -6,7 +6,8 @@
     "dns-resolver",
     "dns-over-https",
     "doh",
-    "dns-proxy"
+    "dns-proxy",
+    "dns-client"
   ],
   "license": "MIT",
   "authors": [
@@ -20,16 +21,14 @@
     "ext-json": "*",
     "ext-sockets": "*",
     "nyholm/psr7": "^1.1",
-    "nyholm/psr7-server": "^0.3.0",
     "php": "^7.3",
     "psr/http-client": "*",
     "psr/log": "^1.1",
     "php-http/guzzle6-adapter": "^2.0",
-    "react/dns": "^0.4.17"
+    "react/dns": "^0.4.17",
+    "symfony/console": "^4.3"
   },
   "require-dev": {
-    "slim/slim": "4.0.0-alpha",
-    "slim/http": "^0.7.0",
     "phpunit/phpunit": "^8.1",
     "mockery/mockery": "^1.2",
     "monolog/monolog": "^1.24",

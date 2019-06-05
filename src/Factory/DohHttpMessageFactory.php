@@ -43,7 +43,7 @@ class DohHttpMessageFactory implements DohHttpMessageFactoryInterface
     private function getMaxAge(MessageInterface $dnsMessage): ?int
     {
         $ttl = [];
-        foreach ($dnsMessage->getAnswers() as $rr) {
+        foreach ($dnsMessage->getAnswer() as $rr) {
             $ttl[] = $rr->getTtl();
         }
 

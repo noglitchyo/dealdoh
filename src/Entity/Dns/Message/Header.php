@@ -147,4 +147,23 @@ class Header implements HeaderInterface
     {
         return $this->rcode;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'qr' => $this->qr,
+            'opcode' => $this->opcode,
+            'aa' => $this->aa,
+            'tc' => $this->tc,
+            'rd' => $this->rd,
+            'ra' => $this->ra,
+            'z' => $this->z,
+            'rcode' => $this->rcode,
+            'qdCount' => $this->getQdCount(),
+            'anCount' => $this->getAnCount(),
+            'nsCount' => $this->getNsCount(),
+            'arCount' => $this->getArCount(),
+        ];
+    }
 }

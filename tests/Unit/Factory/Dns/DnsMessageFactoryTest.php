@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory\Dns;
 
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
