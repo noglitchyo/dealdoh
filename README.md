@@ -13,14 +13,15 @@ Dealdoh is a simple DNS over HTTPS proxy powered by PHP.
 
 Dealdoh go a little beyond what a simple proxy should do:
 
-- [x] It can use multiple upstreams at once and provide a fallback mechanism.
-- [x] It can use different DNS protocol: RFC-1035 (TCP/UDP), RFC-8484 (DoH)
+- [x] Can use multiple upstreams at once and it provides a fallback mechanism.
+- [x] Can use different DNS protocol: RFC-1035 (TCP/UDP), RFC-8484 (DoH)
 - [x] Attempt to provide a DNS abstraction layer to allow easy development on top of it.
+- [x] Google DOH API client (https://developers.google.com/speed/public-dns/docs/dns-over-https) 
+- [x] Make DNS query from the command-line
 
 ## Roadmap
 
 - [ ] Improve the current DNS clients
-- [ ] Add Google DOH API client (https://developers.google.com/speed/public-dns/docs/dns-over-https)
 - [ ] Ability to choose a DNS upstream fallback/selection strategy
 - [ ] Dockerized application
 - [ ] Good documentation
