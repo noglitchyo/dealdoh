@@ -78,7 +78,7 @@ class ResolveCommand extends Command
             throw new InvalidArgumentException('Query name must be a string.');
         }
 
-        if (!is_string($input->getArgument('qtype'))){
+        if (!is_string($input->getArgument('qtype'))) {
             throw new InvalidArgumentException('Query type must be a string.');
         }
 

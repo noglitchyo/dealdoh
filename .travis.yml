@@ -15,8 +15,7 @@ jobs:
     - stage: "Static Code Analysis"
       name: "Static Analyze"
       script: "vendor/bin/phpstan analyse -l max src --no-interaction --no-progress"
-    - stage: "Static Code Analysis"
-      name: "Linter"
+    - name: "Linter"
       script: "vendor/bin/phpcs --standard=PSR2 ./src/"
 
 after_success:
