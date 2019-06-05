@@ -122,6 +122,8 @@ Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted
 I advise you to read [this really good article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
 which will give you lot of details about this TRR and how to configure it like a pro. 
 
+Please check [the browser implementations list](https://github.com/curl/curl/wiki/DNS-over-HTTPS#supported-in-browsers-and-clients). 
+
 #### Examples
 
 Checkout some really simple integration examples to get a glimpse on how it can be done:
@@ -228,3 +230,4 @@ Combined with Dealdoh it is amazing.
 - [RFC-1035](https://tools.ietf.org/html/rfc1035)
 - [PSR-7](https://www.php-fig.org/psr/psr-7/)
 - [PSR-18](https://www.php-fig.org/psr/psr-18/)
+- [Wiki page DNS-over-HTTPS from Curl](https://github.com/curl/curl/wiki/DNS-over-HTTPS)
