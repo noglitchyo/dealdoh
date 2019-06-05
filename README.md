@@ -68,9 +68,9 @@ Two types of DNS client who can handle each of the DNS protocols used by our ups
 
 ```php
 <?php
-$dnsMessageFactory = new \NoGlitchYo\Dealdoh\Factory\MessageFactory();
-$dnsResolver = new \NoGlitchYo\Dealdoh\DnsPoolResolver(
-    new \NoGlitchYo\Dealdoh\DnsUpstreamPool([
+$dnsMessageFactory = new \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory();
+$dnsResolver = new \NoGlitchYo\Dealdoh\Service\DnsPoolResolver(
+    new \NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool([
         '8.8.8.8:53',
         'https://cloudflare-dns.com/dns-query',
     ]),
@@ -92,8 +92,8 @@ $dnsProxy = new \NoGlitchYo\Dealdoh\HttpProxy(
     new \NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory($dnsMessageFactory)
 );
 
-/** @var \Psr\Http\Message\ResponseInterface */
-$response = $dnsProxy->forward($request);
+/** @var $response \Psr\Http\Message\ResponseInterface */
+$response = $dnsProxy->forward(/* Expect a \Psr\Http\Message\RequestInterface object */);
 ```
 - Testing the installation
 
