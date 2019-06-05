@@ -45,6 +45,9 @@
       "NoGlitchYo\\Dealdoh\\Tests\\": "tests/"
     }
   },
+  "bin": [
+    "bin/dealdoh"
+  ],
   "scripts": {
     "phpstan": "phpstan analyse -l max src",
     "phpcs": "phpcs --standard=PSR2 ./src/",

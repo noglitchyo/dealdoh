@@ -118,6 +118,49 @@ Checkout some really simple integration examples to get a glimpse:
 - [Slim Framework](examples/slim-integration/README.md) 
 - [DoH + Docker + DNS + Hostname Discovery](examples/docker-firefox/README.md)
 
+### Using the command-line
+
+To execute DNS query directly from the command-line, you can use the provided binary:
+
+`php bin/dealdoh resolve google.fr AAAA --pretty`
+
+It will output the result as JSON string:
+```json
+{
+    "header": {
+        "id": 0,
+        "qr": true,
+        "opcode": 0,
+        "aa": false,
+        "tc": false,
+        "rd": true,
+        "ra": true,
+        "z": 0,
+        "rcode": 0,
+        ...
+    },
+    "question": [
+        {
+            "qname": "tools.ietf.org.",
+            "qtype": 28,
+            "qclass": 1
+        }
+    ],
+    "answer": [
+        {
+            "name": "tools.ietf.org.",
+            "type": 28,
+            "class": 1,
+            "ttl": 13,
+            "data": "2001:1900:3001:11::3e"
+        },
+        ...
+    ],
+    "authority": [],
+    "additional": []
+}
+```
+
 ## Contributing
 
 Get started here [CONTRIBUTING.md](CONTRIBUTING.md).
