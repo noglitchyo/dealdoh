@@ -42,7 +42,10 @@ Let's see what can be done at the time with Dealdoh.
 #### Requirements
 
 - A web server
-- HTTPS enabled (self-signed certificates can work but it depends of the DOH client)
+- HTTPS enabled with valid certificates (self-signed certificates can work but it depends of the DOH client)
+
+To get valid certificates in a local environment, I recommend you to use [mkcert](https://github.com/FiloSottile/mkcert) which generate for you a local Certificate Authority, and create locally trusted certificates with it. Take 3 minutes to check its really simple documentation for your OS. (since installation differs on each OS)
+
 - PHP 7.3
 
 #### Installation
@@ -168,8 +171,8 @@ It will output the result as JSON string:
         "rd": true,
         "ra": true,
         "z": 0,
-        "rcode": 0,
-        ...
+        "rcode": 0
+        // ...
     },
     "question": [
         {
@@ -185,8 +188,8 @@ It will output the result as JSON string:
             "class": 1,
             "ttl": 13,
             "data": "2001:1900:3001:11::3e"
-        },
-        ...
+        }
+        // ...
     ],
     "authority": [],
     "additional": []
