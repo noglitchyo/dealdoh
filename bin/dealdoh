@@ -8,8 +8,8 @@ use Http\Adapter\Guzzle6\Client;
 use NoGlitchYo\Dealdoh\Client\DohClient;
 use NoGlitchYo\Dealdoh\Client\GoogleDnsClient;
 use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Command\AddUpstreamCommand;
 use NoGlitchYo\Dealdoh\Command\ResolveCommand;
-use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
 use NoGlitchYo\Dealdoh\Mapper\GoogleDns\MessageMapper;
@@ -17,22 +17,17 @@ use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
 use Socket\Raw\Factory;
 use Symfony\Component\Console\Application;
 
+const UPSTREAMPOOL_FILE = __DIR__ . '/../config/upstreampool.json';
+
 $application = new Application();
 
-if (false === $upstreamPoolContent = file_get_contents(__DIR__ . '/../config/upstreampool.json')) {
-    throw new Exception('Please define upstreampool.json file.');
+if (false === $upstreamPoolJson = file_get_contents(UPSTREAMPOOL_FILE)) {
+    $upstreamPoolJson = '[]';
+    file_put_contents(UPSTREAMPOOL_FILE, $upstreamPoolJson);
+    //throw new Exception('Please define upstreampool.json.bak file in the `config` directory.');
 }
 
-$upstreams = json_decode($upstreamPoolContent, true);
-
-if (empty($upstreams)) {
-    throw new Exception('No upstreams configured in upstreampool.json file');
-}
-
-$upstreamPool = new DnsUpstreamPool();
-foreach ($upstreams as $upstream) {
-    $upstreamPool->addUpstream(new DnsUpstream($upstream['uri'], $upstream['code']));
-}
+$upstreamPool = DnsUpstreamPool::fromJson($upstreamPoolJson);
 
 $dnsMessageFactory = new MessageFactory();
 $httpClient = new Client(
@@ -53,6 +48,10 @@ $dnsClients = [
     ),
 ];
 
-$application->add(new ResolveCommand(new DnsPoolResolver($upstreamPool, $dnsClients), $dnsMessageFactory));
+$application->addCommands([
+    new ResolveCommand(new DnsPoolResolver($upstreamPool, $dnsClients), $dnsMessageFactory),
+    new AddUpstreamCommand(UPSTREAMPOOL_FILE)
+]);
 
 $application->run();
+
