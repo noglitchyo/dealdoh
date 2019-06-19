@@ -14,7 +14,7 @@ It can be use as a middleware or a client and attempt to provide a low-level abs
 
 Dealdoh can be use in different manners and for different purposes:
 - as a middleware in a web server and acts as a DNS proxy
-- as a client, using the provided command-line client to make DNS queries
+- as a client, using the provided command-line client to make DNS queries with [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/).
 - as a low-level abstraction layer for development around DNS.
 
 ## Features
@@ -38,6 +38,9 @@ As mentionned above, there is multiple ways to use Dealdoh.
 Let's see what can be done at the time with Dealdoh.
 
 ### As a DoH proxy middleware
+
+If you wish to get started quickly, check Please, check out [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) 
+which offers a ready-to-use implementation.
 
 #### Requirements
 
@@ -136,65 +139,7 @@ Checkout some really simple integration examples to get a glimpse on how it can 
 
 ### As a DNS command-line client
 
-#### Requirements
-
-- PHP 7.3
-- [Composer](https://getcomposer.org/doc/00-intro.md)
-
-#### Installation
-
-- You can use the client by cloning the project:
-
-`git clone https://github.com/noglitchyo/dealdoh` 
-
-`composer install`
-
-- or by using as a dependency in a project:
-
-`composer require noglitchyo/dealdoh` 
-
-#### Usage
-
-To execute DNS query directly from the command-line, you can use the provided binary:
-
-`php bin/dealdoh resolve google.fr AAAA --pretty`
-
-It will output the result as JSON string:
-```json
-{
-    "header": {
-        "id": 0,
-        "qr": true,
-        "opcode": 0,
-        "aa": false,
-        "tc": false,
-        "rd": true,
-        "ra": true,
-        "z": 0,
-        "rcode": 0
-        // ...
-    },
-    "question": [
-        {
-            "qname": "tools.ietf.org.",
-            "qtype": 28,
-            "qclass": 1
-        }
-    ],
-    "answer": [
-        {
-            "name": "tools.ietf.org.",
-            "type": 28,
-            "class": 1,
-            "ttl": 13,
-            "data": "2001:1900:3001:11::3e"
-        }
-        // ...
-    ],
-    "authority": [],
-    "additional": []
-}
-```
+Please, check out [Dealdoh client](https://github.com/noglitchyo/dealdoh-client/) for this.
 
 ## Testing
 
