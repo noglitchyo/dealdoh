@@ -2,13 +2,14 @@
 
 namespace NoGlitchYo\Dealdoh\Entity;
 
+use JsonSerializable;
 use const PHP_URL_PORT;
 use const PHP_URL_SCHEME;
 
 /**
  * @codeCoverageIgnore
  */
-class DnsUpstream
+class DnsUpstream implements JsonSerializable
 {
     /**
      * @var string
@@ -56,5 +57,13 @@ class DnsUpstream
     public function getCode(): string
     {
         return $this->code;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'code' => $this->code,
+            'uri' => $this->uri,
+        ];
     }
 }

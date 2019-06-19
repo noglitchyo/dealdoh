@@ -2,16 +2,16 @@
 
 namespace NoGlitchYo\Dealdoh\Client;
 
-use GuzzleHttp\Psr7\Request;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Exception\DnsClientException;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use Nyholm\Psr7\Request;
 use Psr\Http\Client\ClientInterface;
 use Throwable;
 
 /**
- * DoH client following RFC-8484
+ * DoH client making DNS query as described in RFC-8484
  */
 class DohClient implements DnsClientInterface
 {
