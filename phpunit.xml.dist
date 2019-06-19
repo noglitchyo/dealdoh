@@ -13,7 +13,7 @@
          stopOnFailure="false"
          bootstrap="vendor/autoload.php">
     <testsuites>
-        <testsuite name="DoDoh Test Suite">
+        <testsuite name="Dealdoh Test Suite">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>

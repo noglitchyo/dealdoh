@@ -33,7 +33,7 @@ class DnsUpstreamPool implements DnsUpstreamPoolInterface, JsonSerializable
         }
     }
 
-    public function addUpstream(DnsUpstream $dnsUpstream): self
+    public function addUpstream(DnsUpstream $dnsUpstream): DnsUpstreamPoolInterface
     {
         $this->dnsUpstreams[] = $dnsUpstream;
 

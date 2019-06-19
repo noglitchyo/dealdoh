@@ -48,7 +48,7 @@ class StdClient implements DnsClientInterface
 
     public function supports(DnsUpstream $dnsUpstream): bool
     {
-        return $dnsUpstream->getScheme() === null || $dnsUpstream->getScheme() === 'udp';
+        return in_array($dnsUpstream->getScheme(), ['udp', 'tcp', 'dns']) || $dnsUpstream->getScheme() === null;
     }
 
     private function getClientSocket(DnsUpstream $dnsUpstream)
