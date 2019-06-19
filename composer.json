@@ -24,9 +24,7 @@
     "php": "^7.3",
     "psr/http-client": "*",
     "psr/log": "^1.1",
-    "php-http/guzzle6-adapter": "^2.0",
-    "react/dns": "^0.4.17",
-    "symfony/console": "^4.3"
+    "react/dns": "^0.4.17"
   },
   "require-dev": {
     "phpunit/phpunit": "^8.1",
@@ -45,9 +43,6 @@
       "NoGlitchYo\\Dealdoh\\Tests\\": "tests/"
     }
   },
-  "bin": [
-    "bin/dealdoh"
-  ],
   "scripts": {
     "phpstan": "phpstan analyse -l max src",
     "phpcs": "phpcs --standard=PSR2 ./src/",

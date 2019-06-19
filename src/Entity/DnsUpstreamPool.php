@@ -7,10 +7,10 @@ use JsonSerializable;
 /**
  * @codeCoverageIgnore
  */
-class DnsUpstreamPool implements JsonSerializable
+class DnsUpstreamPool implements DnsUpstreamPoolInterface, JsonSerializable
 {
     /**
-     * @var array
+     * @var DnsUpstream[]
      */
     private $dnsUpstreams = [];
 

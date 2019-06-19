@@ -7,7 +7,7 @@ use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
-use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPoolInterface;
 use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
 use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
 use Psr\Log\LoggerInterface;
@@ -17,7 +17,7 @@ use Throwable;
 class DnsPoolResolver implements DnsResolverInterface
 {
     /**
-     * @var DnsUpstreamPool
+     * @var DnsUpstreamPoolInterface
      */
     private $dnsUpstreamPool;
 
@@ -30,14 +30,14 @@ class DnsPoolResolver implements DnsResolverInterface
      */
     private $logger;
 
-    public function __construct(DnsUpstreamPool $dnsUpstreamPool, array $dnsClients, LoggerInterface $logger = null)
+    public function __construct(DnsUpstreamPoolInterface $dnsUpstreamPool, array $dnsClients, LoggerInterface $logger = null)
     {
         $this->dnsUpstreamPool = $dnsUpstreamPool;
+        $this->logger = $logger ?? new NullLogger();
 
         foreach ($dnsClients as $dnsClient) {
             $this->addClient($dnsClient);
         }
-        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -80,6 +80,11 @@ class DnsPoolResolver implements DnsResolverInterface
         }
 
         throw DnsPoolResolveFailedException::unableToResolveFromUpstreams($dnsUpstreams);
+    }
+
+    public function supports(DnsUpstream $dnsUpstream): bool
+    {
+        return !empty($this->getSupportedClientsForUpstream($dnsUpstream));
     }
 
     /**
