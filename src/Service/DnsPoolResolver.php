@@ -30,8 +30,11 @@ class DnsPoolResolver implements DnsResolverInterface
      */
     private $logger;
 
-    public function __construct(DnsUpstreamPoolInterface $dnsUpstreamPool, array $dnsClients, LoggerInterface $logger = null)
-    {
+    public function __construct(
+        DnsUpstreamPoolInterface $dnsUpstreamPool,
+        array $dnsClients,
+        LoggerInterface $logger = null
+    ) {
         $this->dnsUpstreamPool = $dnsUpstreamPool;
         $this->logger = $logger ?? new NullLogger();
 

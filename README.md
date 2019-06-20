@@ -12,48 +12,46 @@ It can be use as a middleware or a client and attempt to provide a low-level abs
 
 ## Description
 
-Dealdoh can be use in different manners and for different purposes:
-- as a middleware in a web server and acts as a DNS proxy
-- as a client, using the provided command-line client to make DNS queries with [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/).
-- as a low-level abstraction layer for development around DNS.
+Dealdoh can be use in different manners and for different purposes. Dealdoh attempt to achieve the following goals:
+- provide a DoH middleware which can be use in any PHP application acting as a DNS proxy.
+- provide a variety of DNS stub resolver.
+- provide a large panel of DNS clients.
+- provide a low-level abstraction layer for development around DNS.
+
+Dealdoh also comes with a [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) embedding the following features:
+- an application implementing Dealdoh middleware and ready to be run as a micro-service
+- a CLI client to make DNS queries, configure DNS upstreams, etc... 
 
 ## Features
 
-- [x] Create and forward DNS messages in different format to different type of upstreams.
-- [x] Use a pool of DNS upstreams to send queries with a fallback mechanism.
-- [x] Use different DNS protocol: RFC-1035 (TCP/UDP), RFC-8484 (DoH), Google DoH API.
+- [x] Create and forward DNS messages in different format to different type of DNS upstream resolvers.
+- [x] Use a pool of DNS upstream resolvers to send queries with a fallback mechanism.
+- [x] Compatible with a variety of DNS protocols: RFC-1035 (TCP/UDP), RFC-8484 (DoH), Google DoH API.
 - [x] Provide a DNS low-level abstraction layer for DNS development. 
 - [x] Make DNS query from the command-line and provide results in JSON 
 
 ## Roadmap
 
-- [ ] Improve the current DNS clients
+- [ ] Improve robustness and compliance of current DNS clients
 - [ ] Ability to choose a DNS upstream fallback/selection strategy
-- [ ] Dockerized application
 - [ ] Good documentation
 
 ## Getting started
 
-As mentionned above, there is multiple ways to use Dealdoh.
-Let's see what can be done at the time with Dealdoh.
-
-### As a DoH proxy middleware
-
-If you wish to get started quickly, check Please, check out [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) 
+If you wish to get started quickly, you might want to use [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) 
 which offers a ready-to-use implementation.
 
 #### Requirements
 
-- A web server
+- PHP 7.3
+- Web server
 - HTTPS enabled with valid certificates (self-signed certificates can work but it depends of the DOH client)
 
-To get valid certificates in a local environment, I recommend you to use [mkcert](https://github.com/FiloSottile/mkcert) which generate for you a local Certificate Authority, and create locally trusted certificates with it. Take 3 minutes to check its really simple documentation for your OS. (since installation differs on each OS)
-
-- PHP 7.3
+To get trusted certificates in a local environment, I recommend you to use [mkcert](https://github.com/FiloSottile/mkcert) which generate for you a local Certificate Authority, and create locally trusted certificates with it. Take 3 minutes to check its really simple documentation for your OS. (since installation differs on each OS)
 
 #### Installation
 
-- You will need to install Dealdoh as a dependency in your project:
+- Install Dealdoh as a dependency:
 
 `composer require noglitchyo/dealdoh`
 
@@ -63,13 +61,12 @@ Please check those cool implementations below:
     * https://github.com/guzzle/psr7 - `composer require guzzle/psr7`
     * https://github.com/zendframework/zend-diactoros - `composer require zendframework/zend-diactoros`
 
-- Configure your middleware/entrypoint to call Dealdoh's HttpProxy
+- Configure your middleware/entrypoint to call Dealdoh's `HttpProxy::forward()`
 
-As stated before, `HttpProxy::forward()` method consumes PSR-7 ServerRequest to make integration easier 
-when implementing on "Action"/"Middleware" classes. 
+As stated before, `HttpProxy::forward()` method consumes PSR-7 ServerRequest to make the integration easier. 
 
-The example below illustrates how to use two DNS upstreams which are using different protocols. 
-In this example, the used protocols are UDP (RFC-1035) and DoH (RFC-8484).
+The example below illustrates how to use two DNS upstream resolvers which are using different protocols. 
+In this example, the used protocols are TCP/UDP (RFC-1035) and DoH (RFC-8484).
 Two types of DNS client who can handle each of the DNS protocols used by our upstreams are injected to handle those upstreams.
 
 ```php
@@ -77,7 +74,7 @@ Two types of DNS client who can handle each of the DNS protocols used by our ups
 $dnsMessageFactory = new \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory();
 $dnsResolver = new \NoGlitchYo\Dealdoh\Service\DnsPoolResolver(
     new \NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool([
-        '8.8.8.8:53',
+        'dns://8.8.8.8:53',
         'https://cloudflare-dns.com/dns-query',
     ]),
     [
@@ -103,11 +100,14 @@ $response = $dnsProxy->forward(/* Expect a \Psr\Http\Message\RequestInterface ob
 ```
 - Testing the installation
 
-First, you need to know that most of implemented DoH client/server will send/receive DNS requests on the following path:
-`/dns-query`. 
+First, be aware that usually, DoH client/server will send/receive DNS requests on the following path:
+`/dns-query` as recommended in RFC-8484. 
 Make sure your Dealdoh's entrypoint has been configured to listen on this route or configure your client accordingly if it is possible.
 
-A large variety of client already exists than you can easily find on Internet. For testing purpose, I advise the one below:  
+A large variety of client already exists than you can easily find on Internet. 
+For testing purpose, I advise the one below:
+
+* Using [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/)
 
 * Using the doh-client from [Facebook Experimental](https://github.com/facebookexperimental/doh-proxy)
 
@@ -121,9 +121,9 @@ To make it easier, I created a [Docker image](https://hub.docker.com/) that you 
 
 Please, check [how to use the client](https://github.com/facebookexperimental/doh-proxy#doh-client).
     
-* Using your client browser  
+* Using client from Web Browser  
 
-Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted_Recursive_Resolver) who can be configured to query DoH servers.
+Mozilla Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted_Recursive_Resolver) who can be configured to query DoH servers.
 
 I advise you to read [this really good article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
 which will give you lot of details about this TRR and how to configure it like a pro. 
@@ -136,10 +136,8 @@ Checkout some really simple integration examples to get a glimpse on how it can 
 
 - [Slim Framework integration](examples/slim-integration/README.md) 
 - [DoH + Docker + DNS + Hostname Discovery](examples/docker-firefox/README.md)
+- [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/)
 
-### As a DNS command-line client
-
-Please, check out [Dealdoh client](https://github.com/noglitchyo/dealdoh-client/) for this.
 
 ## Testing
 
@@ -176,6 +174,8 @@ Combined with Dealdoh it is amazing.
 
 - [RFC-8484](https://tools.ietf.org/html/rfc8484)
 - [RFC-1035](https://tools.ietf.org/html/rfc1035)
+- [RFC-4501](https://tools.ietf.org/html/rfc4501)
+- [RFC-7719](https://tools.ietf.org/html/rfc7719)
 - [PSR-7](https://www.php-fig.org/psr/psr-7/)
 - [PSR-18](https://www.php-fig.org/psr/psr-18/)
 - [Wiki page DNS-over-HTTPS from Curl](https://github.com/curl/curl/wiki/DNS-over-HTTPS)
