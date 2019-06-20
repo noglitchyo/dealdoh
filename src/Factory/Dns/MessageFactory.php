@@ -2,11 +2,13 @@
 
 namespace NoGlitchYo\Dealdoh\Factory\Dns;
 
+use InvalidArgumentException;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Exception\InvalidWireMessageException;
 use React\Dns\Model\HeaderBag;
 use React\Dns\Model\Message as DnsMessage;
 use React\Dns\Model\Record;
@@ -73,7 +75,13 @@ class MessageFactory implements MessageFactoryInterface
 
     public function createMessageFromDnsWireMessage(string $dnsWireMessage): MessageInterface
     {
-        return self::createFromMessage($this->parser->parseMessage($dnsWireMessage));
+        try {
+            $dnsWireMessage = $this->parser->parseMessage($dnsWireMessage);
+        } catch (InvalidArgumentException $exception) {
+            throw new InvalidWireMessageException();
+        }
+
+        return self::createFromMessage($dnsWireMessage);
     }
 
     /**
