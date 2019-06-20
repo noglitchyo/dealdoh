@@ -2,7 +2,7 @@
 > A toy to deal DNS over HTTPS and more!
 
 Dealdoh is a simple DNS-over-HTTPS (DoH) proxy written in PHP. 
-It can be use as a middleware or a client and attempt to provide a low-level abstraction for DNS.
+It can be use as a middleware or a client and attempt to provide a low-level abstraction layer for DNS messaging.
 
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/noglitchyo/dealdoh.svg)
 [![Build Status](https://travis-ci.org/noglitchyo/dealdoh.svg?branch=master)](https://travis-ci.org/noglitchyo/dealdoh)
