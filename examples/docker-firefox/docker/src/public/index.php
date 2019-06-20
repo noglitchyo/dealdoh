@@ -3,11 +3,11 @@
 use Http\Adapter\Guzzle6\Client;
 use NoGlitchYo\Dealdoh\Client\DohClient;
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\DohProxy;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
 use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory;
-use NoGlitchYo\Dealdoh\HttpProxy;
+use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
@@ -43,7 +43,7 @@ $app->any(
             ]
         );
 
-        $dnsProxy = new HttpProxy(
+        $dnsProxy = new DohProxy(
             $dnsResolver,
             $dnsMessageFactory,
             new DohHttpMessageFactory($dnsMessageFactory)

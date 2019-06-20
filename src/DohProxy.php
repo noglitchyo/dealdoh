@@ -10,11 +10,13 @@ use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 
-class HttpProxy
+class DohProxy implements MiddlewareInterface
 {
     /**
      * @var DnsResolverInterface
@@ -47,6 +49,12 @@ class HttpProxy
         $this->dnsMessageFactory = $dnsMessageFactory;
         $this->dohHttpMessageFactory = $dohHttpMessageFactory;
     }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        return $this->forward($request);
+    }
+
 
     /**
      * @throws HttpProxyException

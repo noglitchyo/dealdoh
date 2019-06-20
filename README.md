@@ -13,7 +13,7 @@ It can be use as a middleware or a client and attempt to provide a low-level abs
 ## Description
 
 Dealdoh can be use in different manners and for different purposes. Dealdoh attempt to achieve the following goals:
-- provide a DoH middleware which can be use in any PHP application acting as a DNS proxy.
+- provide a DoH middleware PSR-15 compliant which can be use in any PHP application to act as a DNS proxy.
 - provide a variety of DNS stub resolver.
 - provide a large panel of DNS clients.
 - provide a low-level abstraction layer for development around DNS.
@@ -55,15 +55,15 @@ To get trusted certificates in a local environment, I recommend you to use [mkce
 
 `composer require noglitchyo/dealdoh`
 
-- You will need a PSR-7 ServerRequest if you wish to directly use the `HttpProxy::forward()` method. 
+- You will need a PSR-7 ServerRequest if you wish to directly use the `DohProxy::forward()` method. 
 Please check those cool implementations below:
     * https://github.com/Nyholm/psr7 - `composer require nyholm/psr7`
     * https://github.com/guzzle/psr7 - `composer require guzzle/psr7`
     * https://github.com/zendframework/zend-diactoros - `composer require zendframework/zend-diactoros`
 
-- Configure your middleware/entrypoint to call Dealdoh's `HttpProxy::forward()`
+- Configure your middleware/entrypoint to call Dealdoh's `DohProxy::forward()`
 
-As stated before, `HttpProxy::forward()` method consumes PSR-7 ServerRequest to make the integration easier. 
+As stated before, `DohProxy::forward()` method consumes PSR-7 ServerRequest to make the integration easier. 
 
 The example below illustrates how to use two DNS upstream resolvers which are using different protocols. 
 In this example, the used protocols are TCP/UDP (RFC-1035) and DoH (RFC-8484).
@@ -89,7 +89,7 @@ $dnsResolver = new \NoGlitchYo\Dealdoh\Service\DnsPoolResolver(
     ]
 );
 
-$dnsProxy = new \NoGlitchYo\Dealdoh\HttpProxy(
+$dnsProxy = new \NoGlitchYo\Dealdoh\DohProxy(
     $dnsResolver,
     $dnsMessageFactory,
     new \NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory($dnsMessageFactory)
@@ -177,5 +177,6 @@ Combined with Dealdoh it is amazing.
 - [RFC-4501](https://tools.ietf.org/html/rfc4501)
 - [RFC-7719](https://tools.ietf.org/html/rfc7719)
 - [PSR-7](https://www.php-fig.org/psr/psr-7/)
+- [PSR-15](https://www.php-fig.org/psr/psr-15/)
 - [PSR-18](https://www.php-fig.org/psr/psr-18/)
 - [Wiki page DNS-over-HTTPS from Curl](https://github.com/curl/curl/wiki/DNS-over-HTTPS)
