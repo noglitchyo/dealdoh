@@ -1,8 +1,9 @@
 # Dealdoh
 > A toy to deal DNS over HTTPS and more!
 
-Dealdoh is a simple DNS-over-HTTPS (DoH) proxy written in PHP. 
-It can be use as a middleware or a client and attempt to provide a low-level abstraction layer for DNS messaging.
+Dealdoh is a powerful DNS-over-HTTPS (DoH) proxy server written in PHP. 
+It can be use as a DoH proxy server or a client.
+Dealdoh also attempts to provide a low-level abstraction layer for DNS messaging.
 
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/noglitchyo/dealdoh.svg)
 [![Build Status](https://travis-ci.org/noglitchyo/dealdoh.svg?branch=master)](https://travis-ci.org/noglitchyo/dealdoh)
@@ -12,18 +13,19 @@ It can be use as a middleware or a client and attempt to provide a low-level abs
 
 ## Description
 
-Dealdoh can be use in different manners and for different purposes. Dealdoh attempt to achieve the following goals:
-- provide a DoH middleware PSR-15 compliant which can be use in any PHP application to act as a DNS proxy.
+Dealdoh can be use in different manners and for different purposes. It attempts to achieve the following goals:
+- provide a DoH middleware PSR-15 compliant which can be use in any PHP application to act as a DNS proxy server.
 - provide a variety of DNS stub resolver.
 - provide a large panel of DNS clients.
 - provide a low-level abstraction layer for development around DNS.
 
 Dealdoh also comes with a [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) embedding the following features:
-- an application implementing Dealdoh middleware and ready to be run as a micro-service
-- a CLI client to make DNS queries, configure DNS upstreams, etc... 
+- an application implementing Dealdoh middleware and ready to be run as a micro-service.
+- a DNS CLI client to make DNS queries, configure DNS upstreams, etc... 
 
 ## Features
 
+- [x] Provide a DoH proxy server which can be simply plug as a middleware on any PHP 7.3 application. Only require a web-server.
 - [x] Create and forward DNS messages in different format to different type of DNS upstream resolvers.
 - [x] Use a pool of DNS upstream resolvers to send queries with a fallback mechanism.
 - [x] Compatible with a variety of DNS protocols: RFC-1035 (TCP/UDP), RFC-8484 (DoH), Google DoH API.
