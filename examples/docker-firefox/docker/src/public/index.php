@@ -3,6 +3,8 @@
 use Http\Adapter\Guzzle6\Client;
 use NoGlitchYo\Dealdoh\Client\DohClient;
 use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\DohProxy;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
@@ -11,7 +13,6 @@ use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
-use Socket\Raw\Factory;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -37,8 +38,9 @@ $app->any(
                     $dnsMessageFactory
                 ),
                 new StdClient(
-                    new Factory(),
-                    $dnsMessageFactory
+                    $dnsMessageFactory,
+                    new DnsOverTcpTransport(),
+                    new DnsOverUdpTransport()
                 ),
             ]
         );
