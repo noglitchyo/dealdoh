@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
@@ -22,11 +24,11 @@ class Query implements QueryInterface
      */
     private $qclass;
 
-    public function __construct(string $name, int $type, int $qclass)
+    public function __construct(string $name, int $type, int $class)
     {
         $this->qname = $name;
         $this->qtype = $type;
-        $this->qclass = $qclass;
+        $this->qclass = $class;
     }
 
     public function getQtype(): int

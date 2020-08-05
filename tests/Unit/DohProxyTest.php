@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit;
 
@@ -133,10 +135,13 @@ class DohProxyTest extends TestCase
 
         $this->loggerMock
             ->shouldReceive('error')
-            ->with(sprintf('Failed to create DNS message: %s', $exception->getMessage()), [
+            ->with(
+                sprintf('Failed to create DNS message: %s', $exception->getMessage()),
+                [
                 'exception' => $exception,
                 'httpRequest' => $requestMock
-            ]);
+                ]
+            );
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')

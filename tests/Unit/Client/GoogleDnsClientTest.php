@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 
@@ -22,17 +24,23 @@ use Psr\Http\Client\ClientInterface;
 
 class GoogleDnsClientTest extends TestCase
 {
-    private const UPSTREAM_ADDR = 'https://dns.google.com/resolve';
-
     use MockeryPHPUnitIntegration;
 
-    /** @var MessageMapper|MockInterface */
+    private const UPSTREAM_ADDR = 'https://dns.google.com/resolve';
+
+    /**
+     * @var MessageMapper|MockInterface
+     */
     private $messageMapperMock;
 
-    /** @var ClientInterface|MockInterface */
+    /**
+     * @var ClientInterface|MockInterface
+     */
     private $clientMock;
 
-    /** @var GoogleDnsClient */
+    /**
+     * @var GoogleDnsClient
+     */
     private $sut;
 
     protected function setUp(): void
@@ -47,7 +55,12 @@ class GoogleDnsClientTest extends TestCase
     {
         $dnsUpstream = new DnsUpstream(static::UPSTREAM_ADDR);
         $dnsRequestMessage = (Message::createWithDefaultHeader())
-            ->addQuestion(new Query('', ResourceRecordInterface::TYPE_A, ResourceRecordInterface::CLASS_IN));
+            ->withQuestionSection(
+                (new Message\Section\QuestionSection())
+                    ->add(
+                        new Query('', ResourceRecordInterface::TYPE_A, ResourceRecordInterface::CLASS_IN)
+                    )
+            );
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query name length must be between 1 and 253');
@@ -58,11 +71,18 @@ class GoogleDnsClientTest extends TestCase
     public function testResolveCheckNameLengthAndThrowExceptionIfTooLong(): void
     {
         $dnsUpstream = new DnsUpstream(static::UPSTREAM_ADDR);
-        $dnsRequestMessage = Message::createWithDefaultHeader();
 
-        $qname = str_repeat('a', 254);
-        $query = new Query($qname, ResourceRecordInterface::TYPE_A, ResourceRecordInterface::CLASS_IN);
-        $dnsRequestMessage->addQuestion($query);
+        $dnsRequestMessage = (Message::createWithDefaultHeader())
+            ->withQuestionSection(
+                (new Message\Section\QuestionSection())
+                    ->add(
+                        new Query(
+                            str_repeat('a', 254),
+                            ResourceRecordInterface::TYPE_A,
+                            ResourceRecordInterface::CLASS_IN
+                        )
+                    )
+            );
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query name length must be between 1 and 253');
@@ -74,7 +94,12 @@ class GoogleDnsClientTest extends TestCase
     {
         $dnsUpstream = new DnsUpstream(static::UPSTREAM_ADDR);
         $dnsRequestMessage = (Message::createWithDefaultHeader())
-            ->addQuestion(new Query('domain.com', 65636, ResourceRecordInterface::CLASS_IN));
+            ->withQuestionSection(
+                (new Message\Section\QuestionSection())
+                    ->add(
+                        new Query('domain.com', 65636, ResourceRecordInterface::CLASS_IN)
+                    )
+            );
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query type must be in range [1, 65535]');
@@ -85,9 +110,13 @@ class GoogleDnsClientTest extends TestCase
     public function testResolveCheckQueryTypeAndThrowExceptionIfTooBig(): void
     {
         $dnsUpstream = new DnsUpstream(static::UPSTREAM_ADDR);
-        $dnsRequestMessage = Message::createWithDefaultHeader();
-
-        $dnsRequestMessage->addQuestion(new Query('domain.com', 0, ResourceRecordInterface::CLASS_IN));
+        $dnsRequestMessage = Message::createWithDefaultHeader()
+            ->withQuestionSection(
+                (new Message\Section\QuestionSection())
+                    ->add(
+                        new Query('domain.com', 0, ResourceRecordInterface::CLASS_IN)
+                    )
+            );
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query type must be in range [1, 65535]');
@@ -97,12 +126,17 @@ class GoogleDnsClientTest extends TestCase
 
     public function testResolveSendGetRequestAndReturnDnsResponse(): void
     {
-        list($qname, $qtype) = ['domain.com', ResourceRecordInterface::TYPE_AAAA];
+        [$qname, $qtype] = ['domain.com', ResourceRecordInterface::TYPE_AAAA];
         $dnsUpstream = new DnsUpstream(static::UPSTREAM_ADDR);
         $httpRequest = new Request('GET', sprintf(static::UPSTREAM_ADDR . '?name=%s&type=%s', $qname, $qtype));
         $httpResponse = (new Response(200, [], '{}'));
         $dnsRequestMessage = (Message::createWithDefaultHeader())
-            ->addQuestion(new Query($qname, $qtype, ResourceRecordInterface::CLASS_IN));
+            ->withQuestionSection(
+                (new Message\Section\QuestionSection())
+                    ->add(
+                        new Query($qname, $qtype, ResourceRecordInterface::CLASS_IN)
+                    )
+            );
         $expectedDnsResponse = Message::createWithDefaultHeader(true);
 
         $this->clientMock->shouldReceive('sendRequest')
@@ -118,13 +152,17 @@ class GoogleDnsClientTest extends TestCase
 
     public function testResolveThrowDnsClientExceptionWhenSendingRequestFailed(): void
     {
-        list($qname, $qtype) = ['domain.com', ResourceRecordInterface::TYPE_AAAA];
+        [$qname, $qtype] = ['domain.com', ResourceRecordInterface::TYPE_AAAA];
         $dnsUpstream = new DnsUpstream(static::UPSTREAM_ADDR);
         $httpRequest = new Request('GET', sprintf(static::UPSTREAM_ADDR . '?name=%s&type=%s', $qname, $qtype));
         $httpResponse = (new Response(200, [], '{}'));
         $dnsRequestMessage = (Message::createWithDefaultHeader())
-            ->addQuestion(new Query($qname, $qtype, ResourceRecordInterface::CLASS_IN));
-
+            ->withQuestionSection(
+                (new Message\Section\QuestionSection())
+                    ->add(
+                        new Query($qname, $qtype, ResourceRecordInterface::CLASS_IN)
+                    )
+            );
         $this->clientMock->shouldReceive('sendRequest')
             ->with(IsEqual::equalTo($httpRequest))
             ->andThrow(Exception::class);
@@ -137,12 +175,17 @@ class GoogleDnsClientTest extends TestCase
 
     public function testResolveThrowDnsClientExceptionWhenMappingFailed(): void
     {
-        list($qname, $qtype) = ['domain.com', ResourceRecordInterface::TYPE_AAAA];
+        [$qname, $qtype] = ['domain.com', ResourceRecordInterface::TYPE_AAAA];
         $dnsUpstream = new DnsUpstream(static::UPSTREAM_ADDR);
         $httpRequest = new Request('GET', sprintf(static::UPSTREAM_ADDR . '?name=%s&type=%s', $qname, $qtype));
         $httpResponse = (new Response(200, [], '{}'));
         $dnsRequestMessage = (Message::createWithDefaultHeader())
-            ->addQuestion(new Query($qname, $qtype, ResourceRecordInterface::CLASS_IN));
+            ->withQuestionSection(
+                (new Message\Section\QuestionSection())
+                    ->add(
+                        new Query($qname, $qtype, ResourceRecordInterface::CLASS_IN)
+                    )
+            );
 
         $this->clientMock->shouldReceive('sendRequest')
             ->with(IsEqual::equalTo($httpRequest))

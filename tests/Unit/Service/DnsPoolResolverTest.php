@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Service;
 
@@ -33,7 +35,9 @@ class DnsPoolResolverTest extends TestCase
      */
     private $dnsUpstreamPool;
 
-    /** @var DnsPoolResolver */
+    /**
+     * @var DnsPoolResolver
+     */
     private $sut;
 
     protected function setUp(): void
@@ -67,7 +71,12 @@ class DnsPoolResolverTest extends TestCase
         $this->dnsUpstreamPool->addUpstream($upstream2);
         $dnsRequestMessage = Message::createWithDefaultHeader();
         $dnsResponseMessage = Message::createWithDefaultHeader(true);
-        $dnsResource = new DnsResource($dnsRequestMessage, $dnsResponseMessage, $upstream1, $this->dnsClientsMock['client1']);
+        $dnsResource = new DnsResource(
+            $dnsRequestMessage,
+            $dnsResponseMessage,
+            $upstream1,
+            $this->dnsClientsMock['client1']
+        );
 
         foreach ($this->dnsClientsMock as $dnsClient) {
             $dnsClient
@@ -103,7 +112,12 @@ class DnsPoolResolverTest extends TestCase
         $dnsRequestMessage = Message::createWithDefaultHeader();
         $dnsResponseMessageOk = Message::createWithDefaultHeader(true);
         $dnsResponseMessageNameError = Message::createWithDefaultHeader(true, HeaderInterface::RCODE_NAME_ERROR);
-        $dnsResource = new DnsResource($dnsRequestMessage, $dnsResponseMessageOk, $upstream2, $this->dnsClientsMock['client1']);
+        $dnsResource = new DnsResource(
+            $dnsRequestMessage,
+            $dnsResponseMessageOk,
+            $upstream2,
+            $this->dnsClientsMock['client1']
+        );
 
         foreach ($this->dnsClientsMock as $dnsClient) {
             $dnsClient
@@ -141,7 +155,12 @@ class DnsPoolResolverTest extends TestCase
         $this->dnsUpstreamPool->addUpstream($upstream2);
         $dnsRequestMessage = Message::createWithDefaultHeader();
         $dnsResponseMessage = Message::createWithDefaultHeader(true);
-        $dnsResource = new DnsResource($dnsRequestMessage, $dnsResponseMessage, $upstream2, $this->dnsClientsMock['client1']);
+        $dnsResource = new DnsResource(
+            $dnsRequestMessage,
+            $dnsResponseMessage,
+            $upstream2,
+            $this->dnsClientsMock['client1']
+        );
 
         foreach ($this->dnsClientsMock as $dnsClient) {
             $dnsClient

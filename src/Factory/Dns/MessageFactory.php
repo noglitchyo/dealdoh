@@ -1,19 +1,24 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Factory\Dns;
 
 use InvalidArgumentException;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
-use NoGlitchYo\Dealdoh\Exception\InvalidWireMessageException;
-use React\Dns\Model\HeaderBag;
-use React\Dns\Model\Message as DnsMessage;
-use React\Dns\Model\Record;
+use NoGlitchYo\Dealdoh\Exception\InvalidDnsWireMessageException;
+use NoGlitchYo\Dealdoh\Helper\MessageHelper;
+use React\Dns\Model\Message as ReactDnsMessage;
+use React\Dns\Model\Record as ReactDnsRecord;
 use React\Dns\Protocol\BinaryDumper;
 use React\Dns\Protocol\Parser;
+use React\Dns\Query\Query as ReactDnsQuery;
 
 class MessageFactory implements MessageFactoryInterface
 {
@@ -33,59 +38,49 @@ class MessageFactory implements MessageFactoryInterface
         $this->binaryDumper = new BinaryDumper();
     }
 
-    private static function createFromMessage(DnsMessage $message): MessageInterface
-    {
-        $dnsMessageHeader = new Header(
-            (int)$message->header->get('id'),
-            (bool)$message->header->get('qr'),
-            (int)$message->header->get('opcode'),
-            (bool)$message->header->get('aa'),
-            (bool)$message->header->get('tc'),
-            (bool)$message->header->get('rd'),
-            (bool)$message->header->get('ra'),
-            (int)$message->header->get('z'),
-            (int)$message->header->get('rcode')
-        );
-        $dnsMessage = new Message($dnsMessageHeader);
-
-        foreach ($message->questions as $query) {
-            $dnsMessage->addQuestion(new Query($query['name'], $query['type'], $query['class']));
+    /**
+     * @param int  $id
+     * @param bool $qr
+     * @param int  $opcode
+     * @param bool $isAa
+     * @param bool $isTc
+     * @param bool $isRd
+     * @param bool $isRa
+     * @param int  $z
+     * @param int  $rcode
+     *
+     * @return MessageInterface
+     */
+    public function create(
+        int $id = null,
+        bool $qr = false,
+        int $opcode = HeaderInterface::RCODE_OK,
+        bool $isAa = false,
+        bool $isTc = false,
+        bool $isRd = false,
+        bool $isRa = false,
+        int $z = 0,
+        int $rcode = HeaderInterface::RCODE_OK
+    ): MessageInterface {
+        if (!$id) {
+            $id = MessageHelper::generateId();
         }
 
-        foreach ($message->answers as $record) {
-            $dnsMessage->addAnswer(
-                new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)
-            );
-        }
-
-        foreach ($message->authority as $record) {
-            $dnsMessage->addAuthority(
-                new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)
-            );
-        }
-
-        foreach ($message->additional as $record) {
-            $dnsMessage->addAdditional(
-                new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)
-            );
-        }
-
-        return $dnsMessage;
+        return new Message(new Header($id, $qr, $opcode, $isAa, $isTc, $isRd, $isRa, $z, $rcode));
     }
 
     public function createMessageFromDnsWireMessage(string $dnsWireMessage): MessageInterface
     {
         try {
-            $dnsWireMessage = $this->parser->parseMessage($dnsWireMessage);
+            return self::createFromReactDnsMessage($this->parser->parseMessage($dnsWireMessage));
         } catch (InvalidArgumentException $exception) {
-            throw new InvalidWireMessageException();
+            throw new InvalidDnsWireMessageException($dnsWireMessage);
         }
-
-        return self::createFromMessage($dnsWireMessage);
     }
 
     /**
      * Return a DNS message in wire format as defined in RFC-1035
+     * If ID of the given message is equal to 0, a new ID will be generated
      *
      * @param MessageInterface $dnsMessage
      *
@@ -93,63 +88,85 @@ class MessageFactory implements MessageFactoryInterface
      */
     public function createDnsWireMessageFromMessage(MessageInterface $dnsMessage): string
     {
-        $message = new DnsMessage();
-        $header = new HeaderBag();
+        $message = new ReactDnsMessage();
         $dnsHeader = $dnsMessage->getHeader();
-
-        $header->set('id', $dnsHeader->getId());
-        $header->set('opcode', $dnsHeader->getOpcode());
-        $header->set('aa', (int)$dnsHeader->isAa());
-        $header->set('tc', (int)$dnsHeader->isTc());
-        $header->set('rd', (int)$dnsHeader->isRd());
-        $header->set('ra', (int)$dnsHeader->isRa());
-        $header->set('z', (int)$dnsHeader->getZ());
-        $header->set('rcode', $dnsHeader->getRcode());
-        $header->set('qdCount', $dnsHeader->getQdCount());
-        $header->set('anCount', $dnsHeader->getAnCount());
-        $header->set('arCount', $dnsHeader->getArCount());
-        $header->set('nsCount', $dnsHeader->getNsCount());
-
-        $message->header = $header;
+        // TODO: Id should not be modified here, to remove...
+        $message->id = ($dnsHeader->getId() != 0) ? $dnsHeader->getId() : MessageHelper::generateId();
+        $message->opcode = $dnsHeader->getOpcode();
+        $message->aa = $dnsHeader->isAa();
+        $message->tc = $dnsHeader->isTc();
+        $message->rd = $dnsHeader->isRd();
+        $message->ra = $dnsHeader->isRa();
+        $message->qr = $dnsHeader->isQr();
+        $message->rcode = $dnsHeader->getRcode();
 
         foreach ($dnsMessage->getQuestion() as $query) {
-            $message->questions[] = [
-                'name' => $query->getQname(),
-                'class' => $query->getQclass(),
-                'type' => $query->getQtype(),
-            ];
-        }
-
-        foreach ($dnsMessage->getAnswer() as $record) {
-            $message->answers[] = new Record(
-                $record->getName(),
-                $record->getType(),
-                $record->getClass(),
-                $record->getTtl(),
-                $record->getData()
+            $message->questions[] = new ReactDnsQuery(
+                $query->getQname(),
+                $query->getQtype(),
+                $query->getQclass(),
             );
         }
 
-        foreach ($dnsMessage->getAuthority() as $record) {
-            $message->answers[] = new Record(
-                $record->getName(),
-                $record->getType(),
-                $record->getClass(),
-                $record->getTtl(),
-                $record->getData()
-            );
-        }
-
-        foreach ($dnsMessage->getAdditional() as $record) {
-            $message->answers[] = new Record(
-                $record->getName(),
-                $record->getType(),
-                $record->getClass(),
-                $record->getTtl(),
-                $record->getData()
-            );
-        }
+        $message->answers = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAnswer());
+        $message->authority = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAuthority());
+        $message->additional = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAdditional());
 
         return $this->binaryDumper->toBinary($message);
+    }
+
+    private static function mapResourceRecordToReactDnsRecords(array $records): array
+    {
+        $newRecords = [];
+        foreach ($records as $record) {
+            $newRecords[] = new ReactDnsRecord(
+                $record->getName(),
+                $record->getType(),
+                $record->getClass(),
+                $record->getTtl(),
+                $record->getData()
+            );
+        }
+        return $newRecords;
+    }
+
+    private static function mapResourceRecordSection(
+        array $records,
+        ResourceRecordSection $recordSection
+    ): ResourceRecordSection {
+        foreach ($records as $record) {
+            $recordSection->add(
+                new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)
+            );
+        }
+        return $recordSection;
+    }
+
+    private static function createFromReactDnsMessage(ReactDnsMessage $message): MessageInterface
+    {
+        $dnsMessageHeader = new Header(
+            (int)$message->id,
+            (bool)$message->qr,
+            (int)$message->opcode,
+            (bool)$message->aa,
+            (bool)$message->tc,
+            (bool)$message->rd,
+            (bool)$message->ra,
+            0, // TODO: it does not exist on React DNS message
+            (int)$message->rcode
+        );
+
+        $questionSection = new Message\Section\QuestionSection();
+        foreach ($message->questions as $query) {
+            $questionSection->add(new Query($query->name, $query->type, $query->class));
+        }
+
+        return new Message(
+            $dnsMessageHeader,
+            $questionSection,
+            static::mapResourceRecordSection($message->answers, new ResourceRecordSection()),
+            static::mapResourceRecordSection($message->additional, new ResourceRecordSection()),
+            static::mapResourceRecordSection($message->authority, new ResourceRecordSection())
+        );
     }
 }

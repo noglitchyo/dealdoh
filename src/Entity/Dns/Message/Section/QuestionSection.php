@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
@@ -13,6 +15,16 @@ class QuestionSection implements JsonSerializable
      * @var QueryInterface[]
      */
     private $queries = [];
+
+    /**
+     * @param QueryInterface[] $queries
+     */
+    public function __construct(array $queries = [])
+    {
+        foreach ($queries as $query) {
+            $this->add($query);
+        }
+    }
 
     public function add(QueryInterface $query): self
     {
