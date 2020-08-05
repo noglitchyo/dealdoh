@@ -14,6 +14,12 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 
+/**
+ * Allow to resolve a DNS query through a `pool` of resolvers.
+ * A pool of resolver is represented by a resolver which implements DnsResolverInterface and wraps multiple
+ * DnsResolverInterface.
+ * Resolvers in the pool are picked one by one until one successfully resolves the query.
+ */
 class DnsPoolResolver implements DnsResolverInterface
 {
     /**
@@ -65,16 +71,19 @@ class DnsPoolResolver implements DnsResolverInterface
                 try {
                     $dnsResponse = $dnsClient->resolve($dnsUpstream, $dnsRequest);
                     if ($dnsResponse->getHeader()->getRcode() === HeaderInterface::RCODE_NAME_ERROR) {
-                        break; // Domain is not found on upstream, retry with the next upstream until out of upstreams.
+                        $this->logger->info(
+                            sprintf('DNS query could not be resolved with upstream `%s`', $dnsUpstream->getCode())
+                        );
+                        break; // DNS query could not be resolved, retry with the next upstream until out of upstreams.
                     }
                     return new DnsResource($dnsRequest, $dnsResponse, $dnsUpstream, $dnsClient);
                 } catch (Throwable $t) {
                     $this->logger->warning(
                         "Resolving from client failed:" . $t->getMessage(),
                         [
-                            "client" => $dnsClient,
-                            "upstream" => $dnsUpstream,
-                            "exception" => $t
+                            "client"    => $dnsClient,
+                            "upstream"  => $dnsUpstream,
+                            "exception" => $t,
                         ]
                     );
                     continue; // Retry with the next client until out of clients for the upstream.
@@ -92,6 +101,7 @@ class DnsPoolResolver implements DnsResolverInterface
 
     /**
      * @param DnsUpstream $dnsUpstream
+     *
      * @return DnsClientInterface[]
      */
     private function getSupportedClientsForUpstream(DnsUpstream $dnsUpstream): array

@@ -3,8 +3,8 @@
 namespace NoGlitchYo\Dealdoh\Client;
 
 use Exception;
-use InvalidArgumentException;
 use LogicException;
+use NoGlitchYo\Dealdoh\Client\Transport\DnsTransportInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
@@ -22,16 +22,29 @@ class StdClient implements DnsClientInterface
      * @var MessageFactoryInterface
      */
     private $dnsMessageFactory;
+    /**
+     * @var DnsTransportInterface
+     */
+    private $tcpTransport;
+    /**
+     * @var DnsTransportInterface
+     */
+    private $udpTransport;
 
-    public function __construct(MessageFactoryInterface $dnsMessageFactory)
-    {
+    public function __construct(
+        MessageFactoryInterface $dnsMessageFactory,
+        DnsTransportInterface $tcpTransport,
+        DnsTransportInterface $udpTransport
+    ) {
         $this->dnsMessageFactory = $dnsMessageFactory;
+        $this->tcpTransport = $tcpTransport;
+        $this->udpTransport = $udpTransport;
     }
 
     /**
      * Resolve message using regular UDP/TCP queries towards DNS upstream
      *
-     * @param DnsUpstream $dnsUpstream
+     * @param DnsUpstream      $dnsUpstream
      * @param MessageInterface $dnsRequestMessage
      *
      * @return MessageInterface
@@ -39,95 +52,87 @@ class StdClient implements DnsClientInterface
      */
     public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
-        $scheme = $dnsUpstream->getScheme();
-
         $dnsRequestMessage = $this->enableRecursionForDnsMessage($dnsRequestMessage);
+        $address = $this->getSanitizedUpstreamAddress($dnsUpstream);
 
-        // Clean up the protocol from URI supported by the client but which can not be used with sockets (e.g. dns://).
-        $address = str_replace($scheme . '://', '', $dnsUpstream->getUri());
-
-        if (in_array($scheme, ['udp', 'dns']) || $dnsUpstream->getScheme() === null) {
-            $dnsWireResponseMessage = $this->sendWithSocket('udp', $address, $dnsRequestMessage);
-        } elseif ($dnsUpstream->getScheme() === 'tcp') {
-            $dnsWireResponseMessage = $this->sendWithSocket('tcp', $address, $dnsRequestMessage);
+        if ($this->isUdp($dnsUpstream)) {
+            $dnsWireResponseMessage = $this->sendWith('udp', $address, $dnsRequestMessage);
+        } elseif ($this->isTcp($dnsUpstream)) {
+            $dnsWireResponseMessage = $this->sendWith('tcp', $address, $dnsRequestMessage);
         } else {
-            throw new LogicException(sprintf('Scheme `%s` is not supported', $scheme));
+            throw new LogicException(sprintf('Scheme `%s` is not supported', $dnsUpstream->getScheme()));
         }
 
         return $dnsWireResponseMessage;
     }
 
-
     public function supports(DnsUpstream $dnsUpstream): bool
     {
-        return in_array($dnsUpstream->getScheme(), ['udp', 'tcp', 'dns']) || $dnsUpstream->getScheme() === null;
+        return $this->isUdp($dnsUpstream) || $this->isTcp($dnsUpstream);
+    }
+
+    private function isUdp($dnsUpstream): bool
+    {
+        return in_array($dnsUpstream->getScheme(), ['udp', 'dns']) || $dnsUpstream->getScheme() === null;
+    }
+
+    private function isTcp($dnsUpstream): bool
+    {
+        return $dnsUpstream->getScheme() === 'tcp';
     }
 
     /**
-     * Send DNS message using socket with the given protocol: UDP or TCP
-     * @param string           $protocol
+     * Send DNS message using socket with the chosen protocol: `udp` or `tcp`
+     * Allow a sender to force usage of a specific protocol (e.g. protocol blocked by network/firewall)
+     *
+     * @param string           $protocol Protocol to use to send the message
      * @param string           $address
      * @param MessageInterface $dnsRequestMessage
      *
      * @return MessageInterface
      * @throws Exception
      */
-    private function sendWithSocket(
+    private function sendWith(
         string $protocol,
         string $address,
         MessageInterface $dnsRequestMessage
     ): MessageInterface {
-        $url = parse_url($address);
+        $dnsWireMessage = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
 
-        $socket = stream_socket_client($protocol . '://' . $url['host'] . ':' . $url['port'], $errno, $errstr, 4);
+        if ($protocol === 'udp') {
+            if (strlen($dnsWireMessage) <= static::EDNS_SIZE) { // Must use TCP if message is bigger
+                $dnsWireResponseMessage = $this->udpTransport->send($address, $dnsWireMessage);
 
-        if ($socket === false) {
-            throw new Exception('Unable to connect:' . $errno . ' - ' . $errstr);
-        } else {
-            $dnsMessage = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
-
-            switch ($protocol) {
-                case 'udp':
-                    if (isset($dnsMessage[static::EDNS_SIZE])) { // Must use TCP if message is bigger
-                        return $this->sendWithSocket('tcp', $address, $dnsRequestMessage);
-                    }
-
-                    \fputs($socket, $dnsMessage);
-
-                    $dnsWireResponseMessage = \fread($socket, static::EDNS_SIZE);
-                    if ($dnsWireResponseMessage === false) {
-                        throw new Exception('something happened');
-                    }
-
-                    break;
-                case 'tcp':
-                    \fputs($socket, $dnsMessage);
-                    $dnsWireResponseMessage = '';
-                    while (!feof($socket)) {
-                        $dnsWireResponseMessage .= fgets($socket, 512);
-                    }
-                    break;
-                default:
-                    throw new InvalidArgumentException(
-                        "Only `tcp`, `udp` are supported protocol to be used with socket."
-                    );
+                $message = $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireResponseMessage);
+                // Only if message is not truncated response is returned, otherwise retry with TCP
+                if (!$message->getHeader()->isTc()) {
+                    return $message;
+                }
             }
         }
 
-        \fclose($socket);
+        $dnsWireResponseMessage = $this->tcpTransport->send($address, $dnsWireMessage);
 
         $message = $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireResponseMessage);
-
-        // Message was truncated, retry with TCP
-        if ($message->getHeader()->isTc()) {
-            return $this->sendWithSocket('tcp', $address, $dnsRequestMessage);
-        }
 
         return $message;
     }
 
     /**
+     * Clean up the protocol from URI supported by the client but which can not be used with transport (e.g. dns://).
+     *
+     * @param DnsUpstream $dnsUpstream
+     *
+     * @return string
+     */
+    private function getSanitizedUpstreamAddress(DnsUpstream $dnsUpstream): string
+    {
+        return str_replace($dnsUpstream->getScheme() . '://', '', $dnsUpstream->getUri());
+    }
+
+    /**
      * Enable recursion for the given DNS message
+     *
      * @param MessageInterface $dnsRequestMessage
      *
      * @return MessageInterface

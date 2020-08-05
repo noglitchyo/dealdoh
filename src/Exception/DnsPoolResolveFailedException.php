@@ -50,6 +50,8 @@ class DnsPoolResolveFailedException extends Exception
 
     public static function unableToResolveFromUpstreams(array $dnsUpstreams): self
     {
-        return new static('Unable to resolve DNS message', [], $dnsUpstreams, static::EC_UPSTREAMS_FAILED);
+        return new static(
+            'Unable to resolve DNS message from upstreams', [], $dnsUpstreams, static::EC_UPSTREAMS_FAILED
+        );
     }
 }

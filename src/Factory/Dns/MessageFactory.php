@@ -72,7 +72,7 @@ class MessageFactory implements MessageFactoryInterface
         try {
             $dnsWireMessage = $this->parser->parseMessage($dnsWireMessage);
         } catch (InvalidArgumentException $exception) {
-            throw new InvalidDnsWireMessageException();
+            throw new InvalidDnsWireMessageException($dnsWireMessage);
         }
 
         return self::createFromReactDnsMessage($dnsWireMessage);

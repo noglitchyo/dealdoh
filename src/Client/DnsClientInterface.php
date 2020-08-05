@@ -8,7 +8,7 @@ use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 interface DnsClientInterface
 {
     /**
-     * Resolve a DNS message using the provided upstream with the current client
+     * Resolve a DNS message using the provided upstream
      * @param DnsUpstream      $dnsUpstream
      * @param MessageInterface $dnsRequestMessage
      *

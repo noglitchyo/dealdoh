@@ -5,6 +5,8 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 use Mockery;
 use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
@@ -28,11 +30,14 @@ class StdClientTest extends TestCase
      */
     private $dnsServerStubManager;
 
+    /**
+     * TODO: these tests should mock the transports layer
+     */
     protected function setUp(): void
     {
         $this->dnsMessageFactoryMock = Mockery::mock(MessageFactoryInterface::class);
         $this->dnsServerStubManager = new DnsServerStubManager();
-        $this->sut = new StdClient($this->dnsMessageFactoryMock);
+        $this->sut = new StdClient($this->dnsMessageFactoryMock, new DnsOverTcpTransport(), new DnsOverUdpTransport());
 
         parent::setUp();
     }

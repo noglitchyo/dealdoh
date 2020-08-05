@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Tests\Integration;
 
 use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
@@ -87,7 +89,7 @@ class DohProxyTest extends TestCase
         );
 
         $dnsClients = [
-            new StdClient($this->messageFactory),
+            new StdClient($this->messageFactory, new DnsOverTcpTransport(), new DnsOverUdpTransport()),
         ];
 
         $this->sut = new DnsPoolResolver($dnsUpstreamPool, $dnsClients);
