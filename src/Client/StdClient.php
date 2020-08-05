@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Client;
 
@@ -85,7 +87,7 @@ class StdClient implements DnsClientInterface
      * Send DNS message using socket with the chosen protocol: `udp` or `tcp`
      * Allow a sender to force usage of a specific protocol (e.g. protocol blocked by network/firewall)
      *
-     * @param string           $protocol Protocol to use to send the message
+     * @param string           $protocol          Protocol to use to send the message
      * @param string           $address
      * @param MessageInterface $dnsRequestMessage
      *

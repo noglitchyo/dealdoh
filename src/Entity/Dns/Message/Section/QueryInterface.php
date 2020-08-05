@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
 
 use JsonSerializable;
 
 /**
- * @see https://tools.ietf.org/html/rfc1035#section-4.1.2
+ * @see                https://tools.ietf.org/html/rfc1035#section-4.1.2
  * @codeCoverageIgnore
  */
 interface QueryInterface extends JsonSerializable

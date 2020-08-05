@@ -125,4 +125,3 @@ class DohProxyTest extends TestCase
         return json_decode($output, true);
     }
 }
-

@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Client\Transport;
 
 use Exception;
+use InvalidArgumentException;
 use NoGlitchYo\Dealdoh\Client\StdClient;
 
 /**
  * Implement DNS Transport over TCP
+ *
  * @see https://tools.ietf.org/html/rfc7766
  */
 class DnsOverTcpTransport implements DnsTransportInterface
 {
     public function send(string $address, string $dnsWireMessage): string
     {
-        $url = parse_url($address);
+        list("host" => $host, "port" => $port) = parse_url($address);
 
-        $socket = @stream_socket_client('tcp://' . $url['host'] . ':' . $url['port'], $errno, $errstr, 4);
+        $socket = @stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, 4);
 
         if ($socket === false) {
             throw new Exception('Unable to connect to DNS server: <' . $errno . '> ' . $errstr);
@@ -53,6 +55,7 @@ class DnsOverTcpTransport implements DnsTransportInterface
 
     /**
      * Check if message has data.
+     *
      * @param string $dnsWireMessage
      *
      * @return bool
@@ -65,6 +68,7 @@ class DnsOverTcpTransport implements DnsTransportInterface
     /**
      * Check if message has header
      * Response header is 12 bytes min.
+     *
      * @param string $dnsWireMessage
      *
      * @return bool
@@ -76,6 +80,7 @@ class DnsOverTcpTransport implements DnsTransportInterface
 
     /**
      * Retrieve length of the message from the first 2 bytes
+     *
      * @see https://tools.ietf.org/html/rfc7766#section-8
      *
      * @param string $dnsWireMessage

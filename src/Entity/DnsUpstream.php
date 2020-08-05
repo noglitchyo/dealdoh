@@ -1,8 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity;
 
 use JsonSerializable;
+
 use const PHP_URL_PORT;
 use const PHP_URL_SCHEME;
 

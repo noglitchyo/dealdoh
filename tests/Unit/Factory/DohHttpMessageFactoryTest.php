@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory;
 
@@ -21,10 +23,14 @@ class DohHttpMessageFactoryTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    /** @var \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface|MockInterface */
+    /**
+     * @var \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface|MockInterface
+     */
     private $dnsMessageFactoryMock;
 
-    /** @var DohHttpMessageFactory */
+    /**
+     * @var DohHttpMessageFactory
+     */
     private $sut;
 
     protected function setUp(): void

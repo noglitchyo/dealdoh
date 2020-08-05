@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns;
 
@@ -14,7 +16,25 @@ use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
  */
 class Message implements MessageInterface
 {
-    use MessageSectionAwareTrait;
+    /**
+     * @var ResourceRecordSection|null *
+     */
+    private $authoritySection;
+
+    /**
+     * @var QuestionSection|null
+     */
+    private $questionSection;
+
+    /**
+     * @var ResourceRecordSection|null
+     */
+    private $answerSection;
+
+    /**
+     * @var ResourceRecordSection|null
+     */
+    private $additionalSection;
 
     /**
      * @var HeaderInterface
@@ -35,27 +55,21 @@ class Message implements MessageInterface
         ResourceRecordSection $additionalSection = null,
         ResourceRecordSection $authoritySection = null
     ) {
-        $this->header = $header;
         $this->questionSection = $questionSection ?? new QuestionSection();
         $this->answerSection = $answerSection ?? new ResourceRecordSection();
         $this->additionalSection = $additionalSection ?? new ResourceRecordSection();
         $this->authoritySection = $authoritySection ?? new ResourceRecordSection();
-
-        // TODO: these methods does not guarantee immutability on section of the headers
-        $this->header = $this->header->withQuestionSection($this->questionSection);
-        $this->header = $this->header->withAnswerSection($this->answerSection);
-        $this->header = $this->header->withAuthoritySection($this->authoritySection);
-        $this->header = $this->header->withAdditionalSection($this->additionalSection);
+        $this->header = $header->withMessage($this);
     }
 
     /**
      * @param bool $isResponse
      * @param int  $rcode
      *
-     * @deprecated Use MessageFactory::create() instead.
-     * @see MessageFactory::create()
-     *
      * @return static
+     * @see        MessageFactory::create()
+     *
+     * @deprecated Use MessageFactory::create() instead.
      */
     public static function createWithDefaultHeader(
         bool $isResponse = false,
@@ -67,49 +81,43 @@ class Message implements MessageInterface
     public function withHeader(HeaderInterface $header): MessageInterface
     {
         $new = clone $this;
-
-        $header = $header->withQuestionSection($this->questionSection);
-        $header = $header->withAnswerSection($this->answerSection);
-        $header = $header->withAuthoritySection($this->authoritySection);
-        $header = $header->withAdditionalSection($this->additionalSection);
-
-        $new->header = $header;
+        $new->header = $header->withMessage($new);
 
         return $new;
     }
 
-    public function withQuestionSection(QuestionSection $questionSection)
+    public function withQuestionSection(QuestionSection $questionSection): MessageInterface
     {
         $new = clone $this;
         $new->questionSection = $questionSection;
-        $new->header = $this->header->withQuestionSection($questionSection);
+        $new->header = $this->header->withMessage($new);
 
         return $new;
     }
 
-    public function withAnswerSection(ResourceRecordSection $answerSection)
+    public function withAnswerSection(ResourceRecordSection $answerSection): MessageInterface
     {
         $new = clone $this;
         $new->answerSection = $answerSection;
-        $new->header = $this->header->withAnswerSection($answerSection);
+        $new->header = $this->header->withMessage($new);
 
         return $new;
     }
 
-    public function withAdditionalSection(ResourceRecordSection $additionalSection)
+    public function withAdditionalSection(ResourceRecordSection $additionalSection): MessageInterface
     {
         $new = clone $this;
         $new->additionalSection = $additionalSection;
-        $new->header = $this->header->withAdditionalSection($additionalSection);
+        $new->header = $this->header->withMessage($new);
 
         return $new;
     }
 
-    public function withAuthoritySection(ResourceRecordSection $authoritySection)
+    public function withAuthoritySection(ResourceRecordSection $authoritySection): MessageInterface
     {
         $new = clone $this;
         $new->authoritySection = $authoritySection;
-        $new->header = $this->header->withAuthoritySection($authoritySection);
+        $new->header = $this->header->withMessage($new);
 
         return $new;
     }
@@ -121,22 +129,22 @@ class Message implements MessageInterface
 
     public function getQuestion(): array
     {
-        return $this->questionSection->getQueries();
+        return $this->questionSection ? $this->questionSection->getQueries() : [];
     }
 
     public function getAnswer(): array
     {
-        return $this->answerSection->getRecords();
+        return $this->answerSection ? $this->answerSection->getRecords() : [];
     }
 
     public function getAuthority(): array
     {
-        return $this->authoritySection->getRecords();
+        return $this->authoritySection ? $this->authoritySection->getRecords() : [];
     }
 
     public function getAdditional(): array
     {
-        return $this->additionalSection->getRecords();
+        return $this->additionalSection ? $this->additionalSection->getRecords() : [];
     }
 
     public function jsonSerialize(): array

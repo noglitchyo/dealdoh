@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Mapper\GoogleDns;
 
@@ -19,7 +21,9 @@ class MessageMapperTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    /** @var MessageMapper */
+    /**
+     * @var MessageMapper
+     */
     private $sut;
 
     protected function setUp(): void

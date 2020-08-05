@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns;
 
@@ -15,19 +17,11 @@ use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
  *
  * TODO: The way Header, Section and Message are attached together need some improvements
  *
- * @see https://tools.ietf.org/html/rfc1035#section-4.1
+ * @see                https://tools.ietf.org/html/rfc1035#section-4.1
  * @codeCoverageIgnore
  */
-interface MessageInterface extends SectionAwareInterface, JsonSerializable
+interface MessageInterface extends JsonSerializable
 {
-    /**
-     * Return a new instance of message with the given Header
-     * @param HeaderInterface $header
-     *
-     * @return MessageInterface
-     */
-    public function withHeader(HeaderInterface $header): MessageInterface;
-
     /**
      * @return HeaderInterface
      */
@@ -52,4 +46,41 @@ interface MessageInterface extends SectionAwareInterface, JsonSerializable
      * @return ResourceRecordInterface[]
      */
     public function getAdditional(): array;
+
+    /**
+     * Return a new instance of message with the given Header
+     *
+     * @param HeaderInterface $header
+     *
+     * @return MessageInterface
+     */
+    public function withHeader(HeaderInterface $header): MessageInterface;
+
+    /**
+     * @param QuestionSection $questionSection
+     *
+     * @return MessageInterface
+     */
+    public function withQuestionSection(QuestionSection $questionSection): MessageInterface;
+
+    /**
+     * @param ResourceRecordSection $answerSectionSection
+     *
+     * @return MessageInterface
+     */
+    public function withAnswerSection(ResourceRecordSection $answerSectionSection): MessageInterface;
+
+    /**
+     * @param ResourceRecordSection $authoritySectionSection
+     *
+     * @return MessageInterface
+     */
+    public function withAuthoritySection(ResourceRecordSection $authoritySectionSection): MessageInterface;
+
+    /**
+     * @param ResourceRecordSection $additionalSectionSection
+     *
+     * @return MessageInterface
+     */
+    public function withAdditionalSection(ResourceRecordSection $additionalSectionSection): MessageInterface;
 }

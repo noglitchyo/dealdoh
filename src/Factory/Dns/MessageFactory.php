@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Factory\Dns;
 
@@ -70,12 +72,10 @@ class MessageFactory implements MessageFactoryInterface
     public function createMessageFromDnsWireMessage(string $dnsWireMessage): MessageInterface
     {
         try {
-            $dnsWireMessage = $this->parser->parseMessage($dnsWireMessage);
+            return self::createFromReactDnsMessage($this->parser->parseMessage($dnsWireMessage));
         } catch (InvalidArgumentException $exception) {
             throw new InvalidDnsWireMessageException($dnsWireMessage);
         }
-
-        return self::createFromReactDnsMessage($dnsWireMessage);
     }
 
     /**
@@ -90,13 +90,13 @@ class MessageFactory implements MessageFactoryInterface
     {
         $message = new ReactDnsMessage();
         $dnsHeader = $dnsMessage->getHeader();
-        // TODO: Id should not be modified here...
+        // TODO: Id should not be modified here, to remove...
         $message->id = ($dnsHeader->getId() != 0) ? $dnsHeader->getId() : MessageHelper::generateId();
         $message->opcode = $dnsHeader->getOpcode();
-        $message->aa = (int)$dnsHeader->isAa();
-        $message->tc = (int)$dnsHeader->isTc();
-        $message->rd = (int)$dnsHeader->isRd();
-        $message->ra = (int)$dnsHeader->isRa();
+        $message->aa = $dnsHeader->isAa();
+        $message->tc = $dnsHeader->isTc();
+        $message->rd = $dnsHeader->isRd();
+        $message->ra = $dnsHeader->isRa();
         $message->qr = $dnsHeader->isQr();
         $message->rcode = $dnsHeader->getRcode();
 

@@ -1,17 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity\Dns\Message;
 
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 
 /**
  * @codeCoverageIgnore
  */
 class Header implements HeaderInterface
 {
-    use MessageSectionAwareTrait;
-
     /**
      * @var int
      */
@@ -57,6 +58,11 @@ class Header implements HeaderInterface
      */
     private $rcode;
 
+    /**
+     * @var MessageInterface
+     */
+    private $message;
+
     public function __construct(
         int $id,
         bool $qr,
@@ -66,11 +72,7 @@ class Header implements HeaderInterface
         bool $rd,
         bool $ra,
         int $z,
-        int $rcode,
-        QuestionSection $questionSection = null, // TODO: Does a question should always be mandatory? Good question!
-        ResourceRecordSection $answerSection = null,
-        ResourceRecordSection $additionalSection = null,
-        ResourceRecordSection $authoritySection = null
+        int $rcode
     ) {
         $this->id = $id;
         $this->qr = $qr;
@@ -81,10 +83,14 @@ class Header implements HeaderInterface
         $this->ra = $ra;
         $this->z = $z;
         $this->rcode = $rcode;
-        $this->questionSection = $questionSection ?? new QuestionSection();
-        $this->answerSection = $answerSection ?? new ResourceRecordSection();
-        $this->additionalSection = $additionalSection ?? new ResourceRecordSection();
-        $this->authoritySection = $authoritySection ?? new ResourceRecordSection();
+    }
+
+    public function withMessage(MessageInterface $message): HeaderInterface
+    {
+        $new = clone $this;
+        $new->message = $message;
+
+        return $new;
     }
 
     public function getId(): int
@@ -94,22 +100,22 @@ class Header implements HeaderInterface
 
     public function getQdCount(): int
     {
-        return count($this->questionSection->getQueries());
+        return count($this->message->getQuestion());
     }
 
     public function getAnCount(): int
     {
-        return count($this->answerSection->getRecords());
+        return count($this->message->getAnswer());
     }
 
     public function getNsCount(): int
     {
-        return count($this->authoritySection->getRecords());
+        return count($this->message->getAuthority());
     }
 
     public function getArCount(): int
     {
-        return count($this->additionalSection->getRecords());
+        return count($this->message->getAdditional());
     }
 
     public function isQr(): bool

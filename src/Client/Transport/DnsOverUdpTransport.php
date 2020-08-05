@@ -11,9 +11,9 @@ class DnsOverUdpTransport implements DnsTransportInterface
 {
     public function send(string $address, string $dnsWireMessage): string
     {
-        $url = parse_url($address);
+        list("host" => $host, "port" => $port) = parse_url($address);
         $length = strlen($dnsWireMessage);
-        $socket = @stream_socket_client('udp://' . $url['host'] . ':' . $url['port'], $errno, $errstr, 4);
+        $socket = @stream_socket_client('udp://' . $host . ':' . $port, $errno, $errstr, 4);
 
         if ($socket === false) {
             throw new Exception('Unable to connect to DNS server: <' . $errno . '> ' . $errstr);

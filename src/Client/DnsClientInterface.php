@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Client;
 
@@ -9,6 +11,7 @@ interface DnsClientInterface
 {
     /**
      * Resolve a DNS message using the provided upstream
+     *
      * @param DnsUpstream      $dnsUpstream
      * @param MessageInterface $dnsRequestMessage
      *

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Factory\Dns;
 
@@ -53,7 +55,7 @@ interface MessageFactoryInterface
      *
      * @param MessageInterface $dnsMessage
      *
-     * @return MessageInterface
+     * @return string
      */
     public function createDnsWireMessageFromMessage(MessageInterface $dnsMessage): string;
 }

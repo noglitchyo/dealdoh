@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 
@@ -22,17 +24,23 @@ use Psr\Http\Client\ClientInterface;
 
 class GoogleDnsClientTest extends TestCase
 {
-    private const UPSTREAM_ADDR = 'https://dns.google.com/resolve';
-
     use MockeryPHPUnitIntegration;
 
-    /** @var MessageMapper|MockInterface */
+    private const UPSTREAM_ADDR = 'https://dns.google.com/resolve';
+
+    /**
+     * @var MessageMapper|MockInterface
+     */
     private $messageMapperMock;
 
-    /** @var ClientInterface|MockInterface */
+    /**
+     * @var ClientInterface|MockInterface
+     */
     private $clientMock;
 
-    /** @var GoogleDnsClient */
+    /**
+     * @var GoogleDnsClient
+     */
     private $sut;
 
     protected function setUp(): void

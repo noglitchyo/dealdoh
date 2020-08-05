@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Stub;
 
@@ -8,6 +10,7 @@ use React\Datagram\Factory;
 use React\Datagram\Socket;
 use React\Datagram\Socket as ReactSocket;
 use React\EventLoop\Factory as EventLoopFactory;
+
 use const STDOUT;
 
 /**
@@ -50,7 +53,9 @@ class DnsServerStub
                     function ($message, $address, $server) use ($dnsResponseMessage) {
                         $this->output($this->createReceiveAction($address, $message));
 
-                        /** @var $server ReactSocket */
+                        /**
+                         * @var $server ReactSocket
+                         */
                         $server->send(
                             $dnsResponseMessage ? Base64UrlCodecHelper::decode($dnsResponseMessage) : $message,
                             $address

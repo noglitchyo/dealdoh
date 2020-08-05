@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Client;
 
@@ -50,10 +52,14 @@ class GoogleDnsClient implements DnsClientInterface
             throw new InvalidArgumentException('Query type must be in range [1, 65535]');
         }
 
-        $uri = $uri->withQuery(http_build_query([
-            'name' => $query->getQname(),
-            'type' => $query->getQtype()
-        ]));
+        $uri = $uri->withQuery(
+            http_build_query(
+                [
+                'name' => $query->getQname(),
+                'type' => $query->getQtype()
+                ]
+            )
+        );
 
         try {
             $response = $this->client->sendRequest(new Request('GET', $uri));

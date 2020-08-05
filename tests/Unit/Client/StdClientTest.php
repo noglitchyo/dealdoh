@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 
@@ -53,10 +55,14 @@ class StdClientTest extends TestCase
         $expectedDnsResponseMessage = Message::createWithDefaultHeader(true);
 
         $this->dnsMessageFactoryMock->shouldReceive('createDnsWireMessageFromMessage')
-            ->with(Mockery::on(function (MessageInterface $argument){
-                // Assert recursion was enabled
-                return $argument->getHeader()->isRd();
-            }))
+            ->with(
+                Mockery::on(
+                    function (MessageInterface $argument) {
+                        // Assert recursion was enabled
+                        return $argument->getHeader()->isRd();
+                    }
+                )
+            )
             ->andReturn($expectedDnsWireRequestMessage);
 
         $this->dnsMessageFactoryMock->shouldReceive('createMessageFromDnsWireMessage')
@@ -69,17 +75,17 @@ class StdClientTest extends TestCase
 
     public function testSupportsAcceptAllowedUpstreamsFormat()
     {
-       $allowedUpstreams = [
+        $allowedUpstreams = [
            "udp://8.8.8.8:53",
            "8.8.8.8:53",
            "dns://8.8.8.8:53",
-       ];
+        ];
 
-       foreach ($allowedUpstreams as $upstreamAddr) {
-           $dnsUpstream = new DnsUpstream($upstreamAddr);
+        foreach ($allowedUpstreams as $upstreamAddr) {
+            $dnsUpstream = new DnsUpstream($upstreamAddr);
 
-           $this->assertTrue($this->sut->supports($dnsUpstream));
-       }
+            $this->assertTrue($this->sut->supports($dnsUpstream));
+        }
     }
 
     public function testSupportsDeclineUpstreamWithScheme()
