@@ -39,55 +39,98 @@ class MessageMapperTest extends TestCase
     {
         return [
             [
+                // Expected message
                 (new Message(new Header(0, true, 0, false, false, true, true, 0, 0)))
-                    ->addQuestion(new Query('apple.com', 1, ResourceRecordInterface::CLASS_IN))
-                    ->addAnswer(new ResourceRecord('apple.com', 1, ResourceRecordInterface::CLASS_IN, 3599, '17.178.96.59'))
-                    ->addAnswer(new ResourceRecord('apple.com', 1, ResourceRecordInterface::CLASS_IN, 3750, '17.142.160.59'))
-                    ->addAnswer(new ResourceRecord('apple.com', 1, ResourceRecordInterface::CLASS_IN, 200, '17.142.160.59'))
-                    ->addAdditional(new ResourceRecord('grossepomme.com', 1, ResourceRecordInterface::CLASS_IN, 3599, '17.141.160.59')),
+                    ->withQuestionSection(
+                        (new Message\Section\QuestionSection())
+                            ->add(new Query('apple.com', 1, ResourceRecordInterface::CLASS_IN))
+                    )
+                    ->withAnswerSection(
+                        (new Message\Section\ResourceRecordSection())
+                            ->add(
+                                new ResourceRecord(
+                                    'apple.com',
+                                    1,
+                                    ResourceRecordInterface::CLASS_IN,
+                                    3599,
+                                    '17.178.96.59'
+                                )
+                            )
+                            ->add(
+                                new ResourceRecord(
+                                    'apple.com',
+                                    1,
+                                    ResourceRecordInterface::CLASS_IN,
+                                    3750,
+                                    '17.142.160.59'
+                                )
+                            )
+                            ->add(
+                                new ResourceRecord(
+                                    'apple.com',
+                                    1,
+                                    ResourceRecordInterface::CLASS_IN,
+                                    200,
+                                    '17.142.160.59'
+                                )
+                            )
+                    )
+                    ->withAdditionalSection(
+                        (new Message\Section\ResourceRecordSection())
+                            ->add(
+                                new ResourceRecord(
+                                    'grossepomme.com',
+                                    1,
+                                    ResourceRecordInterface::CLASS_IN,
+                                    3599,
+                                    '17.141.160.59'
+                                )
+                            )
+                    ),
+                // Raw data
                 [
-                    'Status' => 0,
-                    'TC' => false,
-                    'RD' => true,
-                    'RA' => true,
-                    'AD' => false,
-                    'CD' => false,
-                    'Question' => [
+                    'Status'     => 0,
+                    'TC'         => false,
+                    'RD'         => true,
+                    'RA'         => true,
+                    'AD'         => false,
+                    'CD'         => false,
+                    'Question'   => [
                         [
                             'name' => 'apple.com',
-                            'type' => 1
-                        ]
+                            'type' => 1,
+                        ],
                     ],
-                    'Answer' => [
+                    'Answer'     => [
                         [
                             'name' => 'apple.com',
                             'type' => 1,
-                            'TTL' => 3599,
-                            'data' => '17.178.96.59'
+                            'TTL'  => 3599,
+                            'data' => '17.178.96.59',
                         ],
                         [
                             'name' => 'apple.com',
                             'type' => 1,
-                            'TTL' => 3750,
-                            'data' => '17.142.160.59'
+                            'TTL'  => 3750,
+                            'data' => '17.142.160.59',
                         ],
                         [
                             'name' => 'apple.com',
                             'type' => 1,
-                            'TTL' => 200,
-                            'data' => '17.142.160.59'
+                            'TTL'  => 200,
+                            'data' => '17.142.160.59',
                         ],
                     ],
                     'Additional' => [
                         [
                             'name' => 'grossepomme.com',
                             'type' => 1,
-                            'TTL' => 3599,
-                            'data' => '17.141.160.59'
-                        ]
-                    ]
-                ]
-            ]
+                            'TTL'  => 3599,
+                            'data' => '17.141.160.59',
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }

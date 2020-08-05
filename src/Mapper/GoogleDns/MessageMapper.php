@@ -6,7 +6,9 @@ use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Helper\MessageHelper;
 
 /**
  * @see https://developers.google.com/speed/public-dns/docs/dns-over-https
@@ -15,7 +17,13 @@ class MessageMapper
 {
     public function map(array $googleDnsResponse): MessageInterface
     {
-        $message = new Message(
+        $question = $googleDnsResponse['Question'] ?? [];
+        $questionSection = new Message\Section\QuestionSection();
+        foreach ($question as $query) {
+            $questionSection->add(new Query($query['name'], $query['type'], ResourceRecord::CLASS_IN));
+        }
+
+        return new Message(
             new Header(
                 0,
                 true,
@@ -26,38 +34,32 @@ class MessageMapper
                 $googleDnsResponse['RA'],
                 0,
                 $googleDnsResponse['Status']
+            ),
+            $questionSection,
+            static::mapResourceRecordSection(
+                $googleDnsResponse['Answer'] ?? [],
+                new Message\Section\ResourceRecordSection()
+            ),
+            static::mapResourceRecordSection(
+                $googleDnsResponse['Additional'] ?? [],
+                new Message\Section\ResourceRecordSection()
             )
         );
+    }
 
-        $question = $googleDnsResponse['Question'] ?? [];
-        foreach ($question as $query) {
-            $message->addQuestion(new Query($query['name'], $query['type'], ResourceRecord::CLASS_IN));
-        }
-
-        $answer = $googleDnsResponse['Answer'] ?? [];
-        foreach ($answer as $rr) {
-            $message->addAnswer(
+    public static function mapResourceRecordSection(array $records, ResourceRecordSection $recordSection)
+    {
+        foreach ($records as $record) {
+            $recordSection->add(
                 new ResourceRecord(
-                    $rr['name'],
-                    $rr['type'],
+                    $record['name'],
+                    $record['type'],
                     ResourceRecord::CLASS_IN,
-                    $rr['TTL'],
-                    $rr['data']
+                    $record['TTL'],
+                    $record['data']
                 )
             );
         }
-
-        $additional = $googleDnsResponse['Additional'] ?? [];
-        foreach ($additional as $rr) {
-            $message->addAdditional(new ResourceRecord(
-                $rr['name'],
-                $rr['type'],
-                ResourceRecord::CLASS_IN,
-                $rr['TTL'],
-                $rr['data']
-            ));
-        }
-
-        return $message;
+        return $recordSection;
     }
 }

@@ -14,6 +14,16 @@ class QuestionSection implements JsonSerializable
      */
     private $queries = [];
 
+    /**
+     * @param QueryInterface[] $queries
+     */
+    public function __construct(array $queries = [])
+    {
+        foreach ($queries as $query) {
+            $this->add($query);
+        }
+    }
+
     public function add(QueryInterface $query): self
     {
         $this->queries[] = $query;

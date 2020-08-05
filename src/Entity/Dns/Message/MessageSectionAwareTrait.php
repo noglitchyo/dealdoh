@@ -30,43 +30,35 @@ trait MessageSectionAwareTrait
      */
     private $authoritySection;
 
-    public function setQuestionSection(QuestionSection $section): void
+    public function withQuestionSection(QuestionSection $question)
     {
-        $this->questionSection = $section;
+        $new = clone $this;
+        $new->questionSection = $question;
+
+        return $new;
     }
 
-    public function setAdditionalSection(ResourceRecordSection $section): void
+    public function withAnswerSection(ResourceRecordSection $answerSection)
     {
-        $this->additionalSection = $section;
+        $new = clone $this;
+        $new->answerSection = $answerSection;
+
+        return $new;
     }
 
-    public function setAnswerSection(ResourceRecordSection $section): void
+    public function withAdditionalSection(ResourceRecordSection $additionalSection)
     {
-        $this->answerSection = $section;
+        $new = clone $this;
+        $new->additionalSection = $additionalSection;
+
+        return $new;
     }
 
-    public function setAuthoritySection(ResourceRecordSection $section): void
+    public function withAuthoritySection(ResourceRecordSection $authoritySection)
     {
-        $this->authoritySection = $section;
-    }
+        $new = clone $this;
+        $new->authoritySection = $authoritySection;
 
-    public function getQuestionSection(): QuestionSection
-    {
-        return $this->questionSection;
-    }
-
-    public function getAdditionalSection(): ResourceRecordSection
-    {
-        return $this->additionalSection;
-    }
-
-    public function getAnswerSection(): ResourceRecordSection
-    {
-        return $this->answerSection;
-    }
-
-    public function getAuthoritySection(): ResourceRecordSection
-    {
-        return $this->authoritySection;
+        return $new;
     }
 }

@@ -7,10 +7,17 @@ use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 
 interface DnsClientInterface
 {
+    /**
+     * Resolve a DNS message using the provided upstream with the current client
+     * @param DnsUpstream      $dnsUpstream
+     * @param MessageInterface $dnsRequestMessage
+     *
+     * @return MessageInterface
+     */
     public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface;
 
     /**
-     * Indicate whether or not the given DNS upstream can be used by the client
+     * Indicate whether or not the provided $dnsUpstream can be used by the client
      *
      * @param  DnsUpstream $dnsUpstream
      * @return bool

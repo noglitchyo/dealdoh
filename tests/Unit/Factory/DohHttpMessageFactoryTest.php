@@ -48,7 +48,7 @@ class DohHttpMessageFactoryTest extends TestCase
         $expectedResponse = new Response(
             200,
             [
-                'Content-Type' => 'application/dns-message',
+                'Content-Type'   => 'application/dns-message',
                 'Content-Length' => strlen($dnsWireQuery),
             ],
             Stream::create($dnsWireQuery)
@@ -57,14 +57,18 @@ class DohHttpMessageFactoryTest extends TestCase
         $response = $this->sut->createResponseFromMessage($dnsMessage);
 
         $this->assertEquals($expectedResponse->getHeaders(), $response->getHeaders());
-        $this->assertEquals((string) $expectedResponse->getBody(), (string) $response->getBody());
+        $this->assertEquals((string)$expectedResponse->getBody(), (string)$response->getBody());
     }
 
     public function testCreateResponseUseLowestTtlFromAnswersForCacheControlHeader(): void
     {
         $dnsMessage = new Message(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
-        $dnsMessage->addAnswer(new ResourceRecord('answerWithLowestTtl', 1, 1, 20));
-        $dnsMessage->addAnswer(new ResourceRecord('answerWithHighestTtl', 1, 1, 60));
+        $dnsMessage = $dnsMessage->withAnswerSection(
+            (new Message\Section\ResourceRecordSection())
+                ->add(new ResourceRecord('answerWithLowestTtl', 1, 1, 20))
+                ->add(new ResourceRecord('answerWithHighestTtl', 1, 1, 60))
+        );
+
 
         $dnsMessageLength = 10;
         $dnsWireQuery = random_bytes($dnsMessageLength);
@@ -76,14 +80,14 @@ class DohHttpMessageFactoryTest extends TestCase
         $expectedResponse = new Response(
             200,
             [
-                'Content-Type' => 'application/dns-message',
+                'Content-Type'   => 'application/dns-message',
                 'Content-Length' => strlen($dnsWireQuery),
-                'Cache-Control' => 'max-age=' . 20
+                'Cache-Control'  => 'max-age=' . 20,
             ],
             Stream::create($dnsWireQuery)
         );
         $response = $this->sut->createResponseFromMessage($dnsMessage);
         $this->assertEquals($expectedResponse->getHeaders(), $response->getHeaders());
-        $this->assertEquals((string) $expectedResponse->getBody(), (string) $response->getBody());
+        $this->assertEquals((string)$expectedResponse->getBody(), (string)$response->getBody());
     }
 }

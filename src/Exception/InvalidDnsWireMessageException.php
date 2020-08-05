@@ -4,7 +4,7 @@ namespace NoGlitchYo\Dealdoh\Exception;
 
 use Exception;
 
-class InvalidWireMessageException extends Exception
+class InvalidDnsWireMessageException extends Exception
 {
 
 }

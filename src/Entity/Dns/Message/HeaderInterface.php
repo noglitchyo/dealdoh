@@ -8,7 +8,7 @@ use JsonSerializable;
  * @see https://tools.ietf.org/html/rfc1035#section-4.1.1
  * @codeCoverageIgnore
  */
-interface HeaderInterface extends MessageSectionAwareInterface, JsonSerializable
+interface HeaderInterface extends SectionAwareInterface, JsonSerializable
 {
     /**
      * No error condition
@@ -44,7 +44,7 @@ interface HeaderInterface extends MessageSectionAwareInterface, JsonSerializable
     const RCODE_REFUSED = 5;
 
     /**
-     * A 16 bit identifier assigned by the program that generates any kind of query.  This identifier is copied
+     * A 16 bit identifier assigned by the program that generates any kind of query. This identifier is copied
      * the corresponding reply and can be used by the requester to match up replies to outstanding queries.
      *
      * @return int

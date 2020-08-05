@@ -3,7 +3,7 @@
 namespace NoGlitchYo\Dealdoh;
 
 use NoGlitchYo\Dealdoh\Exception\HttpProxyException;
-use NoGlitchYo\Dealdoh\Exception\InvalidWireMessageException;
+use NoGlitchYo\Dealdoh\Exception\InvalidDnsWireMessageException;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
@@ -83,7 +83,7 @@ class DohProxy implements MiddlewareInterface
             }
 
             $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireMessage);
-        } catch (InvalidWireMessageException $exception) {
+        } catch (InvalidDnsWireMessageException $exception) {
             return new Response(400);
         } catch (Throwable $t) {
             $this->logger->error(

@@ -66,7 +66,11 @@ class Header implements HeaderInterface
         bool $rd,
         bool $ra,
         int $z,
-        int $rcode
+        int $rcode,
+        QuestionSection $questionSection = null, // TODO: Does a question should always be mandatory? Good question!
+        ResourceRecordSection $answerSection = null,
+        ResourceRecordSection $additionalSection = null,
+        ResourceRecordSection $authoritySection = null
     ) {
         $this->id = $id;
         $this->qr = $qr;
@@ -77,10 +81,10 @@ class Header implements HeaderInterface
         $this->ra = $ra;
         $this->z = $z;
         $this->rcode = $rcode;
-        $this->setQuestionSection(new QuestionSection());
-        $this->setAnswerSection(new ResourceRecordSection());
-        $this->setAdditionalSection(new ResourceRecordSection());
-        $this->setAuthoritySection(new ResourceRecordSection());
+        $this->questionSection = $questionSection ?? new QuestionSection();
+        $this->answerSection = $answerSection ?? new ResourceRecordSection();
+        $this->additionalSection = $additionalSection ?? new ResourceRecordSection();
+        $this->authoritySection = $authoritySection ?? new ResourceRecordSection();
     }
 
     public function getId(): int

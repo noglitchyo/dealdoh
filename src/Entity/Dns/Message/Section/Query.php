@@ -22,11 +22,11 @@ class Query implements QueryInterface
      */
     private $qclass;
 
-    public function __construct(string $name, int $type, int $qclass)
+    public function __construct(string $name, int $type, int $class)
     {
         $this->qname = $name;
         $this->qtype = $type;
-        $this->qclass = $qclass;
+        $this->qclass = $class;
     }
 
     public function getQtype(): int
