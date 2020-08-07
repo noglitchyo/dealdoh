@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Stub;
 
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
+use NoGlitchYo\Dealdoh\Helper\UrlSafeBase64CodecHelper;
 use React\Datagram\Factory;
 use React\Datagram\Socket;
 use React\Datagram\Socket as ReactSocket;
@@ -23,7 +23,7 @@ class DnsServerStub
     public const RECEIVE_ACTION = 'receive';
 
     /**
-     * @var MessageFactory
+     * @var \NoGlitchYo\Dealdoh\Factory\MessageFactory
      */
     private $messageFactory;
 
@@ -57,7 +57,7 @@ class DnsServerStub
                          * @var $server ReactSocket
                          */
                         $server->send(
-                            $dnsResponseMessage ? Base64UrlCodecHelper::decode($dnsResponseMessage) : $message,
+                            $dnsResponseMessage ? UrlSafeBase64CodecHelper::decode($dnsResponseMessage) : $message,
                             $address
                         );
                     }
@@ -80,7 +80,7 @@ class DnsServerStub
             static::RECEIVE_ACTION,
             [
                 'from'    => $from,
-                'message' => Base64UrlCodecHelper::encode($message),
+                'message' => UrlSafeBase64CodecHelper::encode($message),
             ]
         );
     }

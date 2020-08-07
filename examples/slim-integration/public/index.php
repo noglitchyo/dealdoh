@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
 
 use Http\Adapter\Guzzle6\Client;
-use NoGlitchYo\Dealdoh\Client\DohClient;
-use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
-use NoGlitchYo\Dealdoh\DohProxy;
+use NoGlitchYo\Dealdoh\Dns\Client\DohClient;
+use NoGlitchYo\Dealdoh\Dns\Client\PlainDnsClient;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsUpstreamPoolResolver;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory;
-use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapper;
+use NoGlitchYo\Dealdoh\Middleware\DohResolverMiddleware;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 use Slim\App;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -19,8 +18,8 @@ $app = new App;
 $app->any(
     '/dns-query',
     function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-        $dnsMessageFactory = new MessageFactory();
-        $dnsResolver = new DnsPoolResolver(
+        $dnsMessageFactory = new \NoGlitchYo\Dealdoh\Mapper\MessageMapper();
+        $dnsResolver = new DnsUpstreamPoolResolver(
             new DnsUpstreamPool(
                 [
                     'https://cloudflare-dns.com/dns-query',
@@ -34,7 +33,7 @@ $app->any(
                     ),
                     $dnsMessageFactory
                 ),
-                new StdClient(
+                new PlainDnsClient(
                     $dnsMessageFactory,
                     new DnsOverTcpTransport(),
                     new DnsOverUdpTransport()
@@ -42,10 +41,10 @@ $app->any(
             ]
         );
 
-        $dnsProxy = new DohProxy(
+        $dnsProxy = new DohResolverMiddleware(
             $dnsResolver,
             $dnsMessageFactory,
-            new DohHttpMessageFactory($dnsMessageFactory)
+            new HttpResponseMapper($dnsMessageFactory)
         );
 
         return $dnsProxy->forward($request);

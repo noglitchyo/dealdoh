@@ -7,37 +7,38 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
-use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Factory\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapper;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory
+ * @covers \NoGlitchYo\Dealdoh\Mapper\HttpResponseMapper
  */
 class DohHttpMessageFactoryTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
     /**
-     * @var \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface|MockInterface
+     * @var MessageFactoryInterface|MockInterface
      */
     private $dnsMessageFactoryMock;
 
     /**
-     * @var DohHttpMessageFactory
+     * @var HttpResponseMapper
      */
     private $sut;
 
     protected function setUp(): void
     {
-        $this->dnsMessageFactoryMock = Mockery::mock(\NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface::class);
+        $this->dnsMessageFactoryMock = Mockery::mock(MessageFactoryInterface::class);
 
-        $this->sut = new DohHttpMessageFactory($this->dnsMessageFactoryMock);
+        $this->sut = new HttpResponseMapper($this->dnsMessageFactoryMock);
     }
 
     public function testCreateResponseFromMessageReturnValidHttpDnsMessage(): void

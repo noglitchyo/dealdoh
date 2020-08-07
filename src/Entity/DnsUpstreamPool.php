@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Entity;
 
 use JsonSerializable;
+use NoGlitchYo\Dealdoh\Factory\DnsUpstreamFactory;
 
 /**
+ * A DnsUpstreamPool stores a collection of DnsUpstreamInterface.
+ *
  * @codeCoverageIgnore
  */
 class DnsUpstreamPool implements DnsUpstreamPoolInterface, JsonSerializable
@@ -16,6 +19,12 @@ class DnsUpstreamPool implements DnsUpstreamPoolInterface, JsonSerializable
      */
     private $dnsUpstreams = [];
 
+    /**
+     * Create a new DnsUpstreamPool from a JSON list of upstreams
+     * @param string $jsonUpstreamPool
+     *
+     * @return static
+     */
     public static function fromJson(string $jsonUpstreamPool): self
     {
         $upstreamPool = json_decode($jsonUpstreamPool, true);
@@ -25,17 +34,21 @@ class DnsUpstreamPool implements DnsUpstreamPoolInterface, JsonSerializable
 
     public function __construct(array $dnsUpstreams = [])
     {
+        $dnsUpstreamFactory = new DnsUpstreamFactory();
+
         foreach ($dnsUpstreams as $dnsUpstream) {
             // TODO: cover this with test case
             if (!is_array($dnsUpstream)) {
                 $dnsUpstream['uri'] = $dnsUpstream;
             }
 
-            $this->addUpstream(new DnsUpstream($dnsUpstream['uri'], $dnsUpstream['code'] ?? null));
+            $this->addUpstream(
+                $dnsUpstreamFactory->create($dnsUpstream['uri'], $dnsUpstream['code'] ?? null)
+            );
         }
     }
 
-    public function addUpstream(DnsUpstream $dnsUpstream): DnsUpstreamPoolInterface
+    public function addUpstream(DnsUpstreamInterface $dnsUpstream): DnsUpstreamPoolInterface
     {
         $this->dnsUpstreams[] = $dnsUpstream;
 
