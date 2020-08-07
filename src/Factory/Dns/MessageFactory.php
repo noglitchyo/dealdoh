@@ -69,6 +69,12 @@ class MessageFactory implements MessageFactoryInterface
         return new Message(new Header($id, $qr, $opcode, $isAa, $isTc, $isRd, $isRa, $z, $rcode));
     }
 
+    /**
+     * @param string $dnsWireMessage
+     *
+     * @return MessageInterface
+     * @throws InvalidDnsWireMessageException
+     */
     public function createMessageFromDnsWireMessage(string $dnsWireMessage): MessageInterface
     {
         try {
