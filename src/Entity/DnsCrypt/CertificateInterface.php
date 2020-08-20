@@ -9,8 +9,8 @@ interface CertificateInterface
 
     public const SIGNATURE_LENGTH = 64;
 
-    public const ES_VERSION_XSALSA20POLY1305 = 0x00 . 0x01;
-    public const ES_VERSION_XCHACHA20POLY1305 = 0x00 . 0x02;
+    public const ES_VERSION_XSALSA20POLY1305 = 1;
+    public const ES_VERSION_XCHACHA20POLY1305 = 2;
 
     /**
      * === DNSC

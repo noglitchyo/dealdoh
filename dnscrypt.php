@@ -23,9 +23,9 @@ $dnsRequestMessage = $messageFactory->create()
 //);
 
 $dnsCryptUpstream = new DnsCryptUpstream(
-    '51.158.166.97:443',
-    '2.dnscrypt-cert.acsacsar-ams.com',
-    '0327f3cf927e995f46fb2381e07c1c764ef25f5d8442ce48bdaee4577a06b651',
+    '185.228.168.168:8443',
+    'cleanbrowsing.org',
+    'bcac32fad54369171f0832d6075027c3208ceef0e8e99f9418dc776065d48f29',
 );
 
 $dnsCryptClient->resolve($dnsCryptUpstream, $dnsRequestMessage);

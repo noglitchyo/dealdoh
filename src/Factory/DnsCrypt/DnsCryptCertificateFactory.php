@@ -6,7 +6,8 @@ use Exception;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\Certificate;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
-use function Sodium\crypto_sign_ed25519_pk_to_curve25519;
+
+//use function Sodium\crypto_sign_ed25519_pk_to_curve25519;
 
 class DnsCryptCertificateFactory
 {
@@ -32,7 +33,12 @@ class DnsCryptCertificateFactory
         ];
         //CertificateInterface::CERT_MAGIC;
 
-        // Retrieve es-version
+        /**
+         * the cryptographic construction to use with this
+         * certificate.
+         * For X25519-XSalsa20Poly1305, <es-version> must be 0x00 0x01.
+         * For X25519-XChacha20Poly1305, <es-version> must be 0x00 0x02.
+         */
         $esVersion = (int)$values[2];
         // TODO: validate this
 
@@ -47,11 +53,13 @@ class DnsCryptCertificateFactory
             $key[] = chr($n & bindec('1111 1111'));
         }
 
-        // Retrieve signature (64-bytes using Ed25519 and provider secret key)
+        // Retrieve 64-bytes signature using the Ed25519 algorithm and the
+        // provider secret key. Ed25519 must be used in this version of the
+        // protocol.
         $signature = substr($certificate, 8, 64); //implode('', $key);
 
 
-        // Construct resolver-pk (32-bytes, using X25519) : resolver short-term PK
+        // the resolver short-term public key, which is 32 bytes when using X25519
         $key = [];
         foreach (array_slice($values, 36, 32 * 8 / 16) as $n) {
             $key[] = chr($n >> 8 & bindec('1111 1111'));
@@ -68,9 +76,24 @@ class DnsCryptCertificateFactory
         }
         $clientMagic = implode('', $key);
 
-        $serial  = (int)unpack('N', substr($certificate, 112, 4))[1];
+        /**
+         * a 4 byte serial number in big-endian format. If more than
+         * one certificates are valid, the client must prefer the certificate
+         * with a higher serial number.
+         */
+        $serial = (int)unpack('N', substr($certificate, 112, 4))[1];
+
+        /**
+         * the date the certificate is valid from, as a big-endian
+         * 4-byte unsigned Unix timestamp.
+         */
         $tsStart = (int)unpack('N', substr($certificate, 116, 4))[1];
-        $tsEnd   = (int)unpack('N', substr($certificate, 120, 4))[1];
+
+        /**
+         * the date the certificate is valid until (inclusive), as a
+         * big-endian 4-byte unsigned Unix timestamp.
+         */
+        $tsEnd = (int)unpack('N', substr($certificate, 120, 4))[1];
 
         /**
          * The resolver responds with a public set of signed certificates, that
