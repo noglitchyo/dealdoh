@@ -5,13 +5,14 @@ require 'vendor/autoload.php';
 use NoGlitchYo\Dealdoh\Client\DnsCryptClient;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Service\DnsCryptService;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Service\DnsCryptService;
+use Service\DnsCrypt\CertificateFetcher;
 
 //use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 
-$dnsCryptClient = new DnsCryptClient(new MessageFactory(), new DnsCryptService());
+$dnsCryptClient = new DnsCryptClient(new MessageFactory(), new DnsCryptService(), new CertificateFetcher());
 
 $messageFactory = new MessageFactory();
 

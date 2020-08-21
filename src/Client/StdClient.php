@@ -7,7 +7,6 @@ namespace NoGlitchYo\Dealdoh\Client;
 use Exception;
 use LogicException;
 use NoGlitchYo\Dealdoh\Client\Transport\DnsTransportInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
@@ -54,7 +53,7 @@ class StdClient implements DnsClientInterface
      */
     public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
-        $dnsRequestMessage = $this->enableRecursionForDnsMessage($dnsRequestMessage);
+        $dnsRequestMessage = $dnsRequestMessage->enableRecursion();
         $address = $this->getSanitizedUpstreamAddress($dnsUpstream);
 
         if ($this->isUdp($dnsUpstream)) {
@@ -130,29 +129,5 @@ class StdClient implements DnsClientInterface
     private function getSanitizedUpstreamAddress(DnsUpstream $dnsUpstream): string
     {
         return str_replace($dnsUpstream->getScheme() . '://', '', $dnsUpstream->getUri());
-    }
-
-    /**
-     * Enable recursion for the given DNS message
-     *
-     * @param MessageInterface $dnsRequestMessage
-     *
-     * @return MessageInterface
-     */
-    private function enableRecursionForDnsMessage(MessageInterface $dnsRequestMessage): MessageInterface
-    {
-        return $dnsRequestMessage->withHeader(
-            new Header(
-                $dnsRequestMessage->getHeader()->getId(),
-                $dnsRequestMessage->getHeader()->isQr(),
-                $dnsRequestMessage->getHeader()->getOpcode(),
-                $dnsRequestMessage->getHeader()->isAa(),
-                $dnsRequestMessage->getHeader()->isTc(),
-                true, // Enable recursion (RD = 1)
-                $dnsRequestMessage->getHeader()->isRa(),
-                $dnsRequestMessage->getHeader()->getZ(),
-                $dnsRequestMessage->getHeader()->getRcode()
-            )
-        );
     }
 }

@@ -156,4 +156,26 @@ class Message implements MessageInterface
             'additional' => $this->additionalSection,
         ];
     }
+
+    /**
+     * Enable recursion for the current DNS message
+     *
+     * @return MessageInterface
+     */
+    public function enableRecursion(): MessageInterface
+    {
+        return $this->withHeader(
+            new Header(
+                $this->getHeader()->getId(),
+                $this->getHeader()->isQr(),
+                $this->getHeader()->getOpcode(),
+                $this->getHeader()->isAa(),
+                $this->getHeader()->isTc(),
+                true, // Enable recursion (RD = 1)
+                $this->getHeader()->isRa(),
+                $this->getHeader()->getZ(),
+                $this->getHeader()->getRcode()
+            )
+        );
+    }
 }

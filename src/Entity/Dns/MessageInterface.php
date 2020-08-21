@@ -6,11 +6,11 @@ namespace NoGlitchYo\Dealdoh\Entity\Dns;
 
 use JsonSerializable;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\SectionAwareInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QueryInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Entity\Dns\Message\SectionAwareInterface;
 
 /**
  * Immutable DNS message.
@@ -83,4 +83,11 @@ interface MessageInterface extends JsonSerializable
      * @return MessageInterface
      */
     public function withAdditionalSection(ResourceRecordSection $additionalSectionSection): MessageInterface;
+
+    /**
+     * Enable recursion for the current DNS message
+     *
+     * @return MessageInterface
+     */
+    public function enableRecursion(): MessageInterface;
 }
