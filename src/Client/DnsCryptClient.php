@@ -3,7 +3,6 @@
 namespace NoGlitchYo\Dealdoh\Client;
 
 use DateTimeImmutable;
-use Exception;
 use InvalidArgumentException;
 use LogicException;
 use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
@@ -14,14 +13,12 @@ use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
-use NoGlitchYo\Dealdoh\Entity\DnsCrypt\DnsCryptQuery;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Factory\DnsCrypt\DnsCryptCertificateFactory;
-use NoGlitchYo\Dealdoh\Service\EncryptionSystem;
-use Socket\Raw\Factory;
+use NoGlitchYo\Dealdoh\Service\DnsCryptServiceInterface;
 
 class DnsCryptClient implements DnsClientInterface
 {
@@ -29,15 +26,18 @@ class DnsCryptClient implements DnsClientInterface
      * @var MessageFactoryInterface
      */
     private $messageFactory;
-    /**
-     * @var Factory
-     */
-    private $socketFactory;
 
-    public function __construct(MessageFactoryInterface $messageFactory, Factory $socketFactory)
-    {
+    /**
+     * @var DnsCryptServiceInterface
+     */
+    private $dnsCryptService;
+
+    public function __construct(
+        MessageFactoryInterface $messageFactory,
+        DnsCryptServiceInterface $dnsCryptQueryFactory
+    ) {
         $this->messageFactory = $messageFactory;
-        $this->socketFactory = $socketFactory;
+        $this->dnsCryptService = $dnsCryptQueryFactory;
     }
 
     public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
@@ -48,14 +48,26 @@ class DnsCryptClient implements DnsClientInterface
 
         $certificate = $this->pickCertificate($dnsUpstream);
         $clientDnsWireQuery = $this->messageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
-        $es = new EncryptionSystem($certificate);
 
-        //                $response = $this->useTcp($dnsUpstream, $dnsCryptQuery);
-        $response = $this->useUdp($dnsUpstream, $es->encrypt($clientDnsWireQuery));
-        // TODO: check if TC flag
+        $es = $this->dnsCryptService->getEncryptionSystem($certificate);
 
+        $dnsQuery = (string)$es->encrypt($clientDnsWireQuery);
+
+        $udpTransport = new DnsOverUdpTransport();
+        $response = $udpTransport->send($dnsUpstream->getUri(), $dnsQuery);
 
         $dnsMessage = $this->messageFactory->createMessageFromDnsWireMessage($es->decrypt($response));
+
+        // TODO: check if TC flag
+        if ($dnsMessage->getHeader()->isTc()) {
+            $tcpTransport = new DnsOverTcpTransport();
+            $response = $tcpTransport->send($dnsUpstream->getUri(), $dnsQuery);
+            $dnsMessage = $this->messageFactory->createMessageFromDnsWireMessage($es->decrypt($response));
+        }
+
+        // TODO: verify response integrity
+
+
         die(var_dump(json_encode($dnsMessage)));
     }
 
@@ -121,68 +133,6 @@ class DnsCryptClient implements DnsClientInterface
         // TODO: Pick the certificate with the higher serial number
         shuffle($certificates);
         return array_shift($certificates);
-    }
-
-    private function useUdp(DnsCryptUpstream $dnsUpstream, DnsCryptQuery $dnsCryptQuery)
-    {
-        $dnsWireMessage = (string)$dnsCryptQuery;
-        ["host" => $host, "port" => $port] = parse_url($dnsUpstream->getUri());
-        $length = strlen($dnsWireMessage);
-        $socket = @stream_socket_client('udp://' . $host . ':' . $port, $errno, $errstr, 4);
-        stream_set_blocking($socket, true);
-        if ($socket === false) {
-            throw new Exception('Unable to connect to DNS server: <' . $errno . '> ' . $errstr);
-        }
-
-        // Must use DNS over TCP if message is bigger
-        if ($length > StdClient::EDNS_SIZE) {
-            throw new Exception(
-                sprintf(
-                    'DNS message is `%s` bytes, maximum `%s` bytes allowed. Use TCP transport instead',
-                    $length,
-                    StdClient::EDNS_SIZE
-                )
-            );
-        }
-
-        if (!@fputs($socket, $dnsWireMessage)) {
-            throw new Exception('Unable to write to DNS server: <' . $errno . '> ' . $errstr);
-        }
-        $dnsWireResponseMessage = fread($socket, StdClient::EDNS_SIZE);
-        if ($dnsWireResponseMessage === false) {
-            throw new Exception('Unable to read from DNS server: Error <' . $errno . '> ' . $errstr);
-        }
-        fclose($socket);
-
-        return $dnsWireResponseMessage;
-    }
-
-    private function useTcp(DnsCryptUpstream $dnsUpstream, DnsCryptQuery $dnsCryptQuery)
-    {
-        ["host" => $host, "port" => $port] = parse_url($dnsUpstream->getUri());
-
-        $socket = @stream_socket_client('tcp://' . $host . ':' . $port, $errno, $errstr, 4);
-
-        if ($socket === false) {
-            throw new Exception('Unable to connect to DNS server: <' . $errno . '> ' . $errstr);
-        }
-
-        stream_set_blocking($socket, false);
-        if (!@fputs($socket, (string)$dnsCryptQuery)) {
-            throw new Exception('Unable to write to DNS server: <' . $errno . '> ' . $errstr);
-        }
-        $response = '';
-        while (!feof($socket)) {
-            $chunk = fread($socket, StdClient::EDNS_SIZE);
-            if ($chunk === false) {
-                throw new Exception('DNS message transfer from DNS server failed');
-            }
-
-            $response .= $chunk;
-        }
-        fclose($socket);
-
-        return $response;
     }
 
     /**

@@ -6,7 +6,6 @@ namespace NoGlitchYo\Dealdoh\Entity\Dns;
 
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\MessageSectionAwareTrait;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
@@ -50,7 +49,7 @@ class Message implements MessageInterface
      */
     public function __construct(
         HeaderInterface $header,
-        QuestionSection $questionSection = null, // TODO: Does a question should always be mandatory? Good question!
+        QuestionSection $questionSection = null,
         ResourceRecordSection $answerSection = null,
         ResourceRecordSection $additionalSection = null,
         ResourceRecordSection $authoritySection = null

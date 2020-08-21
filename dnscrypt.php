@@ -5,13 +5,13 @@ require 'vendor/autoload.php';
 use NoGlitchYo\Dealdoh\Client\DnsCryptClient;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Service\DnsCryptService;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use Socket\Raw\Factory;
 
 //use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 
-$dnsCryptClient = new DnsCryptClient(new MessageFactory(), new Factory());
+$dnsCryptClient = new DnsCryptClient(new MessageFactory(), new DnsCryptService());
 
 $messageFactory = new MessageFactory();
 
