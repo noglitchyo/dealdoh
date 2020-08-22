@@ -7,12 +7,12 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
 use Mockery;
 use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Tests\Stub\DnsServerStubManager;
 use PHPUnit\Framework\TestCase;
 

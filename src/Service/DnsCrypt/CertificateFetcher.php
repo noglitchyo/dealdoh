@@ -1,13 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Service\DnsCrypt;
-
+namespace NoGlitchYo\Dealdoh\Service\DnsCrypt;
 
 use DateTimeImmutable;
 use LogicException;
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
@@ -15,17 +12,22 @@ use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
-use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
 use NoGlitchYo\Dealdoh\Factory\DnsCrypt\DnsCryptCertificateFactory;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 
 class CertificateFetcher
 {
-
-    public function getCertificateForUpstream(DnsUpstream $dnsUpstream): CertificateInterface
+    /**
+     * Retrieve a certificate from the resolver which will be used to send queries to this resolver
+     * @param DnsCryptUpstream $dnsUpstream
+     * @return CertificateInterface
+     * @throws \Exception
+     */
+    public function getCertificateForUpstream(DnsCryptUpstream $dnsUpstream): CertificateInterface
     {
         /**
-         * Step 1.
          * The client begins a DNSCrypt session by sending a regular unencrypted
          * TXT DNS query to the resolver IP address, on the DNSCrypt port, first
          * over UDP, then, in case of failure, timeout or truncation, over TCP.

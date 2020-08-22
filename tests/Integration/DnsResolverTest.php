@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Tests\Integration;
 
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
@@ -15,6 +13,8 @@ use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Tests\Stub\DnsServerStub;
 use NoGlitchYo\Dealdoh\Tests\Stub\DnsServerStubManager;
 use PHPUnit\Framework\TestCase;

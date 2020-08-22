@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Service;
+namespace NoGlitchYo\Dealdoh\Factory\DnsCrypt;
 
 use Exception;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
-use NoGlitchYo\Dealdoh\Service\EncryptionSystemInterface;
-use NoGlitchYo\Dealdoh\Service\XChacha20EncryptionSystem;
-use NoGlitchYo\Dealdoh\Service\XSalsa20EncryptionSystem;
+use NoGlitchYo\Dealdoh\Service\DnsCrypt\EncryptionSystemInterface;
+use NoGlitchYo\Dealdoh\Service\DnsCrypt\XChacha20EncryptionSystem;
+use NoGlitchYo\Dealdoh\Service\DnsCrypt\XSalsa20EncryptionSystem;
 
-class DnsCryptService implements DnsCryptServiceInterface
+class EncryptionSystemFactory implements EncryptionSystemFactoryInterface
 {
-    public function getEncryptionSystem(CertificateInterface $certificate): EncryptionSystemInterface
+    public function createEncryptionSystem(CertificateInterface $certificate): EncryptionSystemInterface
     {
         switch ($certificate->getEsVersion()) {
             case CertificateInterface::ES_VERSION_XSALSA20POLY1305:

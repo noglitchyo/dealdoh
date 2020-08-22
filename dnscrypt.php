@@ -7,12 +7,12 @@ use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Service\DnsCryptService;
-use Service\DnsCrypt\CertificateFetcher;
+use NoGlitchYo\Dealdoh\Factory\DnsCrypt\EncryptionSystemFactory;
+use NoGlitchYo\Dealdoh\Service\DnsCrypt\CertificateFetcher;
 
 //use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 
-$dnsCryptClient = new DnsCryptClient(new MessageFactory(), new DnsCryptService(), new CertificateFetcher());
+$dnsCryptClient = new DnsCryptClient(new MessageFactory(), new EncryptionSystemFactory(), new CertificateFetcher());
 
 $messageFactory = new MessageFactory();
 

@@ -3,15 +3,15 @@
 namespace NoGlitchYo\Dealdoh\Client;
 
 use InvalidArgumentException;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\DnsCryptQuery;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Service\DnsCryptServiceInterface;
-use Service\DnsCrypt\CertificateFetcher;
+use NoGlitchYo\Dealdoh\Factory\DnsCrypt\EncryptionSystemFactoryInterface;
+use NoGlitchYo\Dealdoh\Service\DnsCrypt\CertificateFetcher;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 
 class DnsCryptClient implements DnsClientInterface
 {
@@ -21,7 +21,7 @@ class DnsCryptClient implements DnsClientInterface
     private $messageFactory;
 
     /**
-     * @var DnsCryptServiceInterface
+     * @var EncryptionSystemFactoryInterface
      */
     private $dnsCryptService;
 
@@ -32,7 +32,7 @@ class DnsCryptClient implements DnsClientInterface
 
     public function __construct(
         MessageFactoryInterface $messageFactory,
-        DnsCryptServiceInterface $dnsCryptService,
+        EncryptionSystemFactoryInterface $dnsCryptService,
         CertificateFetcher $certificateFetcher
     )
     {
@@ -51,7 +51,7 @@ class DnsCryptClient implements DnsClientInterface
         $dnsWireMessage = $this->messageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
 
         // Retrieve a handler for the encryption system used by the certificate
-        $es = $this->dnsCryptService->getEncryptionSystem($certificate);
+        $es = $this->dnsCryptService->createEncryptionSystem($certificate);
 
         $dnsCryptQuery = $es->encrypt($dnsWireMessage);
 
@@ -70,15 +70,9 @@ class DnsCryptClient implements DnsClientInterface
 
     private function send(DnsUpstream $dnsUpstream, DnsCryptQuery $dnsCryptQuery, bool $useTcp = false): string
     {
-        if (!$useTcp) {
-            $udpTransport = new DnsOverUdpTransport();
-            $response     = $udpTransport->send($dnsUpstream->getUri(), (string)$dnsCryptQuery);
-        } else {
-            $tcpTransport = new DnsOverTcpTransport();
-            $response     = $tcpTransport->send($dnsUpstream->getUri(), (string)$dnsCryptQuery);
-        }
+        $transport = (!$useTcp) ? new DnsOverUdpTransport() : new DnsOverTcpTransport();
 
-        return $response;
+        return  $transport->send($dnsUpstream->getUri(), (string)$dnsCryptQuery);
     }
 
     public function supports(DnsUpstream $dnsUpstream): bool

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Client\Transport;
+namespace NoGlitchYo\Dealdoh\Service\Transport;
 
 use Exception;
 use NoGlitchYo\Dealdoh\Client\StdClient;

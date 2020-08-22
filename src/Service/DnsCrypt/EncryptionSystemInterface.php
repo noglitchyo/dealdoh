@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Service;
+namespace NoGlitchYo\Dealdoh\Service\DnsCrypt;
 
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\DnsCryptQuery;

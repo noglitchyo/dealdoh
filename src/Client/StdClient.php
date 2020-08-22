@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Client;
 
 use Exception;
-use LogicException;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsTransportInterface;
 use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsTransportInterface;
 
 /**
  * Standard DNS client making request over UDP (& TCP as a fallback)
@@ -56,13 +55,7 @@ class StdClient implements DnsClientInterface
         $dnsRequestMessage = $dnsRequestMessage->enableRecursion();
         $address = $this->getSanitizedUpstreamAddress($dnsUpstream);
 
-        if ($this->isUdp($dnsUpstream)) {
-            $dnsWireResponseMessage = $this->sendWith('udp', $address, $dnsRequestMessage);
-        } elseif ($this->isTcp($dnsUpstream)) {
-            $dnsWireResponseMessage = $this->sendWith('tcp', $address, $dnsRequestMessage);
-        } else {
-            throw new LogicException(sprintf('Scheme `%s` is not supported', $dnsUpstream->getScheme()));
-        }
+        $dnsWireResponseMessage = $this->send($address, $dnsRequestMessage, !$this->isUdp($dnsUpstream));
 
         return $dnsWireResponseMessage;
     }
@@ -86,21 +79,21 @@ class StdClient implements DnsClientInterface
      * Send DNS message using socket with the chosen protocol: `udp` or `tcp`
      * Allow a sender to force usage of a specific protocol (e.g. protocol blocked by network/firewall)
      *
-     * @param string           $protocol          Protocol to use to send the message
      * @param string           $address
      * @param MessageInterface $dnsRequestMessage
+     * @param bool $isTcp Should use TCP to send message instead of UDP
      *
      * @return MessageInterface
      * @throws Exception
      */
-    private function sendWith(
-        string $protocol,
+    private function send(
         string $address,
-        MessageInterface $dnsRequestMessage
+        MessageInterface $dnsRequestMessage,
+        bool $isTcp = false
     ): MessageInterface {
         $dnsWireMessage = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
 
-        if ($protocol === 'udp') {
+        if (!$isTcp) {
             if (strlen($dnsWireMessage) <= static::EDNS_SIZE) { // Must use TCP if message is bigger
                 $dnsWireResponseMessage = $this->udpTransport->send($address, $dnsWireMessage);
 
@@ -114,9 +107,7 @@ class StdClient implements DnsClientInterface
 
         $dnsWireResponseMessage = $this->tcpTransport->send($address, $dnsWireMessage);
 
-        $message = $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireResponseMessage);
-
-        return $message;
+        return $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireResponseMessage);
     }
 
     /**
