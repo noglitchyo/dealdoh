@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Entity\Dns\Message;
+namespace NoGlitchYo\Dealdoh\Entity\Message;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 
 /**
  * @codeCoverageIgnore
@@ -59,7 +57,7 @@ class Header implements HeaderInterface
     private $rcode;
 
     /**
-     * @var MessageInterface
+     * @var \NoGlitchYo\Dealdoh\Entity\MessageInterface
      */
     private $message;
 

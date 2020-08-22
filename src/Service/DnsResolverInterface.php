@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Service;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 
 /**
  * @codeCoverageIgnore

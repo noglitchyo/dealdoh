@@ -1,17 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
+namespace NoGlitchYo\Dealdoh\Mapper;
 
-namespace NoGlitchYo\Dealdoh\Factory\Dns;
 
 use InvalidArgumentException;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use NoGlitchYo\Dealdoh\Exception\InvalidDnsWireMessageException;
 use NoGlitchYo\Dealdoh\Helper\MessageHelper;
 use React\Dns\Model\Message as ReactDnsMessage;
@@ -20,7 +18,7 @@ use React\Dns\Protocol\BinaryDumper;
 use React\Dns\Protocol\Parser;
 use React\Dns\Query\Query as ReactDnsQuery;
 
-class MessageFactory implements MessageFactoryInterface
+class MessageMapper implements MessageMapperInterface
 {
     /**
      * @var Parser
@@ -39,40 +37,9 @@ class MessageFactory implements MessageFactoryInterface
     }
 
     /**
-     * @param int  $id
-     * @param bool $qr
-     * @param int  $opcode
-     * @param bool $isAa
-     * @param bool $isTc
-     * @param bool $isRd
-     * @param bool $isRa
-     * @param int  $z
-     * @param int  $rcode
-     *
-     * @return MessageInterface
-     */
-    public function create(
-        int $id = null,
-        bool $qr = false,
-        int $opcode = HeaderInterface::RCODE_OK,
-        bool $isAa = false,
-        bool $isTc = false,
-        bool $isRd = false,
-        bool $isRa = false,
-        int $z = 0,
-        int $rcode = HeaderInterface::RCODE_OK
-    ): MessageInterface {
-        if (!$id) {
-            $id = MessageHelper::generateId();
-        }
-
-        return new Message(new Header($id, $qr, $opcode, $isAa, $isTc, $isRd, $isRa, $z, $rcode));
-    }
-
-    /**
      * @param string $dnsWireMessage
      *
-     * @return MessageInterface
+     * @return \NoGlitchYo\Dealdoh\Entity\MessageInterface
      * @throws InvalidDnsWireMessageException
      */
     public function createMessageFromDnsWireMessage(string $dnsWireMessage): MessageInterface
@@ -88,34 +55,34 @@ class MessageFactory implements MessageFactoryInterface
      * Return a DNS message in wire format as defined in RFC-1035
      * If ID of the given message is equal to 0, a new ID will be generated
      *
-     * @param MessageInterface $dnsMessage
+     * @param \NoGlitchYo\Dealdoh\Entity\MessageInterface $dnsMessage
      *
      * @return string
      */
     public function createDnsWireMessageFromMessage(MessageInterface $dnsMessage): string
     {
-        $message = new ReactDnsMessage();
+        $message   = new ReactDnsMessage();
         $dnsHeader = $dnsMessage->getHeader();
         // TODO: Id should not be modified here, to remove...
-        $message->id = ($dnsHeader->getId() != 0) ? $dnsHeader->getId() : MessageHelper::generateId();
+        $message->id     = ($dnsHeader->getId() != 0) ? $dnsHeader->getId() : MessageHelper::generateId();
         $message->opcode = $dnsHeader->getOpcode();
-        $message->aa = $dnsHeader->isAa();
-        $message->tc = $dnsHeader->isTc();
-        $message->rd = $dnsHeader->isRd();
-        $message->ra = $dnsHeader->isRa();
-        $message->qr = $dnsHeader->isQr();
-        $message->rcode = $dnsHeader->getRcode();
+        $message->aa     = $dnsHeader->isAa();
+        $message->tc     = $dnsHeader->isTc();
+        $message->rd     = $dnsHeader->isRd();
+        $message->ra     = $dnsHeader->isRa();
+        $message->qr     = $dnsHeader->isQr();
+        $message->rcode  = $dnsHeader->getRcode();
 
         foreach ($dnsMessage->getQuestion() as $query) {
             $message->questions[] = new ReactDnsQuery(
                 $query->getQname(),
                 $query->getQtype(),
-                $query->getQclass(),
+                $query->getQclass()
             );
         }
 
-        $message->answers = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAnswer());
-        $message->authority = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAuthority());
+        $message->answers    = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAnswer());
+        $message->authority  = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAuthority());
         $message->additional = static::mapResourceRecordToReactDnsRecords($dnsMessage->getAdditional());
 
         return $this->binaryDumper->toBinary($message);
@@ -139,7 +106,8 @@ class MessageFactory implements MessageFactoryInterface
     private static function mapResourceRecordSection(
         array $records,
         ResourceRecordSection $recordSection
-    ): ResourceRecordSection {
+    ): ResourceRecordSection
+    {
         foreach ($records as $record) {
             $recordSection->add(
                 new ResourceRecord($record->name, $record->type, $record->class, $record->ttl, $record->data)

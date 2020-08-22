@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Tests\Stub;
 
 use Exception;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use Symfony\Component\Process\Process;
 
@@ -31,7 +31,7 @@ class DnsServerStubManager
      * Create a fake DNS upstream which listen for messages and send them back.
      * Return address and port of the created server
      *
-     * @param MessageInterface $dnsResponseToReturn A message to send back to the sender.
+     * @param \NoGlitchYo\Dealdoh\Entity\MessageInterface $dnsResponseToReturn A message to send back to the sender.
      *
      * @return mixed
      * @throws Exception

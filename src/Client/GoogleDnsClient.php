@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Client;
 
 use InvalidArgumentException;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use NoGlitchYo\Dealdoh\Exception\DnsClientException;
 use NoGlitchYo\Dealdoh\Mapper\GoogleDns\MessageMapper;
 use Nyholm\Psr7\Request;

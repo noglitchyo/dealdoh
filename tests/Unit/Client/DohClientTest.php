@@ -8,10 +8,11 @@ use Exception;
 use Mockery;
 use Mockery\MockInterface;
 use NoGlitchYo\Dealdoh\Client\DohClient;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\Message;
 use NoGlitchYo\Dealdoh\Exception\DnsClientException;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Factory\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapperInterface;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
@@ -28,9 +29,9 @@ class DohClientTest extends TestCase
     private $clientMock;
 
     /**
-     * @var MockInterface|MessageFactoryInterface
+     * @var MockInterface|\NoGlitchYo\Dealdoh\Factory\MessageFactoryInterface
      */
-    private $dnsMessageFactoryMock;
+    private $messageMapperMock;
 
     /**
      * @var DohClient
@@ -39,10 +40,10 @@ class DohClientTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->clientMock = Mockery::mock(ClientInterface::class);
-        $this->dnsMessageFactoryMock = Mockery::mock(MessageFactoryInterface::class);
+        $this->clientMock        = Mockery::mock(ClientInterface::class);
+        $this->messageMapperMock = Mockery::mock(MessageMapperInterface::class);
 
-        $this->sut = new DohClient($this->clientMock, $this->dnsMessageFactoryMock);
+        $this->sut = new DohClient($this->clientMock, $this->messageMapperMock);
 
         parent::setUp();
     }
@@ -57,7 +58,7 @@ class DohClientTest extends TestCase
         $dnsResponseMessage = Message::createWithDefaultHeader(true);
         $httpResponse = new Response(200, [], $dnsWireResponseMessage);
 
-        $this->dnsMessageFactoryMock->shouldReceive('createDnsWireMessageFromMessage')
+        $this->messageMapperMock->shouldReceive('createDnsWireMessageFromMessage')
             ->with($dnsRequestMessage)
             ->andReturn($dnsWireRequestMessage);
 
@@ -73,7 +74,7 @@ class DohClientTest extends TestCase
             )
             ->andReturn($httpResponse);
 
-        $this->dnsMessageFactoryMock->shouldReceive('createMessageFromDnsWireMessage')
+        $this->messageMapperMock->shouldReceive('createMessageFromDnsWireMessage')
             ->with($dnsWireResponseMessage)
             ->andReturn($dnsResponseMessage);
 
@@ -89,7 +90,7 @@ class DohClientTest extends TestCase
         $dnsWireResponseMessage = 'somemorebytesindnswireformat';
         $dnsResponseMessage = Message::createWithDefaultHeader(true);
 
-        $this->dnsMessageFactoryMock->shouldReceive('createDnsWireMessageFromMessage')
+        $this->messageMapperMock->shouldReceive('createDnsWireMessageFromMessage')
             ->with($dnsRequestMessage)
             ->andReturn($dnsWireRequestMessage);
 

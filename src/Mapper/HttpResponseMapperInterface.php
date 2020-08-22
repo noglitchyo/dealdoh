@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Factory;
+namespace NoGlitchYo\Dealdoh\Mapper;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * @codeCoverageIgnore
  */
-interface DohHttpMessageFactoryInterface
+interface HttpResponseMapperInterface
 {
     public function createResponseFromMessage(MessageInterface $dnsMessage): ResponseInterface;
 }

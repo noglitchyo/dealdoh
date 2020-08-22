@@ -1,29 +1,29 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Service\DnsCrypt;
+namespace NoGlitchYo\Dealdoh\Repository\DnsCrypt;
 
 use DateTimeImmutable;
+use Exception;
 use LogicException;
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Factory\DnsCrypt\DnsCryptCertificateFactory;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapper;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 
-class CertificateFetcher
+class CertificateRepository implements CertificateRepositoryInterface
 {
     /**
      * Retrieve a certificate from the resolver which will be used to send queries to this resolver
      * @param DnsCryptUpstream $dnsUpstream
      * @return CertificateInterface
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCertificateForUpstream(DnsCryptUpstream $dnsUpstream): CertificateInterface
     {
@@ -55,7 +55,7 @@ class CertificateFetcher
          * long. With the addition of the cert-magic, es-version and
          * protocol-minor-version, the record is 124 bytes long.
          */
-        $dnsCertificateFactory = new DnsCryptCertificateFactory();
+        $dnsCertificateFactory = new \NoGlitchYo\Dealdoh\Mapper\DnsCrypt\DnsCryptCertificateMapper();
         /** @var CertificateInterface[] $certificates */
         $certificates = [];
         foreach ($dnsResponseCertificatesMessage->getAnswer() as $record) {
@@ -115,7 +115,7 @@ class CertificateFetcher
 
     private function getCertificates(DnsCryptUpstream $dnsCryptUpstream): MessageInterface
     {
-        $stdClient = new StdClient(new MessageFactory(), new DnsOverTcpTransport(), new DnsOverUdpTransport());
+        $stdClient = new StdClient(new MessageMapper(), new DnsOverTcpTransport(), new DnsOverUdpTransport());
 
         $dnsQuery = new Message(
             new Header(0, false, 0, false, false, false, false, 0, 0),

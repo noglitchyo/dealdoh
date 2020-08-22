@@ -2,20 +2,18 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Entity\Dns;
+namespace NoGlitchYo\Dealdoh\Entity;
 
 use JsonSerializable;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QueryInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\SectionAwareInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\QueryInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\QuestionSection;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordSection;
 
 /**
  * Immutable DNS message.
  *
- * TODO: The way Header, Section and Message are attached together need some improvements
  *
  * @see                https://tools.ietf.org/html/rfc1035#section-4.1
  * @codeCoverageIgnore
@@ -89,5 +87,5 @@ interface MessageInterface extends JsonSerializable
      *
      * @return MessageInterface
      */
-    public function enableRecursion(): MessageInterface;
+    public function withRecursionEnabled(): MessageInterface;
 }

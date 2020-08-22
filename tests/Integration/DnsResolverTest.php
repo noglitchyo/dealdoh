@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Tests\Integration;
 
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
@@ -28,7 +28,7 @@ class DohProxyTest extends TestCase
     private $sut;
 
     /**
-     * @var MessageFactory
+     * @var \NoGlitchYo\Dealdoh\Factory\MessageFactory
      */
     private $messageFactory;
 

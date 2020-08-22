@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Entity;
 
 use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 
 /**
  * A DNS Resource is a DNS request message which has been resolved through a DNS upstream with a DNS client and for

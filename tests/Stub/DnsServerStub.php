@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Stub;
 
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use React\Datagram\Factory;
 use React\Datagram\Socket;
 use React\Datagram\Socket as ReactSocket;
 use React\EventLoop\Factory as EventLoopFactory;
-
 use const STDOUT;
 
 /**
@@ -23,7 +22,7 @@ class DnsServerStub
     public const RECEIVE_ACTION = 'receive';
 
     /**
-     * @var MessageFactory
+     * @var \NoGlitchYo\Dealdoh\Factory\MessageFactory
      */
     private $messageFactory;
 

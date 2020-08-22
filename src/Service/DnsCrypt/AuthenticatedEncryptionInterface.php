@@ -5,7 +5,7 @@ namespace NoGlitchYo\Dealdoh\Service\DnsCrypt;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\DnsCryptQuery;
 
-interface EncryptionSystemInterface
+interface AuthenticatedEncryptionInterface
 {
     /**
      * DNSCrypt queries sent by the client must use the <client-magic>

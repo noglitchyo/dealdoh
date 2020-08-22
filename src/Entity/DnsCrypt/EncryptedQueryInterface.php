@@ -2,8 +2,6 @@
 
 namespace NoGlitchYo\Dealdoh\Entity\DnsCrypt;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
-
 interface EncryptedQueryInterface
 {
     /**

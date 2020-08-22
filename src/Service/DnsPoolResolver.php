@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Service;
 
 use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPoolInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
 use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
 use Psr\Log\LoggerInterface;

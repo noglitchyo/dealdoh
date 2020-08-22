@@ -3,16 +3,17 @@
 require 'vendor/autoload.php';
 
 use NoGlitchYo\Dealdoh\Client\DnsCryptClient;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Factory\DnsCrypt\EncryptionSystemFactory;
-use NoGlitchYo\Dealdoh\Service\DnsCrypt\CertificateFetcher;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
+use NoGlitchYo\Dealdoh\Mapper\DnsCrypt\EncryptionSystemMapper;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapper;
+use NoGlitchYo\Dealdoh\Repository\DnsCrypt\CertificateRepository;
 
 //use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 
-$dnsCryptClient = new DnsCryptClient(new MessageFactory(), new EncryptionSystemFactory(), new CertificateFetcher());
+$dnsCryptClient = new DnsCryptClient(new EncryptionSystemMapper(), new CertificateRepository(), new MessageMapper());
 
 $messageFactory = new MessageFactory();
 
@@ -27,6 +28,6 @@ $dnsCryptUpstream = new DnsCryptUpstream(
     '185.228.168.168:8443',
     'cleanbrowsing.org',
     'bcac32fad54369171f0832d6075027c3208ceef0e8e99f9418dc776065d48f29',
-);
+    );
 
 $dnsCryptClient->resolve($dnsCryptUpstream, $dnsRequestMessage);

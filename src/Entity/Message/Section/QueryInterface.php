@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Entity\Dns\Message\Section;
+namespace NoGlitchYo\Dealdoh\Entity\Message\Section;
 
 use JsonSerializable;
 

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Client;
 
 use Exception;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapperInterface;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsTransportInterface;
 
 /**
@@ -19,32 +19,35 @@ class StdClient implements DnsClientInterface
     public const EDNS_SIZE = 4096;
 
     /**
-     * @var MessageFactoryInterface
+     * @var MessageMapperInterface
      */
-    private $dnsMessageFactory;
+    private $messageMapper;
+
     /**
      * @var DnsTransportInterface
      */
     private $tcpTransport;
+
     /**
      * @var DnsTransportInterface
      */
     private $udpTransport;
 
     public function __construct(
-        MessageFactoryInterface $dnsMessageFactory,
+        MessageMapperInterface $messageMapper,
         DnsTransportInterface $tcpTransport,
         DnsTransportInterface $udpTransport
-    ) {
-        $this->dnsMessageFactory = $dnsMessageFactory;
-        $this->tcpTransport = $tcpTransport;
-        $this->udpTransport = $udpTransport;
+    )
+    {
+        $this->messageMapper = $messageMapper;
+        $this->tcpTransport  = $tcpTransport;
+        $this->udpTransport  = $udpTransport;
     }
 
     /**
      * Resolve message using regular UDP/TCP queries towards DNS upstream
      *
-     * @param DnsUpstream      $dnsUpstream
+     * @param DnsUpstream $dnsUpstream
      * @param MessageInterface $dnsRequestMessage
      *
      * @return MessageInterface
@@ -52,12 +55,11 @@ class StdClient implements DnsClientInterface
      */
     public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
-        $dnsRequestMessage = $dnsRequestMessage->enableRecursion();
-        $address = $this->getSanitizedUpstreamAddress($dnsUpstream);
-
-        $dnsWireResponseMessage = $this->send($address, $dnsRequestMessage, !$this->isUdp($dnsUpstream));
-
-        return $dnsWireResponseMessage;
+        return $this->send(
+            $dnsUpstream->getAddr(),
+            $dnsRequestMessage->withRecursionEnabled(),
+            !$this->isUdp($dnsUpstream)
+        );
     }
 
     public function supports(DnsUpstream $dnsUpstream): bool
@@ -65,12 +67,12 @@ class StdClient implements DnsClientInterface
         return $this->isUdp($dnsUpstream) || $this->isTcp($dnsUpstream);
     }
 
-    private function isUdp($dnsUpstream): bool
+    private function isUdp(DnsUpstream $dnsUpstream): bool
     {
         return in_array($dnsUpstream->getScheme(), ['udp', 'dns']) || $dnsUpstream->getScheme() === null;
     }
 
-    private function isTcp($dnsUpstream): bool
+    private function isTcp(DnsUpstream $dnsUpstream): bool
     {
         return $dnsUpstream->getScheme() === 'tcp';
     }
@@ -79,7 +81,7 @@ class StdClient implements DnsClientInterface
      * Send DNS message using socket with the chosen protocol: `udp` or `tcp`
      * Allow a sender to force usage of a specific protocol (e.g. protocol blocked by network/firewall)
      *
-     * @param string           $address
+     * @param string $address
      * @param MessageInterface $dnsRequestMessage
      * @param bool $isTcp Should use TCP to send message instead of UDP
      *
@@ -90,14 +92,15 @@ class StdClient implements DnsClientInterface
         string $address,
         MessageInterface $dnsRequestMessage,
         bool $isTcp = false
-    ): MessageInterface {
-        $dnsWireMessage = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
+    ): MessageInterface
+    {
+        $dnsWireMessage = $this->messageMapper->createDnsWireMessageFromMessage($dnsRequestMessage);
 
         if (!$isTcp) {
             if (strlen($dnsWireMessage) <= static::EDNS_SIZE) { // Must use TCP if message is bigger
                 $dnsWireResponseMessage = $this->udpTransport->send($address, $dnsWireMessage);
 
-                $message = $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireResponseMessage);
+                $message = $this->messageMapper->createMessageFromDnsWireMessage($dnsWireResponseMessage);
                 // Only if message is not truncated response is returned, otherwise retry with TCP
                 if (!$message->getHeader()->isTc()) {
                     return $message;
@@ -107,18 +110,6 @@ class StdClient implements DnsClientInterface
 
         $dnsWireResponseMessage = $this->tcpTransport->send($address, $dnsWireMessage);
 
-        return $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireResponseMessage);
-    }
-
-    /**
-     * Clean up the protocol from URI supported by the client but which can not be used with transport (e.g. dns://).
-     *
-     * @param DnsUpstream $dnsUpstream
-     *
-     * @return string
-     */
-    private function getSanitizedUpstreamAddress(DnsUpstream $dnsUpstream): string
-    {
-        return str_replace($dnsUpstream->getScheme() . '://', '', $dnsUpstream->getUri());
+        return $this->messageMapper->createMessageFromDnsWireMessage($dnsWireResponseMessage);
     }
 }

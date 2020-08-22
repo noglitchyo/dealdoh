@@ -6,9 +6,9 @@ namespace NoGlitchYo\Dealdoh;
 
 use NoGlitchYo\Dealdoh\Exception\HttpProxyException;
 use NoGlitchYo\Dealdoh\Exception\InvalidDnsWireMessageException;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
+use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapperInterface;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapperInterface;
 use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -32,24 +32,25 @@ class DohProxy implements MiddlewareInterface
     private $logger;
 
     /**
-     * @var MessageFactoryInterface
+     * @var MessageMapperInterface
      */
-    private $dnsMessageFactory;
+    private $messageMapper;
 
     /**
-     * @var DohHttpMessageFactoryInterface
+     * @var \NoGlitchYo\Dealdoh\Mapper\HttpResponseMapperInterface
      */
     private $dohHttpMessageFactory;
 
     public function __construct(
         DnsResolverInterface $dnsResolver,
-        MessageFactoryInterface $dnsMessageFactory,
-        DohHttpMessageFactoryInterface $dohHttpMessageFactory,
+        MessageMapperInterface $messageMapper,
+        HttpResponseMapperInterface $dohHttpMessageFactory,
         LoggerInterface $logger = null
-    ) {
-        $this->dnsResolver = $dnsResolver;
-        $this->logger = $logger ?? new NullLogger();
-        $this->dnsMessageFactory = $dnsMessageFactory;
+    )
+    {
+        $this->dnsResolver           = $dnsResolver;
+        $this->logger                = $logger ?? new NullLogger();
+        $this->messageMapper         = $messageMapper;
         $this->dohHttpMessageFactory = $dohHttpMessageFactory;
     }
 
@@ -62,8 +63,9 @@ class DohProxy implements MiddlewareInterface
         return $this->forward($request);
     }
 
-
     /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
      * @throws HttpProxyException
      */
     public function forward(ServerRequestInterface $request): ResponseInterface
@@ -84,15 +86,15 @@ class DohProxy implements MiddlewareInterface
                     return new Response(405);
             }
 
-            $dnsRequestMessage = $this->dnsMessageFactory->createMessageFromDnsWireMessage($dnsWireMessage);
+            $dnsRequestMessage = $this->messageMapper->createMessageFromDnsWireMessage($dnsWireMessage);
         } catch (InvalidDnsWireMessageException $exception) {
             return new Response(400);
         } catch (Throwable $t) {
             $this->logger->error(
                 sprintf('Failed to create DNS message: %s', $t->getMessage()),
                 [
-                    'exception' => $t,
-                    'httpRequest' => $request
+                    'exception'   => $t,
+                    'httpRequest' => $request,
                 ]
             );
             throw new HttpProxyException('DNS message creation failed.', 0, $t);
@@ -104,7 +106,7 @@ class DohProxy implements MiddlewareInterface
             $this->logger->error(
                 sprintf('Failed to resolve DNS query: %s', $t->getMessage()),
                 [
-                    'exception' => $t,
+                    'exception'         => $t,
                     'dnsRequestMessage' => $dnsRequestMessage,
                 ]
             );

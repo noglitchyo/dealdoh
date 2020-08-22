@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Entity;
 
 use JsonSerializable;
-
 use const PHP_URL_PORT;
 use const PHP_URL_SCHEME;
 
@@ -68,5 +67,15 @@ class DnsUpstream implements JsonSerializable
             'code' => $this->code,
             'uri' => $this->uri,
         ];
+    }
+
+    /**
+     * Clean up the protocol from URI supported by the client but which can not be used with transport (e.g. dns://)
+     *
+     * @return string
+     */
+    public function getAddr(): string
+    {
+        return str_replace($this->getScheme() . '://', '', $this->getUri());
     }
 }

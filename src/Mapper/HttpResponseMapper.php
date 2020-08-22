@@ -2,28 +2,27 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Factory;
+namespace NoGlitchYo\Dealdoh\Mapper;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 
-class DohHttpMessageFactory implements DohHttpMessageFactoryInterface
+class HttpResponseMapper implements HttpResponseMapperInterface
 {
     /**
-     * @var MessageFactoryInterface
+     * @var MessageMapperInterface
      */
-    private $dnsMessageFactory;
+    private $messageMapper;
 
-    public function __construct(MessageFactoryInterface $dnsMessageFactory)
+    public function __construct(MessageMapperInterface $messageMapper)
     {
-        $this->dnsMessageFactory = $dnsMessageFactory;
+        $this->messageMapper = $messageMapper;
     }
 
     public function createResponseFromMessage(MessageInterface $dnsMessage): ResponseInterface
     {
-        $dnsWireQuery = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsMessage);
+        $dnsWireQuery = $this->messageMapper->createDnsWireMessageFromMessage($dnsMessage);
 
         $headers = [
             'Content-Type' => 'application/dns-message',

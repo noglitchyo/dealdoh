@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Entity\Dns;
+namespace NoGlitchYo\Dealdoh\Entity;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\QuestionSection;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\QuestionSection;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
 
 /**
  * @codeCoverageIgnore
@@ -66,7 +66,7 @@ class Message implements MessageInterface
      * @param int  $rcode
      *
      * @return static
-     * @see        MessageFactory::create()
+     * @see        \NoGlitchYo\Dealdoh\Factory\MessageFactory::create()
      *
      * @deprecated Use MessageFactory::create() instead.
      */
@@ -162,7 +162,7 @@ class Message implements MessageInterface
      *
      * @return MessageInterface
      */
-    public function enableRecursion(): MessageInterface
+    public function withRecursionEnabled(): MessageInterface
     {
         return $this->withHeader(
             new Header(

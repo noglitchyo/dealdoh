@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Entity\Dns\Message;
+namespace NoGlitchYo\Dealdoh\Entity\Message;
 
 use JsonSerializable;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 
 /**
  * @see                https://tools.ietf.org/html/rfc1035#section-4.1.1

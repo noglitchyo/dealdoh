@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Unit\Factory\Dns;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory
+ * @covers \NoGlitchYo\Dealdoh\Factory\MessageFactory
  */
 class DnsMessageFactoryTest extends TestCase
 {
     /**
-     * @var MessageFactory
+     * @var \NoGlitchYo\Dealdoh\Factory\MessageFactory
      */
     private $sut;
 
@@ -32,7 +32,7 @@ class DnsMessageFactoryTest extends TestCase
 
     public function testCreateDnsWireMessageFromMessageReturnString(): void
     {
-        $dnsMessage = new Message(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
+        $dnsMessage = new \NoGlitchYo\Dealdoh\Entity\Message(new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK));
         $this->assertIsString($this->sut->createDnsWireMessageFromMessage($dnsMessage));
     }
 
@@ -70,7 +70,7 @@ class DnsMessageFactoryTest extends TestCase
 
         return [
             'simple message with header' => [
-                new Message(
+                new \NoGlitchYo\Dealdoh\Entity\Message(
                     new Header(0, false, 0, false, false, true, false, 0, HeaderInterface::RCODE_OK)
                 ),
                 "AAABAAAAAAAAAAAA",

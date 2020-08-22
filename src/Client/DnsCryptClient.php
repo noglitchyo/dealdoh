@@ -3,42 +3,42 @@
 namespace NoGlitchYo\Dealdoh\Client;
 
 use InvalidArgumentException;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\DnsCryptQuery;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Factory\DnsCrypt\EncryptionSystemFactoryInterface;
-use NoGlitchYo\Dealdoh\Service\DnsCrypt\CertificateFetcher;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
+use NoGlitchYo\Dealdoh\Mapper\DnsCrypt\EncryptionSystemMapperInterface;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapperInterface;
+use NoGlitchYo\Dealdoh\Repository\DnsCrypt\CertificateRepository;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 
 class DnsCryptClient implements DnsClientInterface
 {
     /**
-     * @var MessageFactoryInterface
-     */
-    private $messageFactory;
-
-    /**
-     * @var EncryptionSystemFactoryInterface
+     * @var \NoGlitchYo\Dealdoh\Mapper\DnsCrypt\EncryptionSystemMapperInterface
      */
     private $dnsCryptService;
 
     /**
-     * @var CertificateFetcher
+     * @var CertificateRepository
      */
     private $certificateFetcher;
 
+    /**
+     * @var MessageMapperInterface
+     */
+    private $messageMapper;
+
     public function __construct(
-        MessageFactoryInterface $messageFactory,
-        EncryptionSystemFactoryInterface $dnsCryptService,
-        CertificateFetcher $certificateFetcher
+        EncryptionSystemMapperInterface $dnsCryptService,
+        CertificateRepository $certificateFetcher,
+        MessageMapperInterface $messageMapper
     )
     {
-        $this->messageFactory     = $messageFactory;
         $this->dnsCryptService    = $dnsCryptService;
         $this->certificateFetcher = $certificateFetcher;
+        $this->messageMapper      = $messageMapper;
     }
 
     public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
@@ -48,7 +48,7 @@ class DnsCryptClient implements DnsClientInterface
         }
 
         $certificate    = $this->certificateFetcher->getCertificateForUpstream($dnsUpstream);
-        $dnsWireMessage = $this->messageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
+        $dnsWireMessage = $this->messageMapper->createDnsWireMessageFromMessage($dnsRequestMessage);
 
         // Retrieve a handler for the encryption system used by the certificate
         $es = $this->dnsCryptService->createEncryptionSystem($certificate);
@@ -58,10 +58,10 @@ class DnsCryptClient implements DnsClientInterface
         $dnsResponseMessage = $this->send($dnsUpstream, $dnsCryptQuery);
         // TODO: verify response integrity
         // Check if TC flag is true, if yes, fallback on TCP transport
-        $dnsMessage = $this->messageFactory->createMessageFromDnsWireMessage($es->decrypt($dnsResponseMessage));
+        $dnsMessage = $this->messageMapper->createMessageFromDnsWireMessage($es->decrypt($dnsResponseMessage));
         if ($dnsMessage->getHeader()->isTc()) {
             $dnsResponseMessage = $this->send($dnsUpstream, $dnsCryptQuery, true);
-            $dnsMessage         = $this->messageFactory->createMessageFromDnsWireMessage(
+            $dnsMessage         = $this->messageMapper->createMessageFromDnsWireMessage(
                 $es->decrypt($dnsResponseMessage)
             );
         }
@@ -72,7 +72,7 @@ class DnsCryptClient implements DnsClientInterface
     {
         $transport = (!$useTcp) ? new DnsOverUdpTransport() : new DnsOverTcpTransport();
 
-        return  $transport->send($dnsUpstream->getUri(), (string)$dnsCryptQuery);
+        return $transport->send($dnsUpstream->getUri(), (string)$dnsCryptQuery);
     }
 
     public function supports(DnsUpstream $dnsUpstream): bool

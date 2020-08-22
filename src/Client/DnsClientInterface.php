@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Client;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 
 interface DnsClientInterface
 {
@@ -13,7 +13,7 @@ interface DnsClientInterface
      * Resolve a DNS message using the provided upstream
      *
      * @param DnsUpstream      $dnsUpstream
-     * @param MessageInterface $dnsRequestMessage
+     * @param \NoGlitchYo\Dealdoh\Entity\MessageInterface $dnsRequestMessage
      *
      * @return MessageInterface
      */

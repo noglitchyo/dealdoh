@@ -3,13 +3,13 @@
 use Http\Adapter\Guzzle6\Client;
 use NoGlitchYo\Dealdoh\Client\DohClient;
 use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\DohProxy;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory;
+use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapper;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapper;
 use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\App;
@@ -21,7 +21,7 @@ $app = new App;
 $app->any(
     '/dns-query',
     function (ServerRequestInterface $request, ResponseInterface $response, $args) {
-        $dnsMessageFactory = new MessageFactory();
+        $dnsMessageFactory = new MessageMapper();
         $dnsResolver = new DnsPoolResolver(
             new DnsUpstreamPool(
                 [
@@ -48,7 +48,7 @@ $app->any(
         $dnsProxy = new DohProxy(
             $dnsResolver,
             $dnsMessageFactory,
-            new DohHttpMessageFactory($dnsMessageFactory)
+            new HttpResponseMapper($dnsMessageFactory)
         );
 
         return $dnsProxy->forward($request);

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Client;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use NoGlitchYo\Dealdoh\Exception\DnsClientException;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapperInterface;
 use Nyholm\Psr7\Request;
 use Psr\Http\Client\ClientInterface;
 use Throwable;
@@ -23,27 +23,30 @@ class DohClient implements DnsClientInterface
     private $client;
 
     /**
-     * @var MessageFactoryInterface
+     * @var MessageMapperInterface
      */
-    private $dnsMessageFactory;
+    private $messageMapper;
 
-    public function __construct(ClientInterface $client, MessageFactoryInterface $dnsMessageFactory)
+    public function __construct(
+        ClientInterface $client,
+        MessageMapperInterface $messageMapper
+    )
     {
-        $this->client = $client;
-        $this->dnsMessageFactory = $dnsMessageFactory;
+        $this->client            = $client;
+        $this->messageMapper     = $messageMapper;
     }
 
     public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
-        $dnsMessage = $this->dnsMessageFactory->createDnsWireMessageFromMessage($dnsRequestMessage);
+        $dnsMessage = $this->messageMapper->createDnsWireMessageFromMessage($dnsRequestMessage);
 
         // TODO: should follow recommendations from https://tools.ietf.org/html/rfc8484#section-5.1 about cache
         $request = new Request(
             'POST',
             $dnsUpstream->getUri(),
             [
-                'Content-Type' => 'application/dns-message',
-                'Content-Length' => strlen($dnsMessage)
+                'Content-Type'   => 'application/dns-message',
+                'Content-Length' => strlen($dnsMessage),
             ],
             $dnsMessage
         );
@@ -58,7 +61,7 @@ class DohClient implements DnsClientInterface
             );
         }
 
-        return $this->dnsMessageFactory->createMessageFromDnsWireMessage((string)$response->getBody());
+        return $this->messageMapper->createMessageFromDnsWireMessage((string)$response->getBody());
     }
 
     public function supports(DnsUpstream $dnsUpstream): bool

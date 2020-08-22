@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Factory\DnsCrypt;
+namespace NoGlitchYo\Dealdoh\Mapper\DnsCrypt;
 
 use Exception;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\Certificate;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
 
 //use function Sodium\crypto_sign_ed25519_pk_to_curve25519;
 
-class DnsCryptCertificateFactory
+class DnsCryptCertificateMapper
 {
     public function createFromResourceRecord(
         ResourceRecordInterface $resourceRecord,
