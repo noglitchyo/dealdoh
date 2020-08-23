@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Client;
+namespace NoGlitchYo\Dealdoh\Dns\Client;
 
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\MessageInterface;
@@ -36,7 +36,7 @@ class DohClient implements DnsClientInterface
         $this->messageMapper     = $messageMapper;
     }
 
-    public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
+    public function query(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
         $dnsMessage = $this->messageMapper->createDnsWireMessageFromMessage($dnsRequestMessage);
 

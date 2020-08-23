@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Dns\Client;
 
 use Mockery;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Dns\Client\StdClient;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\Message;
 use NoGlitchYo\Dealdoh\Entity\MessageInterface;
@@ -68,7 +68,7 @@ class StdClientTest extends TestCase
         $this->dnsMessageFactoryMock->shouldReceive('createMessageFromDnsWireMessage')
             ->andReturn($expectedDnsResponseMessage);
 
-        $dnsResponseMessage = $this->sut->resolve($dnsUpstream, $dnsRequestMessage);
+        $dnsResponseMessage = $this->sut->query($dnsUpstream, $dnsRequestMessage);
 
         $this->assertEquals($expectedDnsResponseMessage, $dnsResponseMessage);
     }

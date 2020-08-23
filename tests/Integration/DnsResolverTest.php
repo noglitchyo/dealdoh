@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Integration;
 
-use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Dns\Client\StdClient;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsPoolResolver;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Entity\Message;
 use NoGlitchYo\Dealdoh\Entity\Message\Header;
@@ -12,7 +13,6 @@ use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
 use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Factory\MessageFactory;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
-use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Tests\Stub\DnsServerStub;

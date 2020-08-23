@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace NoGlitchYo\Dealdoh\Exception;
 
 use Exception;
-use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsClientInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use Throwable;
 

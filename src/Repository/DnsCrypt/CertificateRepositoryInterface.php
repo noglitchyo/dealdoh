@@ -7,5 +7,16 @@ use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 
 interface CertificateRepositoryInterface
 {
-    public function getCertificateForUpstream(DnsCryptUpstream $dnsUpstream): CertificateInterface;
+    /**
+     * Retrieve a certificate from the upstream which will be used to send queries to this resolver.
+     * Certificates can be filtered by providing a list of supported encryptions.
+     *
+     * @param DnsCryptUpstream $dnsUpstream
+     * @param array $supportedEncryptions
+     * @return CertificateInterface
+     */
+    public function getCertificate(
+        DnsCryptUpstream $dnsUpstream,
+        array $supportedEncryptions = []
+    ): CertificateInterface;
 }

@@ -1,8 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Client;
+namespace NoGlitchYo\Dealdoh\Dns\Client;
 
 use InvalidArgumentException;
+use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\DnsCryptQuery;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
@@ -10,20 +11,25 @@ use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use NoGlitchYo\Dealdoh\Mapper\DnsCrypt\EncryptionSystemMapperInterface;
 use NoGlitchYo\Dealdoh\Mapper\MessageMapperInterface;
 use NoGlitchYo\Dealdoh\Repository\DnsCrypt\CertificateRepository;
+use NoGlitchYo\Dealdoh\Repository\DnsCrypt\CertificateRepositoryInterface;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 
 class DnsCryptClient implements DnsClientInterface
 {
+    public const SUPPORTED_AUTHENTICATED_ENCRYPTION = [
+        CertificateInterface::ES_VERSION_XSALSA20POLY1305,
+    ];
+
     /**
-     * @var \NoGlitchYo\Dealdoh\Mapper\DnsCrypt\EncryptionSystemMapperInterface
+     * @var EncryptionSystemMapperInterface
      */
     private $dnsCryptService;
 
     /**
      * @var CertificateRepository
      */
-    private $certificateFetcher;
+    private $certificateRepository;
 
     /**
      * @var MessageMapperInterface
@@ -32,26 +38,30 @@ class DnsCryptClient implements DnsClientInterface
 
     public function __construct(
         EncryptionSystemMapperInterface $dnsCryptService,
-        CertificateRepository $certificateFetcher,
+        CertificateRepositoryInterface $certificateFetcher,
         MessageMapperInterface $messageMapper
     )
     {
-        $this->dnsCryptService    = $dnsCryptService;
-        $this->certificateFetcher = $certificateFetcher;
-        $this->messageMapper      = $messageMapper;
+        $this->dnsCryptService = $dnsCryptService;
+        $this->certificateRepository = $certificateFetcher;
+        $this->messageMapper = $messageMapper;
     }
 
-    public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
+    public function query(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
         if (!$dnsUpstream instanceof DnsCryptUpstream) {
             throw new InvalidArgumentException('Upstream must be an instance of ' . DnsCryptUpstream::class);
         }
 
-        $certificate    = $this->certificateFetcher->getCertificateForUpstream($dnsUpstream);
+        $certificate = $this->certificateRepository->getCertificate(
+            $dnsUpstream,
+            static::SUPPORTED_AUTHENTICATED_ENCRYPTION
+        );
+
         $dnsWireMessage = $this->messageMapper->createDnsWireMessageFromMessage($dnsRequestMessage);
 
         // Retrieve a handler for the encryption system used by the certificate
-        $es = $this->dnsCryptService->createEncryptionSystem($certificate);
+        $es = $this->dnsCryptService->createAuthenticatedEncryptionFromCertificate($certificate);
 
         $dnsCryptQuery = $es->encrypt($dnsWireMessage);
 

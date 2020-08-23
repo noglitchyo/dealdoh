@@ -7,7 +7,8 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Service;
 use Exception;
 use Mockery;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsPoolResolver;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
@@ -15,11 +16,10 @@ use NoGlitchYo\Dealdoh\Entity\Message;
 use NoGlitchYo\Dealdoh\Entity\Message\HeaderInterface;
 use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
 use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
-use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\Service\DnsPoolResolver
+ * @covers \NoGlitchYo\Dealdoh\Dns\Resolver\DnsPoolResolver
  */
 class DnsPoolResolverTest extends TestCase
 {

@@ -5,27 +5,30 @@ namespace NoGlitchYo\Dealdoh\Service\DnsCrypt;
 use Exception;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\DnsCryptQuery;
+use NoGlitchYo\Dealdoh\Helper\DnsCryptHelper;
 
 class XSalsa20AuthenticatedEncryption implements AuthenticatedEncryptionInterface
 {
-    public const PADDING_START = 0x80;
-
     /**
      * @var CertificateInterface
      */
     private $certificate;
+
     /**
      * @var string
      */
     private $clientKeyPair;
+
     /**
      * @var string
      */
     private $clientPublicKey;
+
     /**
      * @var string
      */
     private $clientSecretKey;
+
     /**
      * @var string
      */
@@ -33,8 +36,8 @@ class XSalsa20AuthenticatedEncryption implements AuthenticatedEncryptionInterfac
 
     public function __construct(CertificateInterface $certificate)
     {
-        $this->certificate = $certificate;
-        $this->clientKeyPair = sodium_crypto_box_keypair();
+        $this->certificate     = $certificate;
+        $this->clientKeyPair   = sodium_crypto_box_keypair();
         $this->clientPublicKey = sodium_crypto_box_publickey($this->clientKeyPair);
         $this->clientSecretKey = sodium_crypto_box_secretkey($this->clientKeyPair);
         /**
@@ -61,21 +64,19 @@ class XSalsa20AuthenticatedEncryption implements AuthenticatedEncryptionInterfac
          */
         [$clientNonce, $clientNonceWithPad] = $this->createClientNonce(SODIUM_CRYPTO_BOX_NONCEBYTES);
 
-        $encryptedQuery = $this->encryptWithXsalsa20(
-            $this->getClientQueryWithPadding($clientDnsWireQuery),
+        $encryptedQuery = sodium_crypto_box(
+            DnsCryptHelper::addUdpPadding($clientDnsWireQuery),
             // <client-query> <client-query-pad> must be at least <min-query-len>
             $clientNonceWithPad,
             $this->sharedKey
         );
-        $dnsCryptQuery = new DnsCryptQuery(
+
+        return new DnsCryptQuery(
             $this->certificate->getClientMagic(),
             $this->clientPublicKey,
             $clientNonce,
             $encryptedQuery
         );
-
-
-        return $dnsCryptQuery;
     }
 
     /**
@@ -102,34 +103,14 @@ class XSalsa20AuthenticatedEncryption implements AuthenticatedEncryptionInterfac
      */
     public function decrypt(string $message): string
     {
-        $decryptedMessage = $this->decryptWithXsalsa20($message, $this->sharedKey);
-
-        return $this->removePaddingFromMessage($decryptedMessage);
-    }
-
-    private function removePaddingFromMessage(string $message): string
-    {
-        return substr($message, 0, strrpos($message, 0x80));
-    }
-
-    private function decryptWithXsalsa20(string $response, string $keypair): string
-    {
-        $nonceLength = 24;
+        $nonceLength         = 24;
         $resolverMagicLength = 8;
-        $nonce = substr($response, $resolverMagicLength, $nonceLength);
-        $encryptedQuery = substr($response, $resolverMagicLength + $nonceLength);
+        $nonce               = substr($message, $resolverMagicLength, $nonceLength);
+        $encryptedQuery      = substr($message, $resolverMagicLength + $nonceLength);
 
-        return sodium_crypto_box_open($encryptedQuery, $nonce, $keypair);
-    }
+        $decryptedMessage = sodium_crypto_box_open($encryptedQuery, $nonce, $this->sharedKey);
 
-    private function encryptWithXsalsa20(string $message, string $nonce, string $keypair): string
-    {
-        return sodium_crypto_box($message, $nonce, $keypair);
-    }
-
-    private function encryptWithXchacha20(string $message, string $nonce, string $key): string
-    {
-        return sodium_crypto_aead_chacha20poly1305_ietf_encrypt($message, $nonce, $nonce, $key);
+        return DnsCryptHelper::removeUdpPadding($decryptedMessage);
     }
 
     /**
@@ -141,40 +122,12 @@ class XSalsa20AuthenticatedEncryption implements AuthenticatedEncryptionInterfac
      */
     private function createClientNonce(int $nonceLength): array
     {
-        $clientNonce = random_bytes($nonceLength / 2);
+        $clientNonce        = random_bytes($nonceLength / 2);
         $clientNonceWithPad = $clientNonce . str_repeat(
                 "\0",
                 $nonceLength / 2
             ); // half the required nonce length  + 12 null bytes
 
         return [$clientNonce, $clientNonceWithPad];
-    }
-
-    /**
-     * Prior to encryption, queries are padded using the ISO/IEC 7816-4
-     * format.
-     *
-     * The padding starts with a byte valued 0x80 followed by a
-     * variable number of NUL bytes.
-     *
-     * <client-query> <client-query-pad> must be at least <min-query-len>
-     * <min-query-len> is a variable length, initially set to 256 bytes, and
-     * must be a multiple of 64 bytes.
-     *
-     * @param string $clientQuery
-     *
-     * @return string
-     */
-    private function getClientQueryWithPadding(string $clientQuery)
-    {
-        // Check if query greater than min query length
-        $queryLength = strlen($clientQuery);
-        $paddingLength = 256;
-
-        if ($queryLength > $paddingLength) {
-            $paddingLength = $queryLength + (64 - ($queryLength % 64));
-        }
-
-        return sodium_pad($clientQuery . static::PADDING_START, $paddingLength);
     }
 }

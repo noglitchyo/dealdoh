@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Client;
+namespace NoGlitchYo\Dealdoh\Dns\Client;
 
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\MessageInterface;
@@ -10,17 +10,17 @@ use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 interface DnsClientInterface
 {
     /**
-     * Resolve a DNS message using the provided upstream
+     * Query the given DNS upstream with the given DNS message
      *
      * @param DnsUpstream      $dnsUpstream
-     * @param \NoGlitchYo\Dealdoh\Entity\MessageInterface $dnsRequestMessage
+     * @param MessageInterface $dnsRequestMessage
      *
      * @return MessageInterface
      */
-    public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface;
+    public function query(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface;
 
     /**
-     * Indicate whether or not the provided $dnsUpstream can be used by the client
+     * Return true if the client can send queries to the provided $dnsUpstream
      *
      * @param  DnsUpstream $dnsUpstream
      * @return bool

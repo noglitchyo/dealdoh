@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
 use Http\Adapter\Guzzle6\Client;
-use NoGlitchYo\Dealdoh\Client\DohClient;
-use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\DohProxy;
+use NoGlitchYo\Dealdoh\Dns\Client\DohClient;
+use NoGlitchYo\Dealdoh\Dns\Client\StdClient;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsPoolResolver;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
 use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapper;
-use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\Middleware\DohHttpMiddleware;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
 use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 use Slim\App;
@@ -41,7 +41,7 @@ $app->any(
             ]
         );
 
-        $dnsProxy = new DohProxy(
+        $dnsProxy = new DohHttpMiddleware(
             $dnsResolver,
             $dnsMessageFactory,
             new HttpResponseMapper($dnsMessageFactory)

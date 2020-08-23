@@ -22,21 +22,22 @@ class DnsCryptQuery implements DnsCryptQueryInterface
     private $encryptedQuery;
 
     /**
-     * @param string                  $clientMagic
-     * @param string                  $clientPublicKey
-     * @param string                  $clientNonce
-     * @param EncryptedQueryInterface $encryptedQuery
+     * @param string $clientMagic
+     * @param string $clientPublicKey
+     * @param string $clientNonce
+     * @param string $encryptedQuery
      */
     public function __construct(
         string $clientMagic,
         string $clientPublicKey,
         string $clientNonce,
         string $encryptedQuery
-    ) {
-        $this->clientMagic = $clientMagic;
+    )
+    {
+        $this->clientMagic     = $clientMagic;
         $this->clientPublicKey = $clientPublicKey;
-        $this->clientNonce = $clientNonce;
-        $this->encryptedQuery = $encryptedQuery;
+        $this->clientNonce     = $clientNonce;
+        $this->encryptedQuery  = $encryptedQuery;
     }
 
     /**

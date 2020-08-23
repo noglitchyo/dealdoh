@@ -7,5 +7,5 @@ use NoGlitchYo\Dealdoh\Service\DnsCrypt\AuthenticatedEncryptionInterface;
 
 interface EncryptionSystemMapperInterface
 {
-    public function createEncryptionSystem(CertificateInterface $certificate): AuthenticatedEncryptionInterface;
+    public function createAuthenticatedEncryptionFromCertificate(CertificateInterface $certificate): AuthenticatedEncryptionInterface;
 }

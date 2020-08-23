@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Dns\Client;
 
 use Exception;
 use Hamcrest\Core\IsEqual;
@@ -10,7 +10,7 @@ use InvalidArgumentException;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Client\GoogleDnsClient;
+use NoGlitchYo\Dealdoh\Dns\Client\GoogleDnsClient;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\Message;
 use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
@@ -65,7 +65,7 @@ class GoogleDnsClientTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query name length must be between 1 and 253');
 
-        $this->sut->resolve($dnsUpstream, $dnsRequestMessage);
+        $this->sut->query($dnsUpstream, $dnsRequestMessage);
     }
 
     public function testResolveCheckNameLengthAndThrowExceptionIfTooLong(): void
@@ -87,7 +87,7 @@ class GoogleDnsClientTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query name length must be between 1 and 253');
 
-        $this->sut->resolve($dnsUpstream, $dnsRequestMessage);
+        $this->sut->query($dnsUpstream, $dnsRequestMessage);
     }
 
     public function testResolveCheckQueryTypeAndThrowExceptionIfTooSmall(): void
@@ -104,7 +104,7 @@ class GoogleDnsClientTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query type must be in range [1, 65535]');
 
-        $this->sut->resolve($dnsUpstream, $dnsRequestMessage);
+        $this->sut->query($dnsUpstream, $dnsRequestMessage);
     }
 
     public function testResolveCheckQueryTypeAndThrowExceptionIfTooBig(): void
@@ -121,7 +121,7 @@ class GoogleDnsClientTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Query type must be in range [1, 65535]');
 
-        $this->sut->resolve($dnsUpstream, $dnsRequestMessage);
+        $this->sut->query($dnsUpstream, $dnsRequestMessage);
     }
 
     public function testResolveSendGetRequestAndReturnDnsResponse(): void
@@ -147,7 +147,7 @@ class GoogleDnsClientTest extends TestCase
             ->with([])
             ->andReturn($expectedDnsResponse);
 
-        $this->assertEquals($expectedDnsResponse, $this->sut->resolve($dnsUpstream, $dnsRequestMessage));
+        $this->assertEquals($expectedDnsResponse, $this->sut->query($dnsUpstream, $dnsRequestMessage));
     }
 
     public function testResolveThrowDnsClientExceptionWhenSendingRequestFailed(): void
@@ -170,7 +170,7 @@ class GoogleDnsClientTest extends TestCase
         $this->expectException(DnsClientException::class);
         $this->expectExceptionMessage('Failed to send the request to Google DNS API');
 
-        $this->sut->resolve($dnsUpstream, $dnsRequestMessage);
+        $this->sut->query($dnsUpstream, $dnsRequestMessage);
     }
 
     public function testResolveThrowDnsClientExceptionWhenMappingFailed(): void
@@ -198,7 +198,7 @@ class GoogleDnsClientTest extends TestCase
         $this->expectException(DnsClientException::class);
         $this->expectExceptionMessage('Failed to map the response from Google DNS API');
 
-        $this->sut->resolve($dnsUpstream, $dnsRequestMessage);
+        $this->sut->query($dnsUpstream, $dnsRequestMessage);
     }
 
     public function testSupportsOnlyAcceptGoogleDnsApiUpstream(): void

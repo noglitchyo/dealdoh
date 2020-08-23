@@ -4,8 +4,6 @@ namespace NoGlitchYo\Dealdoh\Entity\DnsCrypt;
 
 class Certificate implements CertificateInterface
 {
-
-
     /**
      * @var int
      */

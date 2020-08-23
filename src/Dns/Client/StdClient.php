@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Client;
+namespace NoGlitchYo\Dealdoh\Dns\Client;
 
 use Exception;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
@@ -53,7 +53,7 @@ class StdClient implements DnsClientInterface
      * @return MessageInterface
      * @throws Exception
      */
-    public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
+    public function query(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
         return $this->send(
             $dnsUpstream->getAddr(),

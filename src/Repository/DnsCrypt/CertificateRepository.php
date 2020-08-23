@@ -5,12 +5,13 @@ namespace NoGlitchYo\Dealdoh\Repository\DnsCrypt;
 use DateTimeImmutable;
 use Exception;
 use LogicException;
-use NoGlitchYo\Dealdoh\Client\StdClient;
+use NoGlitchYo\Dealdoh\Dns\Client\StdClient;
 use NoGlitchYo\Dealdoh\Entity\DnsCrypt\CertificateInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Entity\Message;
 use NoGlitchYo\Dealdoh\Entity\Message\Header;
 use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\QuestionSection;
 use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
 use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use NoGlitchYo\Dealdoh\Mapper\MessageMapper;
@@ -25,7 +26,10 @@ class CertificateRepository implements CertificateRepositoryInterface
      * @return CertificateInterface
      * @throws Exception
      */
-    public function getCertificateForUpstream(DnsCryptUpstream $dnsUpstream): CertificateInterface
+    public function getCertificate(
+        DnsCryptUpstream $dnsUpstream,
+        array $supportedEncryptions = []
+    ): CertificateInterface
     {
         /**
          * The client begins a DNSCrypt session by sending a regular unencrypted
@@ -80,25 +84,70 @@ class CertificateRepository implements CertificateRepositoryInterface
          * highest serial number among the currently valid ones that match a
          * supported protocol version.
          */
-        $certificates = $this->filterCertificates($certificates);
+        $certificates = $this->validateCertificates($certificates);
+        $certificates = $this->filterCertificates($certificates, $supportedEncryptions);
+        $certificates = $this->sortCertificates($certificates);
 
-        // TODO: Check supported encryptions
-        // TODO: Pick the certificate with the higher serial number
-        shuffle($certificates);
+        if (empty($certificates)){
+            throw new Exception("No certificates supported");
+        }
+
         return array_shift($certificates);
+    }
+
+    /**
+     * @param array $certificates
+     * @return array
+     * @throws Exception
+     */
+    public function sortCertificates(array $certificates): array
+    {
+        $isFiltered = usort(
+            $certificates,
+            function (CertificateInterface $certA, CertificateInterface $certB) {
+                if ($certA->getSerial() > $certB->getSerial()) {
+                    return 1;
+                }
+                if ($certA->getSerial() < $certB->getSerial()) {
+                    return -1;
+                }
+                return 0;
+            }
+        );
+
+        if (!$isFiltered) {
+            throw new Exception("Sorting certificates by serial number failed");
+        }
+
+        return $certificates;
+    }
+
+    /**
+     * Filter certificates with the given supported encryptions
+     * @param CertificateInterface[] $certificates
+     * @param array $supportedEncryptions
+     */
+    public function filterCertificates(array $certificates, array $supportedEncryptions): array
+    {
+        return array_filter(
+            $certificates,
+            function ($certificate) use ($supportedEncryptions) {
+                return in_array($certificate->getEsVersion(), $supportedEncryptions);
+            }
+        );
     }
 
     /**
      * @param CertificateInterface[] $certificates
      */
-    private function filterCertificates(array $certificates)
+    private function validateCertificates(array $certificates)
     {
         $currentDate = new DateTimeImmutable();
         return array_filter(
             $certificates,
             function (CertificateInterface $certificate) use ($currentDate) {
                 $dateStart = (new DateTimeImmutable())->setTimestamp($certificate->getTsStart());
-                $dateEnd = (new DateTimeImmutable())->setTimestamp($certificate->getTsEnd());
+                $dateEnd   = (new DateTimeImmutable())->setTimestamp($certificate->getTsEnd());
 
                 if ($dateStart > $currentDate) {
                     throw new LogicException('Not valid start date');
@@ -119,7 +168,7 @@ class CertificateRepository implements CertificateRepositoryInterface
 
         $dnsQuery = new Message(
             new Header(0, false, 0, false, false, false, false, 0, 0),
-            new Message\Section\QuestionSection(
+            new QuestionSection(
                 [
                     new Query(
                         $dnsCryptUpstream->getProviderName(),
@@ -130,6 +179,6 @@ class CertificateRepository implements CertificateRepositoryInterface
             )
         );
 
-        return $stdClient->resolve($dnsCryptUpstream, $dnsQuery);
+        return $stdClient->query($dnsCryptUpstream, $dnsQuery);
     }
 }

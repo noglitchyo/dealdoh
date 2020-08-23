@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Tests\Unit\Client;
+namespace NoGlitchYo\Dealdoh\Tests\Unit\Dns\Client;
 
 use Exception;
 use Mockery;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Client\DohClient;
+use NoGlitchYo\Dealdoh\Dns\Client\DohClient;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\Message;
 use NoGlitchYo\Dealdoh\Exception\DnsClientException;
@@ -19,7 +19,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\Client\DohClient
+ * @covers \NoGlitchYo\Dealdoh\Dns\Client\DohClient
  */
 class DohClientTest extends TestCase
 {
@@ -78,7 +78,7 @@ class DohClientTest extends TestCase
             ->with($dnsWireResponseMessage)
             ->andReturn($dnsResponseMessage);
 
-        $this->assertEquals($dnsResponseMessage, $this->sut->resolve($dnsUpstream, $dnsRequestMessage));
+        $this->assertEquals($dnsResponseMessage, $this->sut->query($dnsUpstream, $dnsRequestMessage));
     }
 
     public function testResolveThrowDnsClientExceptionWhenSendingRequestFailed(): void
@@ -101,7 +101,7 @@ class DohClientTest extends TestCase
         $this->expectException(DnsClientException::class);
         $this->expectExceptionMessage(sprintf('Failed to send the request to DoH upstream `%s`', $dnsUpstreamAddr));
 
-        $this->assertEquals($dnsResponseMessage, $this->sut->resolve($dnsUpstream, $dnsRequestMessage));
+        $this->assertEquals($dnsResponseMessage, $this->sut->query($dnsUpstream, $dnsRequestMessage));
     }
 
     public function testSupportsAcceptUpstreamWithHttps(): void

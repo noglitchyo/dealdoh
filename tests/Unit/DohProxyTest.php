@@ -8,8 +8,8 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
-use NoGlitchYo\Dealdoh\DohProxy;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsResolverInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\Message;
@@ -18,7 +18,7 @@ use NoGlitchYo\Dealdoh\Exception\HttpProxyException;
 use NoGlitchYo\Dealdoh\Factory\MessageFactoryInterface;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapperInterface;
-use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
+use NoGlitchYo\Dealdoh\Middleware\DohHttpMiddleware;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\DohProxy
+ * @covers \NoGlitchYo\Dealdoh\Middleware\DohHttpMiddleware
  */
 class DohProxyTest extends TestCase
 {
@@ -48,7 +48,7 @@ class DohProxyTest extends TestCase
     private $loggerMock;
 
     /**
-     * @var DohProxy
+     * @var \NoGlitchYo\Dealdoh\Middleware\DohHttpMiddleware
      */
     private $sut;
 
@@ -64,7 +64,7 @@ class DohProxyTest extends TestCase
         $this->dohHttpMessageFactoryMock = Mockery::mock(HttpResponseMapperInterface::class);
         $this->loggerMock = Mockery::mock(LoggerInterface::class);
 
-        $this->sut = new DohProxy(
+        $this->sut = new DohHttpMiddleware(
             $this->dnsResolverMock,
             $this->dnsMessageFactoryMock,
             $this->dohHttpMessageFactoryMock,

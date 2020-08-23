@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Service;
+namespace NoGlitchYo\Dealdoh\Dns\Resolver;
 
-use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsClientInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPoolInterface;
@@ -52,6 +52,8 @@ class DnsPoolResolver implements DnsResolverInterface
     }
 
     /**
+     * @param MessageInterface $dnsRequest
+     * @return DnsResource
      * @throws DnsPoolResolveFailedException
      * @throws UpstreamNotSupportedException
      */
@@ -71,7 +73,7 @@ class DnsPoolResolver implements DnsResolverInterface
 
             foreach ($dnsClients as $dnsClient) {
                 try {
-                    $dnsResponse = $dnsClient->resolve($dnsUpstream, $dnsRequest);
+                    $dnsResponse = $dnsClient->query($dnsUpstream, $dnsRequest);
                     if ($dnsResponse->getHeader()->getRcode() === HeaderInterface::RCODE_NAME_ERROR) {
                         $this->logger->info(
                             sprintf('DNS query could not be resolved with upstream `%s`', $dnsUpstream->getCode())

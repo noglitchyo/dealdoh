@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh\Client;
+namespace NoGlitchYo\Dealdoh\Dns\Client;
 
 use InvalidArgumentException;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
@@ -38,7 +38,7 @@ class GoogleDnsClient implements DnsClientInterface
         $this->messageMapper = $messageMapper;
     }
 
-    public function resolve(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
+    public function query(DnsUpstream $dnsUpstream, MessageInterface $dnsRequestMessage): MessageInterface
     {
         // TODO: we should make as much query as entries there is in the question
         $uri = (new Uri(self::API_URI));

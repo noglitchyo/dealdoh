@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace NoGlitchYo\Dealdoh;
+namespace NoGlitchYo\Dealdoh\Middleware;
 
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsResolverInterface;
 use NoGlitchYo\Dealdoh\Exception\HttpProxyException;
 use NoGlitchYo\Dealdoh\Exception\InvalidDnsWireMessageException;
 use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
 use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapperInterface;
 use NoGlitchYo\Dealdoh\Mapper\MessageMapperInterface;
-use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Throwable;
 
-class DohProxy implements MiddlewareInterface
+class DohHttpMiddleware implements MiddlewareInterface
 {
     /**
      * @var DnsResolverInterface
@@ -37,7 +37,7 @@ class DohProxy implements MiddlewareInterface
     private $messageMapper;
 
     /**
-     * @var \NoGlitchYo\Dealdoh\Mapper\HttpResponseMapperInterface
+     * @var HttpResponseMapperInterface
      */
     private $dohHttpMessageFactory;
 
