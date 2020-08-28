@@ -99,19 +99,14 @@ class PlainDnsClient implements DnsClientInterface
     ): MessageInterface {
         $dnsWireMessage = $this->messageMapper->createDnsWireMessageFromMessage($dnsRequestMessage);
 
-        if ($dnsUpstream::getType() === DnsUpstream::TYPE) {
-            ["host" => $address, "port" => $port] = parse_url($dnsUpstream->getAddr());
-        } else {
-            // TODO: Improve how this is handled
-            // Check for IPV6
-            $address = $dnsUpstream->getHost();
-            $port = $dnsUpstream->getPort();
-        }
-
         if (!$isTcp) {
             if (strlen($dnsWireMessage) <= static::EDNS_SIZE) { // Must use TCP if message is bigger
                 try {
-                    $dnsWireResponseMessage = $this->udpTransport->send($address, $port, $dnsWireMessage);
+                    $dnsWireResponseMessage = $this->udpTransport->send(
+                        $dnsUpstream->getHost(),
+                        $dnsUpstream->getPort(),
+                        $dnsWireMessage
+                    );
 
                     $message = $this->messageMapper->createMessageFromDnsWireMessage($dnsWireResponseMessage);
 
@@ -127,7 +122,11 @@ class PlainDnsClient implements DnsClientInterface
             }
         }
 
-        $dnsWireResponseMessage = $this->tcpTransport->send($address, $port, $dnsWireMessage);
+        $dnsWireResponseMessage = $this->tcpTransport->send(
+            $dnsUpstream->getHost(),
+            $dnsUpstream->getPort(),
+            $dnsWireMessage
+        );
 
         return $this->messageMapper->createMessageFromDnsWireMessage($dnsWireResponseMessage);
     }

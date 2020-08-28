@@ -7,6 +7,7 @@ use NoGlitchYo\Dealdoh\Entity\DnsCryptUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsStamp\DnsCryptServerStamp;
 use NoGlitchYo\Dealdoh\Entity\DnsStamp\DohServerStamp;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstream\DohUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamAddress;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamInterface;
 use Throwable;
@@ -29,7 +30,7 @@ class DnsUpstreamFactory
      *
      * @see https://dnscrypt.info/stamps-specifications
      *
-     * @param string      $dnsUpstreamUri
+     * @param string $dnsUpstreamUri
      * @param string|null $code
      *
      * @return DnsUpstreamInterface
@@ -50,11 +51,24 @@ class DnsUpstreamFactory
             throw new Exception('DNS stamp was provided but can not be parsed:' . $t->getMessage(), 0, $t);
         }
 
-        if ($stamp instanceof DohServerStamp) {
-            return new DnsUpstream($stamp->getAddress(), $code);
-        }
-        if ($stamp instanceof DnsCryptServerStamp) {
-            return new DnsCryptUpstream($stamp->getAddress(), $stamp->getProviderName(), $stamp->getPublicKey(), $code);
+        switch (true) {
+            case $stamp instanceof DohServerStamp:
+                return new DohUpstream(
+                    $stamp->getAddress(),
+                    $stamp->getPath(),
+                    $stamp->getHashes(),
+                    $stamp->getHostname(),
+                    $code
+                );
+            case $stamp instanceof DnsCryptServerStamp:
+                return new DnsCryptUpstream(
+                    $stamp->getAddress(),
+                    $stamp->getProviderName(),
+                    $stamp->getPublicKey(),
+                    $code
+                );
+            default:
+                return new DnsUpstream($stamp->getAddress(), $code);
         }
     }
 }
