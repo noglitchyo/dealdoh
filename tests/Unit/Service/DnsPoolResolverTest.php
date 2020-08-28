@@ -7,19 +7,19 @@ namespace NoGlitchYo\Dealdoh\Tests\Unit\Service;
 use Exception;
 use Mockery;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsUpstreamPoolResolver;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
-use NoGlitchYo\Dealdoh\Exception\DnsPoolResolveFailedException;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\HeaderInterface;
+use NoGlitchYo\Dealdoh\Exception\DnsUpstreamPoolResolveFailedException;
 use NoGlitchYo\Dealdoh\Exception\UpstreamNotSupportedException;
-use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\Service\DnsPoolResolver
+ * @covers \NoGlitchYo\Dealdoh\Dns\Resolver\DnsUpstreamPoolResolver
  */
 class DnsPoolResolverTest extends TestCase
 {
@@ -36,7 +36,7 @@ class DnsPoolResolverTest extends TestCase
     private $dnsUpstreamPool;
 
     /**
-     * @var DnsPoolResolver
+     * @var DnsUpstreamPoolResolver
      */
     private $sut;
 
@@ -48,7 +48,7 @@ class DnsPoolResolverTest extends TestCase
             'client2' => Mockery::mock(DnsClientInterface::class),
         ];
 
-        $this->sut = new DnsPoolResolver($this->dnsUpstreamPool, $this->dnsClientsMock);
+        $this->sut = new DnsUpstreamPoolResolver($this->dnsUpstreamPool, $this->dnsClientsMock);
 
         parent::setUp();
     }
@@ -57,8 +57,8 @@ class DnsPoolResolverTest extends TestCase
     {
         $dnsRequestMessageMock = Message::createWithDefaultHeader();
 
-        $this->expectException(DnsPoolResolveFailedException::class);
-        $this->expectExceptionCode(DnsPoolResolveFailedException::EC_CLIENTS_POOL_EMPTY);
+        $this->expectException(DnsUpstreamPoolResolveFailedException::class);
+        $this->expectExceptionCode(DnsUpstreamPoolResolveFailedException::EC_CLIENTS_POOL_EMPTY);
 
         $this->sut->resolve($dnsRequestMessageMock);
     }
@@ -219,8 +219,8 @@ class DnsPoolResolverTest extends TestCase
                 ->andThrow(Exception::class);
         }
 
-        $this->expectException(DnsPoolResolveFailedException::class);
-        $this->expectExceptionCode(DnsPoolResolveFailedException::EC_UPSTREAMS_FAILED);
+        $this->expectException(DnsUpstreamPoolResolveFailedException::class);
+        $this->expectExceptionCode(DnsUpstreamPoolResolveFailedException::EC_UPSTREAMS_FAILED);
 
         $this->sut->resolve($dnsRequestMessage);
     }

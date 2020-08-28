@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity;
 
-use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsClientInterface;
 
 /**
  * A DNS Resource is a DNS request message which has been resolved through a DNS upstream with a DNS client and for
@@ -19,23 +18,32 @@ class DnsResource
      * @var MessageInterface
      */
     private $dnsRequest;
+
     /**
      * @var MessageInterface
      */
     private $dnsResponse;
+
     /**
-     * @var DnsUpstream
+     * @var DnsUpstreamInterface
      */
     private $dnsUpstream;
+
     /**
      * @var DnsClientInterface
      */
     private $dnsClient;
 
+    /**
+     * @param MessageInterface     $dnsRequest  The query for this DNS resource
+     * @param MessageInterface     $dnsResponse The response for this DNS resource
+     * @param DnsUpstreamInterface $dnsUpstream The DNS upstream which was queried
+     * @param DnsClientInterface   $dnsClient   The DNS client which was used to execute the query
+     */
     public function __construct(
         MessageInterface $dnsRequest,
         MessageInterface $dnsResponse,
-        DnsUpstream $dnsUpstream,
+        DnsUpstreamInterface $dnsUpstream,
         DnsClientInterface $dnsClient
     ) {
         $this->dnsRequest = $dnsRequest;
@@ -54,7 +62,7 @@ class DnsResource
         return $this->dnsResponse;
     }
 
-    public function getUpstream(): DnsUpstream
+    public function getUpstream(): DnsUpstreamInterface
     {
         return $this->dnsUpstream;
     }

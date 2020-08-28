@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Mapper\GoogleDns;
 
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecord;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordSection;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
-use NoGlitchYo\Dealdoh\Helper\MessageHelper;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecord;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordSection;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 
 /**
  * @see https://developers.google.com/speed/public-dns/docs/dns-over-https

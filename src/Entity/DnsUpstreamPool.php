@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Entity;
 
+use Exception;
 use JsonSerializable;
+use NoGlitchYo\Dealdoh\Factory\DnsUpstreamFactory;
 
 /**
+ * A DnsUpstreamPool stores a collection of DnsUpstreamInterface.
+ *
  * @codeCoverageIgnore
  */
 class DnsUpstreamPool implements DnsUpstreamPoolInterface, JsonSerializable
@@ -16,26 +20,47 @@ class DnsUpstreamPool implements DnsUpstreamPoolInterface, JsonSerializable
      */
     private $dnsUpstreams = [];
 
+    /**
+     * Create a new DnsUpstreamPool from a JSON list of upstreams
+     *
+     * @param string $jsonUpstreamPool
+     *
+     * @return static
+     * @throws Exception
+     */
     public static function fromJson(string $jsonUpstreamPool): self
     {
-        $upstreamPool = json_decode($jsonUpstreamPool, true);
+        $dnsUpstreamFactory = new DnsUpstreamFactory();
 
-        return new static($upstreamPool);
-    }
+        $dnsUpstreams = json_decode($jsonUpstreamPool, true);
 
-    public function __construct(array $dnsUpstreams = [])
-    {
+        $upstreams = [];
+
         foreach ($dnsUpstreams as $dnsUpstream) {
             // TODO: cover this with test case
             if (!is_array($dnsUpstream)) {
                 $dnsUpstream['uri'] = $dnsUpstream;
             }
 
-            $this->addUpstream(new DnsUpstream($dnsUpstream['uri'], $dnsUpstream['code'] ?? null));
+            $upstreams[] = $dnsUpstreamFactory->create($dnsUpstream['uri'], $dnsUpstream['code'] ?? null);
+        }
+
+        return new static($dnsUpstreams);
+    }
+
+    /**
+     * @param DnsUpstreamInterface[] $dnsUpstreams
+     *
+     * @throws Exception
+     */
+    public function __construct(array $dnsUpstreams = [])
+    {
+        foreach ($dnsUpstreams as $dnsUpstream) {
+            $this->addUpstream($dnsUpstream);
         }
     }
 
-    public function addUpstream(DnsUpstream $dnsUpstream): DnsUpstreamPoolInterface
+    public function addUpstream(DnsUpstreamInterface $dnsUpstream): DnsUpstreamPoolInterface
     {
         $this->dnsUpstreams[] = $dnsUpstream;
 

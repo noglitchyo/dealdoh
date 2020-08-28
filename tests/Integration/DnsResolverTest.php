@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace NoGlitchYo\Dealdoh\Tests\Integration;
 
-use NoGlitchYo\Dealdoh\Client\StdClient;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverTcpTransport;
-use NoGlitchYo\Dealdoh\Client\Transport\DnsOverUdpTransport;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Header;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\Query;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Dns\Client\PlainDnsClient;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsUpstreamPoolResolver;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory;
-use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
-use NoGlitchYo\Dealdoh\Service\DnsPoolResolver;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\Message\Header;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\Query;
+use NoGlitchYo\Dealdoh\Entity\Message\Section\ResourceRecordInterface;
+use NoGlitchYo\Dealdoh\Factory\MessageFactory;
+use NoGlitchYo\Dealdoh\Helper\UrlSafeBase64CodecHelper;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverTcpTransport;
+use NoGlitchYo\Dealdoh\Service\Transport\DnsOverUdpTransport;
 use NoGlitchYo\Dealdoh\Tests\Stub\DnsServerStub;
 use NoGlitchYo\Dealdoh\Tests\Stub\DnsServerStubManager;
 use PHPUnit\Framework\TestCase;
@@ -23,12 +23,12 @@ use Throwable;
 class DohProxyTest extends TestCase
 {
     /**
-     * @var DnsPoolResolver
+     * @var DnsUpstreamPoolResolver
      */
     private $sut;
 
     /**
-     * @var MessageFactory
+     * @var \NoGlitchYo\Dealdoh\Factory\MessageFactory
      */
     private $messageFactory;
 
@@ -89,10 +89,10 @@ class DohProxyTest extends TestCase
         );
 
         $dnsClients = [
-            new StdClient($this->messageFactory, new DnsOverTcpTransport(), new DnsOverUdpTransport()),
+            new PlainDnsClient($this->messageFactory, new DnsOverTcpTransport(), new DnsOverUdpTransport()),
         ];
 
-        $this->sut = new DnsPoolResolver($dnsUpstreamPool, $dnsClients);
+        $this->sut = new DnsUpstreamPoolResolver($dnsUpstreamPool, $dnsClients);
 
         try {
             $dnsResource = $this->sut->resolve($dnsQueryMessage);
@@ -105,7 +105,7 @@ class DohProxyTest extends TestCase
         // Assert that server receives DNS message
         $this->assertSame(DnsServerStub::RECEIVE_ACTION, $action['name']);
         $dnsMessage = $this->messageFactory->createMessageFromDnsWireMessage(
-            Base64UrlCodecHelper::decode($action['data']['message'])
+            UrlSafeBase64CodecHelper::decode($action['data']['message'])
         );
         $this->assertFalse(
             $dnsMessage->getHeader()->isQr(),

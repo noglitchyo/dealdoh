@@ -1,11 +1,7 @@
 # Dealdoh
-> A toy to deal DNS over HTTPS and more!
+> Play with DNS over HTTPS and much more!
 
-Dealdoh is a powerful DNS-over-HTTPS (DoH) proxy server written in PHP.
-
-It can be use as a DoH proxy server or a client.
-
-Dealdoh also attempts to provide a low-level abstraction layer for DNS messaging.
+Dealdoh is a DNS-over-HTTPS (DoH) proxy and a library around DNS messaging written in PHP.
 
 ![PHP from Packagist](https://img.shields.io/packagist/php-v/noglitchyo/dealdoh.svg)
 [![Build Status](https://travis-ci.org/noglitchyo/dealdoh.svg?branch=master)](https://travis-ci.org/noglitchyo/dealdoh)
@@ -13,135 +9,113 @@ Dealdoh also attempts to provide a low-level abstraction layer for DNS messaging
 ![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/noglitchyo/dealdoh.svg)
 ![Packagist](https://img.shields.io/packagist/l/noglitchyo/dealdoh.svg)
 
-## Description
+## Overview
 
-Dealdoh can be use in different manners and for different purposes. It attempts to achieve the following goals:
-- provide a DoH middleware PSR-15 compliant which can be use in any PHP application to act as a DNS proxy server.
-- provide a variety of DNS stub resolver.
-- provide a large panel of DNS clients.
-- provide a low-level abstraction layer for development around DNS.
+This library gives ability to proxy DoH requests and/or to send DNS queries with various modern DNS protocols: DNSCrypt, DoH, GoogleDNS...
 
-Dealdoh also comes with a [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) embedding the following features:
-- an application implementing Dealdoh middleware and ready to be run as a micro-service.
-- a DNS CLI client to make DNS queries, configure DNS upstreams, etc... 
+It attempts to achieve the following goals:
+- provide high-compatibility with a large variety of DNS protocols.
+- provide a well-designed abstraction layer for development around DNS in PHP.
 
 ## Features
 
-- [x] Provide a DoH proxy server which can be simply plug as a middleware on any PHP 7.3 application. Only require a web-server.
-- [x] Create and forward DNS messages in different format to different type of DNS upstream resolvers.
-- [x] Use a pool of DNS upstream resolvers to send queries with a fallback mechanism.
-- [x] Compatible with a variety of DNS protocols: RFC-1035 (TCP/UDP), RFC-8484 (DoH), Google DoH API.
-- [x] Provide a DNS low-level abstraction layer for DNS development. 
-- [x] Make DNS query from the command-line and provide results in JSON 
+- [x] DoH proxy middleware PSR-15/PSR-7 compliant.
+- [x] Create and forward DNS messages to different type of DNS upstream resolvers.
+- [x] Forward DNS query through multiple DNS upstream resolvers.
+- [x] Compatible with DNS protocols: RFC-1035 (Plain DNS over TCP/UDP), RFC-8484 (DoH), Google DoH API, DNSCrypt
+- [x] Abstraction layer around DNS development.
+- [x] Read [DNS stamps](https://dnscrypt.info/stamps-specifications)
 
-## Roadmap
+## Client
 
-- [ ] Improve robustness and compliance of current DNS clients
-- [ ] Ability to choose a DNS upstream fallback/selection strategy
-- [ ] Good documentation
+[dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) is a CLI utility which offers a ready-to-use implementation
+of this library to send and forward DNS queries.
 
-## Getting started
-
-If you wish to get started quickly, you might want to use [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/) 
-which offers a ready-to-use implementation.
+## Library
 
 #### Requirements
 
 - PHP 7.3
 - Web server
-- HTTPS enabled with valid certificates (self-signed certificates can work but it depends of the DOH client)
-
-To get trusted certificates in a local environment, I recommend you to use [mkcert](https://github.com/FiloSottile/mkcert) which generate for you a local Certificate Authority, and create locally trusted certificates with it. Take 3 minutes to check its really simple documentation for your OS. (since installation differs on each OS)
+- Optional: HTTPS enabled with valid certificates (self-signed certificates can work but it depends of the DOH client making the queries)
 
 #### Installation
 
-- Install Dealdoh as a dependency:
+- Run `composer require noglitchyo/dealdoh`
 
-`composer require noglitchyo/dealdoh`
-
-- You will need a PSR-7 ServerRequest if you wish to directly use the `DohProxy::forward()` method. 
-Please check those cool implementations below:
+- `DohResolverMiddleware::forward()` method consumes PSR-7 ServerRequest. 
+Some compatible implementations which can be used:
     * https://github.com/Nyholm/psr7 - `composer require nyholm/psr7`
     * https://github.com/guzzle/psr7 - `composer require guzzle/psr7`
     * https://github.com/zendframework/zend-diactoros - `composer require zendframework/zend-diactoros`
-
-- Configure your middleware/entrypoint to call Dealdoh's `DohProxy::forward()`
-
-As stated before, `DohProxy::forward()` method consumes PSR-7 ServerRequest to make the integration easier. 
-
-The example below illustrates how to use two DNS upstream resolvers which are using different protocols. 
-In this example, the used protocols are TCP/UDP (RFC-1035) and DoH (RFC-8484).
-Two types of DNS client who can handle each of the DNS protocols used by our upstreams are injected to handle those upstreams.
-
-```php
-<?php
-$dnsMessageFactory = new \NoGlitchYo\Dealdoh\Factory\Dns\MessageFactory();
-$dnsResolver = new \NoGlitchYo\Dealdoh\Service\DnsPoolResolver(
-    new \NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool([
-        'dns://8.8.8.8:53',
-        'https://cloudflare-dns.com/dns-query',
-    ]),
-    [
-        new \NoGlitchYo\Dealdoh\Client\DohClient(
-            new \Http\Adapter\Guzzle6\Client(new \GuzzleHttp\Client()),
-            $dnsMessageFactory
-        ),
-        new \NoGlitchYo\Dealdoh\Client\StdClient(
-            new \Socket\Raw\Factory(), 
-            $dnsMessageFactory
-        ),
-    ]
-);
-
-$dnsProxy = new \NoGlitchYo\Dealdoh\DohProxy(
-    $dnsResolver,
-    $dnsMessageFactory,
-    new \NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactory($dnsMessageFactory)
-);
-
-/** @var $response \Psr\Http\Message\ResponseInterface */
-$response = $dnsProxy->forward(/* Expect a \Psr\Http\Message\RequestInterface object */);
-```
+- Configure your application to call `DohResolverMiddleware::forward()`
 - Testing the installation
 
-First, be aware that usually, DoH client/server will send/receive DNS requests on the following path:
-`/dns-query` as recommended in RFC-8484. 
-Make sure your Dealdoh's entrypoint has been configured to listen on this route or configure your client accordingly if it is possible.
+As recommended in RFC-8484, usually, DoH client/server will send/receive DNS requests on the path: `/dns-query`. 
+Your application should be configured to listen on this route.
 
-A large variety of client already exists than you can easily find on Internet. 
-For testing purpose, I advise the one below:
+A large variety of DoH client exists than can be used to test the installation. 
 
-* Using [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/)
-
-* Using the doh-client from [Facebook Experimental](https://github.com/facebookexperimental/doh-proxy)
-
-To make it easier, I created a [Docker image](https://hub.docker.com/) that you can directly pull and run by running:
-
-`docker run --name dohfb -it noglitchyo/facebookexperimental-doh-proxy doh-client --domain <DEALDOH_ENTRYPOINT> --qname google.com --dnssec --insecure`
-
-*Replace the <DEALDOH_ENTRYPOINT> with the host of your entrypoint for Dealdoh.*
-
-(Tips: pass the --insecure option to doh-client if you are using self-signed certificates **#notDocumented**)
-
-Please, check [how to use the client](https://github.com/facebookexperimental/doh-proxy#doh-client).
-    
+* [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/)
+* [Facebook Experimental](https://github.com/facebookexperimental/doh-proxy)
+  
 * Using client from Web Browser  
-
 Mozilla Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted_Recursive_Resolver) who can be configured to query DoH servers.
 
-I advise you to read [this really good article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
-which will give you lot of details about this TRR and how to configure it like a pro. 
+[This article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
+provides a lot of details about TRR and how to configure it. 
+Please check also [the browser implementations list](https://github.com/curl/curl/wiki/DNS-over-HTTPS#supported-in-browsers-and-clients). 
 
-Please check [the browser implementations list](https://github.com/curl/curl/wiki/DNS-over-HTTPS#supported-in-browsers-and-clients). 
+#### Example
+```php
+<?php
+use GuzzleHttp\Client as GuzzleClient;
+use Http\Adapter\Guzzle6\Client as GuzzleClientAdapter;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsCryptClient;
+use NoGlitchYo\Dealdoh\Dns\Client\DohClient;
+use NoGlitchYo\Dealdoh\Dns\Client\PlainDnsClient;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsUpstreamPoolResolver;
+use NoGlitchYo\Dealdoh\Entity\DnsUpstreamPool;
+use NoGlitchYo\Dealdoh\Mapper\DnsCrypt\AuthenticatedEncryptionMapper;
+use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapper;
+use NoGlitchYo\Dealdoh\Mapper\MessageMapper;
+use NoGlitchYo\Dealdoh\Middleware\DohResolverMiddleware;
+use NoGlitchYo\Dealdoh\Repository\DnsCrypt\CertificateRepository;
+use Psr\Http\Message\ResponseInterface;
 
-#### Examples
+$messageMapper = new MessageMapper();
+
+// Initialize the DNS clients to use with the resolver
+$dnsClients = [
+    new DohClient(new GuzzleClientAdapter(new GuzzleClient()), $messageMapper),
+    new PlainDnsClient($messageMapper),
+    new DnsCryptClient(new AuthenticatedEncryptionMapper(), new CertificateRepository(), $messageMapper)
+];
+
+// Initialize the list of DNS upstreams to use to resolve the DNS queries
+$dnsUpstreamPool = new DnsUpstreamPool([
+    'dns://8.8.8.8:53',
+    'https://cloudflare-dns.com/dns-query',
+    'sdns://AQcAAAAAAAAAFlsyMDAxOmJjODoxODI0OjczODo6MV0gAyfzz5J-mV9G-yOB4Hwcdk7yX12EQs5Iva7kV3oGtlEgMi5kbnNjcnlwdC1jZXJ0LmFjc2Fjc2FyLWFtcy5jb20',
+]);
+
+// Initialize the DNS resolver with the list of upstreams and the list of clients able to exchange with the upstreams
+$dnsResolver = new DnsUpstreamPoolResolver($dnsUpstreamPool, $dnsClients);
+
+// Create the ResolverMiddleware with the created DnsResolver
+$dohMiddleware = new DohResolverMiddleware($dnsResolver, $messageMapper, new HttpResponseMapper($messageMapper));
+
+/** @var $response ResponseInterface */
+$response = $dohMiddleware->forward(/* Expect a \Psr\Http\Message\RequestInterface object */);
+```
+
+#### More examples
 
 Checkout some really simple integration examples to get a glimpse on how it can be done:
 
 - [Slim Framework integration](examples/slim-integration/README.md) 
 - [DoH + Docker + DNS + Hostname Discovery](examples/docker-firefox/README.md)
 - [dealdoh-client](https://github.com/noglitchyo/dealdoh-client/)
-
 
 ## Testing
 
@@ -157,22 +131,12 @@ Get started here [CONTRIBUTING.md](CONTRIBUTING.md).
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-## Why Dealdoh?
-
-Dealdoh was created for development purpose. I wanted to reach my Docker containers from the browser by their hostnames. 
-So I started to use a [Docker image who discover services and register their hostname into a DNS](https://github.com/mageddo/dns-proxy-server) exposed on port 53.
-But I encountered the following issues:
-- I could not change the /etc/hosts file
-- I could not change the DNS for my computer (restrictions issue)
- 
-I ended up with the following solution: use the DoH client from Firefox and proxy every DNS query to a DoH proxy: Dealdoh.
-
 ## Acknowledgments
 
-* https://github.com/reactphp/dns for their really good DNS wire format codec. 
-* https://github.com/mageddo/dns-proxy-server for its amazing container hostname discovery & DNS Docker image.
-Combined with Dealdoh it is amazing.
-* https://github.com/facebookexperimental/doh-proxy, because their doh-client rocks!
+* https://github.com/reactphp/dns 
+* https://github.com/mageddo/dns-proxy-server
+* https://github.com/facebookexperimental/doh-proxy
+* https://github.com/DNSCrypt/dnscrypt-proxy
 
 ## References
 
@@ -183,4 +147,6 @@ Combined with Dealdoh it is amazing.
 - [PSR-7](https://www.php-fig.org/psr/psr-7/)
 - [PSR-15](https://www.php-fig.org/psr/psr-15/)
 - [PSR-18](https://www.php-fig.org/psr/psr-18/)
+- [DNSCrypt](https://dnscrypt.info/protocol)
+- [DNS Stamps](https://dnscrypt.info/stamps-specifications)
 - [Wiki page DNS-over-HTTPS from Curl](https://github.com/curl/curl/wiki/DNS-over-HTTPS)

@@ -8,17 +8,17 @@ use Exception;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use NoGlitchYo\Dealdoh\Client\DnsClientInterface;
-use NoGlitchYo\Dealdoh\DohProxy;
-use NoGlitchYo\Dealdoh\Entity\Dns\Message;
-use NoGlitchYo\Dealdoh\Entity\Dns\MessageInterface;
+use NoGlitchYo\Dealdoh\Dns\Client\DnsClientInterface;
+use NoGlitchYo\Dealdoh\Dns\Resolver\DnsResolverInterface;
 use NoGlitchYo\Dealdoh\Entity\DnsResource;
 use NoGlitchYo\Dealdoh\Entity\DnsUpstream;
+use NoGlitchYo\Dealdoh\Entity\Message;
+use NoGlitchYo\Dealdoh\Entity\MessageInterface;
 use NoGlitchYo\Dealdoh\Exception\HttpProxyException;
-use NoGlitchYo\Dealdoh\Factory\Dns\MessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Factory\DohHttpMessageFactoryInterface;
-use NoGlitchYo\Dealdoh\Helper\Base64UrlCodecHelper;
-use NoGlitchYo\Dealdoh\Service\DnsResolverInterface;
+use NoGlitchYo\Dealdoh\Factory\MessageFactoryInterface;
+use NoGlitchYo\Dealdoh\Helper\UrlSafeBase64CodecHelper;
+use NoGlitchYo\Dealdoh\Mapper\HttpResponseMapperInterface;
+use NoGlitchYo\Dealdoh\Middleware\DohResolverMiddleware;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Stream;
@@ -26,7 +26,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @covers \NoGlitchYo\Dealdoh\DohProxy
+ * @covers \NoGlitchYo\Dealdoh\Middleware\DohResolverMiddleware
  */
 class DohProxyTest extends TestCase
 {
@@ -38,7 +38,7 @@ class DohProxyTest extends TestCase
     private $dnsResolverMock;
 
     /**
-     * @var MockInterface|MessageFactoryInterface
+     * @var MockInterface|\NoGlitchYo\Dealdoh\Factory\MessageFactoryInterface
      */
     private $dnsMessageFactoryMock;
 
@@ -48,12 +48,12 @@ class DohProxyTest extends TestCase
     private $loggerMock;
 
     /**
-     * @var DohProxy
+     * @var \NoGlitchYo\Dealdoh\Middleware\DohResolverMiddleware
      */
     private $sut;
 
     /**
-     * @var MockInterface|DohHttpMessageFactoryInterface
+     * @var MockInterface|\NoGlitchYo\Dealdoh\Mapper\HttpResponseMapperInterface
      */
     private $dohHttpMessageFactoryMock;
 
@@ -61,10 +61,10 @@ class DohProxyTest extends TestCase
     {
         $this->dnsResolverMock = Mockery::mock(DnsResolverInterface::class);
         $this->dnsMessageFactoryMock = Mockery::mock(MessageFactoryInterface::class);
-        $this->dohHttpMessageFactoryMock = Mockery::mock(DohHttpMessageFactoryInterface::class);
+        $this->dohHttpMessageFactoryMock = Mockery::mock(HttpResponseMapperInterface::class);
         $this->loggerMock = Mockery::mock(LoggerInterface::class);
 
-        $this->sut = new DohProxy(
+        $this->sut = new DohResolverMiddleware(
             $this->dnsResolverMock,
             $this->dnsMessageFactoryMock,
             $this->dohHttpMessageFactoryMock,
@@ -95,7 +95,7 @@ class DohProxyTest extends TestCase
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')
-            ->with(Base64UrlCodecHelper::decode($base64EncodedDnsRequest))
+            ->with(UrlSafeBase64CodecHelper::decode($base64EncodedDnsRequest))
             ->andReturn($dnsRequestMessage);
 
         $this->dnsResolverMock
@@ -253,7 +253,7 @@ class DohProxyTest extends TestCase
 
         $this->dnsMessageFactoryMock
             ->shouldReceive('createMessageFromDnsWireMessage')
-            ->with(Base64UrlCodecHelper::decode($base64EncodedDnsRequest))
+            ->with(UrlSafeBase64CodecHelper::decode($base64EncodedDnsRequest))
             ->andReturn($dnsRequestMessage);
 
         $exception = new Exception('Resolve failed');
