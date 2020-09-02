@@ -61,7 +61,6 @@ A large variety of DoH client exists than can be used to test the installation.
   
 * Using client from Web Browser  
 Mozilla Firefox provides a [Trusted Recursive Resolver](https://wiki.mozilla.org/Trusted_Recursive_Resolver) who can be configured to query DoH servers.
-
 [This article from Daniel Stenberg](https://daniel.haxx.se/blog/2018/06/03/inside-firefoxs-doh-engine/) 
 provides a lot of details about TRR and how to configure it. 
 Please check also [the browser implementations list](https://github.com/curl/curl/wiki/DNS-over-HTTPS#supported-in-browsers-and-clients). 
