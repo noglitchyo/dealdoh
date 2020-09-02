@@ -24,7 +24,7 @@ It attempts to achieve the following goals:
 - [x] Forward DNS query through multiple DNS upstream resolvers.
 - [x] Compatible with DNS protocols: RFC-1035 (Plain DNS over TCP/UDP), RFC-8484 (DoH), Google DoH API, DNSCrypt
 - [x] Abstraction layer around DNS development.
-- [x] Read [DNS stamps](https://dnscrypt.info/stamps-specifications)
+- [x] Parse [DNS stamps](https://dnscrypt.info/stamps-specifications)
 
 ## Client
 
