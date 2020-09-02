@@ -11,7 +11,7 @@ Dealdoh is a DNS-over-HTTPS (DoH) proxy and a library around DNS messaging writt
 
 ## Overview
 
-This library gives ability to proxy DoH requests and/or to send DNS queries with various modern DNS protocols: DNSCrypt, DoH, GoogleDNS...
+This library gives ability to proxy DoH requests and/or to send DNS queries with standard UDP/TCP and various modern and secure DNS protocols like DNSCrypt, DNS-over-HTTPS (DoH), GoogleDNS.
 
 It attempts to achieve the following goals:
 - provide high-compatibility with a large variety of DNS protocols.
